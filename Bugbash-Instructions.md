@@ -191,7 +191,7 @@ Generate a dataset and a rubric evaluator, then declare an eval over them.
 
 ```bash
 azd ai eval generate --from agent --target support-agent --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
-azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --target support-agent --judge-model gpt-4.1-nano
+azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --target support-agent --judge-model gpt-4.1-nano --evaluator builtin.task_adherence --evaluator support-agent-quality
 azd ai eval create
 azd ai eval run start --eval support-agent-regression-eval
 ```
@@ -204,6 +204,12 @@ required`: that shape sends only a traces source, carrying neither a prompt nor
 an agent name. `--from agent` seeds from the agent's instructions and works.
 You will see a warning that agent-seeded generation failed and it is retrying
 from the instruction alone — that is expected and it succeeds.
+
+The two `--evaluator` flags are needed. Without them `init` plans a *second*
+rubric named `<target>-quality`, writes it into the config, and never generates
+it — so `azd ai eval create` fails with
+`The evaluator support-agent-quality was not found`. Passing `--evaluator`
+opts out of that and names the evaluator `generate` actually produced.
 Then inspect one sample (take an item id from the run output):
 
 ```bash
