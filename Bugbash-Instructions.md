@@ -42,10 +42,12 @@ is granted through the **Evaluation Service Team** group (`raisvcteam@microsoft.
 so if you are on the team you already have it.
 
 **You need an azd project.** The scenarios run from the root of one, because the
-eval service is added to its `azure.yaml`. If you do not have one:
+eval service is added to its `azure.yaml`. If you do not have one, run these two
+lines in any shell:
 
-```bash
-mkdir azd-eval-bugbash && cd azd-eval-bugbash
+```
+mkdir azd-eval-bugbash
+cd azd-eval-bugbash
 azd init
 ```
 
@@ -68,13 +70,27 @@ azd extension list --installed
 running a lot of commands, and the endpoint is long enough that retyping it per
 command invites a typo into the wrong project.
 
-```bash
-export FOUNDRY_PROJECT_ENDPOINT=https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
-```
+Pick the line for the shell you are in:
+
+**PowerShell** (Windows default, and `pwsh` on macOS/Linux)
 
 ```powershell
 $env:FOUNDRY_PROJECT_ENDPOINT="https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral"
 ```
+
+**Command Prompt** (`cmd.exe` on Windows) — no quotes, no spaces around `=`
+
+```bat
+set FOUNDRY_PROJECT_ENDPOINT=https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
+```
+
+**bash / zsh** (macOS, Linux, WSL, Git Bash)
+
+```bash
+export FOUNDRY_PROJECT_ENDPOINT=https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
+```
+
+Check it took: `azd ai dataset list -o json` should print `[` and exit 0.
 
 Every command also takes `--project-endpoint <url>`, which wins over the
 environment. Use it only to aim a single command somewhere else.
@@ -241,9 +257,9 @@ commands. Anything you invent beyond this list is fair game and welcome.
 
 **Empty and missing state**
 - Every `list` command in a brand-new, empty project
-- Commands with no Foundry endpoint configured at all (unset
-  `FOUNDRY_PROJECT_ENDPOINT` first — `unset` in bash,
-  `Remove-Item Env:\FOUNDRY_PROJECT_ENDPOINT` in PowerShell)
+- Commands with no Foundry endpoint configured at all (clear it first:
+  `Remove-Item Env:\FOUNDRY_PROJECT_ENDPOINT` in PowerShell,
+  `set FOUNDRY_PROJECT_ENDPOINT=` in cmd, `unset FOUNDRY_PROJECT_ENDPOINT` in bash)
 - Commands with no active `azd` environment
 - An eval config file that does not exist, and one that is completely empty
 
