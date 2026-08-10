@@ -190,15 +190,20 @@ scenarios use. Tracked as
 Generate a dataset and a rubric evaluator, then declare an eval over them.
 
 ```bash
-azd ai eval generate --from traces --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
-azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --judge-model gpt-4.1-nano
+azd ai eval generate --from agent --target support-agent --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
+azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --target support-agent --judge-model gpt-4.1-nano
 azd ai eval create
 azd ai eval run start --eval support-agent-regression-eval
 ```
 
 `--generation-model` is **required** â€” it names the deployment that writes the
 samples and the rubric. `gpt-4.1-nano` exists in the shared project.
-
+`--from agent`, not `--from traces`. Dataset generation from `--from traces`
+is rejected by the service with `Atleast Prompt or prompt agent_name is
+required`: that shape sends only a traces source, carrying neither a prompt nor
+an agent name. `--from agent` seeds from the agent's instructions and works.
+You will see a warning that agent-seeded generation failed and it is retrying
+from the instruction alone — that is expected and it succeeds.
 Then inspect one sample (take an item id from the run output):
 
 ```bash
