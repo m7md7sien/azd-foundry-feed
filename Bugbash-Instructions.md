@@ -152,11 +152,21 @@ You have been chatting with an agent and want a first signal, with no dataset
 prepared. This evaluates the traces the agent already produced.
 
 ```bash
-azd ai eval init --source traces --target support-agent
+azd ai eval init --source traces --target support-agent --judge-model gpt-4.1-nano
 azd deploy
 azd ai eval run start --eval support-agent-trace-eval
 azd ai eval run output list --eval support-agent-trace-eval
 ```
+
+`--judge-model` is documented as optional ("detected from the project when
+omitted"), but detection currently leaves the built-in graders without a
+`deployment_name` and the deploy then fails with:
+
+```
+evaluator "builtin.task_adherence" requires "deployment_name"
+```
+
+So pass it explicitly. Already reported — please don't re-file.
 
 **Note on `azd up` vs `azd deploy`.** The spec's scenarios say `azd up`, which
 is provision **plus** deploy. A scratch project created with `azd init` has no
@@ -180,7 +190,7 @@ Generate a dataset and a rubric evaluator, then declare an eval over them.
 
 ```bash
 azd ai eval generate --from traces --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
-azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression
+azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --judge-model gpt-4.1-nano
 azd deploy
 azd ai eval run start --eval support-agent-regression-eval
 ```
@@ -262,11 +272,14 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
 
 **Known rough edges — already reported, please don't re-file**
 
+- `WARNING: 1 extension did not start.` It is **`azure.ai.agents`**, and it is
+  not one of the two extensions under test. It and `azure.ai.projects` both try
+  to register the `microsoft.foundry` provisioning provider; the second one
+  loses with `AlreadyExists`. Harmless for eval work.
 - `azd up` prompts for a subscription and location even though eval resources are
-  data-plane only. Pick anything; or use `azd deploy`, which does not ask.
-- `azd deploy` may print `WARNING: 1 extension did not start.` It does not stop
-  the eval work. If you see it, re-run with `--debug` and tell us which
-  extension it names — that detail is what we are missing.
+  data-plane only. Use `azd deploy`, which does not ask.
+- `--judge-model` and `--generation-model` are both effectively required despite
+  reading as optional (see Scenarios 1 and 2).
 - `--fail-on` is documented to exit **2**, but `azd` collapses every extension
   failure to exit **1**. Non-zero vs zero is still correct.
 
