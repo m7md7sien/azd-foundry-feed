@@ -153,24 +153,40 @@ prepared. This evaluates the traces the agent already produced.
 
 ```bash
 azd ai eval init --source traces --target support-agent
-azd up
+azd deploy
 azd ai eval run start --eval support-agent-trace-eval
 azd ai eval run output list --eval support-agent-trace-eval
 ```
 
+**Note on `azd up` vs `azd deploy`.** The spec's scenarios say `azd up`, which
+is provision **plus** deploy. A scratch project created with `azd init` has no
+`infra/` folder, so `azd up` fails with:
+
+```
+failed to compile bicep template: ... Could not find a part of the path '...\infra\main.bicep'
+```
+
+Eval resources are data-plane only — there is nothing to provision — so use
+`azd deploy`. If you are working in a real agent project that already has
+`infra/`, `azd up` is fine. Everywhere below that says `azd deploy`, `azd up`
+works too in that case.
+
 **Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
-`azd up` reconciles it. The run prints a summary with a row per evaluator.
+`azd deploy` reconciles it. The run prints a summary with a row per evaluator.
 
 ### Scenario 2 — Turning that signal into a repeatable baseline
 
 Generate a dataset and a rubric evaluator, then declare an eval over them.
 
 ```bash
-azd ai eval generate --from traces --dataset-name support-agent-regression --evaluator-name support-agent-quality
+azd ai eval generate --from traces --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
 azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression
-azd up
+azd deploy
 azd ai eval run start --eval support-agent-regression-eval
 ```
+
+`--generation-model` is **required** — it names the deployment that writes the
+samples and the rubric. `gpt-4.1-nano` exists in the shared project.
 
 Then inspect one sample (take an item id from the run output):
 
@@ -179,14 +195,14 @@ azd ai eval run output show <item-id> --eval support-agent-regression-eval
 ```
 
 **Expect:** `generate` submits two jobs, downloads both artifacts, and adds them
-to `evals/azure.eval.yaml`. A second `azd up` with no edits must publish
+to `evals/azure.eval.yaml`. A second `azd deploy` with no edits must publish
 **nothing** — every line should say `(unchanged)`.
 
 ### Scenario 3 — Inner loop: change the agent, re-evaluate
 
 ```bash
 # ...edit the agent's instructions, then:
-azd up
+azd deploy
 azd ai eval run start --eval support-agent-regression-eval
 azd ai eval run list --eval support-agent-regression-eval
 ```
@@ -198,12 +214,12 @@ comparable. Editing one eval must not disturb another in the same file.
 
 ```bash
 # ...edit evals/evaluators/support-agent-quality.json, then:
-azd up
+azd deploy
 azd ai eval evaluator versions list support-agent-quality
-azd up
+azd deploy
 ```
 
-**Expect (important):** the evaluator gains a new version, and `azd up` must
+**Expect (important):** the evaluator gains a new version, and `azd deploy` must
 report the eval as `Skipped ... (unchanged)`. The eval keeps its id, so runs
 from before and after the rubric edit remain comparable. **If the eval is
 recreated here, that is a bug** — unless you also edited the eval's own entry in
@@ -214,8 +230,8 @@ create a new eval. Editing the rubric the evaluator points at is not.
 ### Scenario 5 — Automation and CI/CD
 
 This one needs a gate eval. Declare it by adding a second eval to
-`evals/azure.eval.yaml` named `support-agent-gate` and running `azd up`, or just
-substitute `support-agent-regression-eval` below.
+`evals/azure.eval.yaml` named `support-agent-gate` and running `azd deploy`, or
+just substitute `support-agent-regression-eval` below.
 
 ```bash
 azd ai eval run start --eval support-agent-gate --fail-on pass-rate=0.8
@@ -244,9 +260,15 @@ Export results for a build artifact:
 azd ai eval run output export <run-id> --eval support-agent-gate --format csv --output-file results.csv
 ```
 
-**Known limitation, not a bug:** `--fail-on` is documented to exit **2**, but
-`azd` currently collapses every extension failure to exit **1**. Non-zero vs
-zero is still correct — only the specific code is wrong. Please do not file it.
+**Known rough edges — already reported, please don't re-file**
+
+- `azd up` prompts for a subscription and location even though eval resources are
+  data-plane only. Pick anything; or use `azd deploy`, which does not ask.
+- `azd deploy` may print `WARNING: 1 extension did not start.` It does not stop
+  the eval work. If you see it, re-run with `--debug` and tell us which
+  extension it names — that detail is what we are missing.
+- `--fail-on` is documented to exit **2**, but `azd` collapses every extension
+  failure to exit **1**. Non-zero vs zero is still correct.
 
 ---
 
