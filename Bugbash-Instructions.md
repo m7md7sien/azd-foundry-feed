@@ -42,14 +42,18 @@ is granted through the **Evaluation Service Team** group (`raisvcteam@microsoft.
 so if you are on the team you already have it.
 
 **You need an azd project.** The scenarios run from the root of one, because the
-eval service is added to its `azure.yaml`. If you do not have one, run these two
-lines in any shell:
+eval service is added to its `azure.yaml`. If you do not have one, run these
+three lines in any shell:
 
 ```
 mkdir azd-eval-bugbash
 cd azd-eval-bugbash
-azd init
+azd init --minimal --no-prompt -e bugbash
 ```
+
+`--minimal --no-prompt` matters. Plain `azd init` asks how to initialise the
+app, then asks for a project name; even `azd init --minimal` still asks for the
+name. Both forms hang a script or an agent that cannot answer.
 
 **Install from the feed**
 
