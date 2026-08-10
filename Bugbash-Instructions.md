@@ -57,25 +57,20 @@ Confirm both resolve to the `foundry-bugbash` source, not a local build:
 azd extension list --installed
 ```
 
-**Point at the shared project** (any one of these; the extensions resolve in this order):
-
-```
-https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
-```
+**Point at the shared project.** Set it once for the session — you will be
+running a lot of commands, and the endpoint is long enough that retyping it per
+command invites a typo into the wrong project.
 
 ```bash
-# 1. flag, per command
---project-endpoint https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
-
-# 2. shell environment
 export FOUNDRY_PROJECT_ENDPOINT=https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
 ```
-
-On Windows PowerShell:
 
 ```powershell
 $env:FOUNDRY_PROJECT_ENDPOINT="https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral"
 ```
+
+Every command also takes `--project-endpoint <url>`, which wins over the
+environment. Use it only to aim a single command somewhere else.
 
 **What is already there**
 
@@ -231,7 +226,9 @@ commands. Anything you invent beyond this list is fair game and welcome.
 
 **Empty and missing state**
 - Every `list` command in a brand-new, empty project
-- Commands with no Foundry endpoint configured at all
+- Commands with no Foundry endpoint configured at all (unset
+  `FOUNDRY_PROJECT_ENDPOINT` first — `unset` in bash,
+  `Remove-Item Env:\FOUNDRY_PROJECT_ENDPOINT` in PowerShell)
 - Commands with no active `azd` environment
 - An eval config file that does not exist, and one that is completely empty
 
