@@ -157,7 +157,7 @@ prepared. This evaluates the traces the agent already produced.
 
 ```bash
 azd ai eval init --source traces --target support-agent --judge-model gpt-4.1-nano
-azd deploy
+azd ai eval create
 azd ai eval run start --eval support-agent-trace-eval
 azd ai eval run output list --eval support-agent-trace-eval
 ```
@@ -174,21 +174,16 @@ So pass it explicitly. Tracked as
 [Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012) â€”
 please don't re-file.
 
-**Note on `azd up` vs `azd deploy`.** The spec's scenarios say `azd up`, which
-is provision **plus** deploy. A scratch project created with `azd init` has no
-`infra/` folder, so `azd up` fails with:
-
-```
-failed to compile bicep template: ... Could not find a part of the path '...\infra\main.bicep'
-```
-
-Eval resources are data-plane only â€” there is nothing to provision â€” so use
-`azd deploy`. If you are working in a real agent project that already has
-`infra/`, `azd up` is fine. Everywhere below that says `azd deploy`, `azd up`
-works too in that case.
-
+**Why not `azd up`?** The spec's scenarios say `azd up`, and the extension's own
+"Next:" hint says the same, but neither `azd up` nor `azd deploy` works in a
+project scaffolded by `azd init --minimal`: `azd up` fails compiling a bicep
+template that does not exist, and `azd deploy` fails with "infrastructure has
+not been provisioned". Eval resources are data-plane only, so there is nothing to
+provision. `azd ai eval create` reconciles the config directly and is what these
+scenarios use. Tracked as
+[Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012).
 **Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
-`azd deploy` reconciles it. The run prints a summary with a row per evaluator.
+`azd ai eval create` reconciles it. The run prints a summary with a row per evaluator.
 
 ### Scenario 2 â€” Turning that signal into a repeatable baseline
 
@@ -197,7 +192,7 @@ Generate a dataset and a rubric evaluator, then declare an eval over them.
 ```bash
 azd ai eval generate --from traces --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
 azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --judge-model gpt-4.1-nano
-azd deploy
+azd ai eval create
 azd ai eval run start --eval support-agent-regression-eval
 ```
 
@@ -218,7 +213,7 @@ to `evals/azure.eval.yaml`. A second `azd ai eval create` with no edits must pub
 
 ```bash
 # ...edit the agent's instructions, then:
-azd deploy
+azd ai eval create
 azd ai eval run start --eval support-agent-regression-eval
 azd ai eval run list --eval support-agent-regression-eval
 ```
@@ -230,12 +225,12 @@ comparable. Editing one eval must not disturb another in the same file.
 
 ```bash
 # ...edit evals/evaluators/support-agent-quality.json, then:
-azd deploy
+azd ai eval create
 azd ai eval evaluator versions list support-agent-quality
-azd deploy
+azd ai eval create
 ```
 
-**Expect (important):** the evaluator gains a new version, and `azd deploy` must
+**Expect (important):** the evaluator gains a new version, and `azd ai eval create` must
 report the eval as unchanged. The eval keeps its id, so runs
 from before and after the rubric edit remain comparable. **If the eval is
 recreated here, that is a bug** â€” unless you also edited the eval's own entry in
@@ -332,8 +327,8 @@ commands. Anything you invent beyond this list is fair game and welcome.
 - Terminals at narrow widths
 
 **Concurrency and interruption**
-- Ctrl-C in the middle of `azd up` and of a run, then re-run the same command
-- Two `azd up` runs at once against the same project
+- Ctrl-C in the middle of `azd ai eval create` and of a run, then re-run the same command
+- Two `azd ai eval create` runs at once against the same project
 - `--no-wait`, then cancel the run, then ask for its output
 
 **Cross-extension consistency**
