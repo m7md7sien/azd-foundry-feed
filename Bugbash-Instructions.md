@@ -64,10 +64,23 @@ azd extension install azure.ai.evaluations
 azd extension install azure.ai.dataset
 ```
 
-Confirm both resolve to the `foundry-bugbash` source, not a local build:
+Each extension is about 15 MB and the feed is a GitHub release, so the progress
+bar can sit still for several minutes on the first install. That is expected.
+Let it finish rather than interrupting it.
+
+Confirm both resolve to the `foundry-bugbash` source, not a local build, and
+that you are on **1.0.0-beta.2** of `azure.ai.evaluations`:
 
 ```bash
 azd extension list --installed
+```
+
+**If you installed before and are on beta.1, upgrade** - beta.2 fixes
+`azd ai eval show <name>` and makes `azd ai eval create` actually publish the
+dataset and evaluator it references, which Scenario 4 depends on:
+
+```bash
+azd extension upgrade azure.ai.evaluations
 ```
 
 **Point at the shared project.** Set it once for the session â€” you will be
