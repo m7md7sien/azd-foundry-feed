@@ -103,9 +103,14 @@ The hero scenarios in section 3 and the list in section 4 are **examples, not a
 script**. Work through them to get oriented, then go wherever you like — the
 most useful findings usually come from something nobody thought to write down.
 
-**File every finding as a bug in Azure DevOps** — not as a PR comment:
+**File every finding as a bug in Azure DevOps** — not as a PR comment.
 
-> **https://msdata.visualstudio.com/Vienna** → area path `Vienna\Observability\Evaluation`
+> **Bug template (start here): https://aka.ms/evalsbug**
+>
+> It opens a pre-filled work item in
+> [msdata.visualstudio.com/Vienna](https://msdata.visualstudio.com/Vienna)
+> under area path `Vienna\Observability\Evaluation`. Sign in with your
+> Microsoft account if prompted.
 
 Include:
 
