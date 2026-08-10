@@ -211,7 +211,7 @@ azd ai eval run output show <item-id> --eval support-agent-regression-eval
 ```
 
 **Expect:** `generate` submits two jobs, downloads both artifacts, and adds them
-to `evals/azure.eval.yaml`. A second `azd deploy` with no edits must publish
+to `evals/azure.eval.yaml`. A second `azd ai eval create` with no edits must publish
 **nothing** â€” every line should say `(unchanged)`.
 
 ### Scenario 3 â€” Inner loop: change the agent, re-evaluate
@@ -236,7 +236,7 @@ azd deploy
 ```
 
 **Expect (important):** the evaluator gains a new version, and `azd deploy` must
-report the eval as `Skipped ... (unchanged)`. The eval keeps its id, so runs
+report the eval as unchanged. The eval keeps its id, so runs
 from before and after the rubric edit remain comparable. **If the eval is
 recreated here, that is a bug** â€” unless you also edited the eval's own entry in
 `evals/azure.eval.yaml`. Changing what the eval *declares* (its evaluator list,
@@ -246,7 +246,7 @@ create a new eval. Editing the rubric the evaluator points at is not.
 ### Scenario 5 â€” Automation and CI/CD
 
 This one needs a gate eval. Declare it by adding a second eval to
-`evals/azure.eval.yaml` named `support-agent-gate` and running `azd deploy`, or
+`evals/azure.eval.yaml` named `support-agent-gate` and running `azd ai eval create`, or
 just substitute `support-agent-regression-eval` below.
 
 ```bash
@@ -282,8 +282,14 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
   not one of the two extensions under test. It and `azure.ai.projects` both try
   to register the `microsoft.foundry` provisioning provider; the second one
   loses with `AlreadyExists`. Harmless for eval work.
-- `azd up` prompts for a subscription and location even though eval resources are
-  data-plane only. Use `azd deploy`, which does not ask.
+- `azd up` needs `infra/main.bicep` and `azd deploy` needs provisioned
+  infrastructure, so neither works in a scratch project. Use
+  `azd ai eval create`. Verified end to end on 2026-08-11.
+- `azd init` and `azd init --minimal` both prompt. Use
+  `azd init --minimal --no-prompt -e <name>`.
+- Token acquisition fails intermittently with
+  `AzureDeveloperCLICredential: exit status 1` while `azd` reports a valid
+  login. Retry the command; it usually succeeds on the next attempt.
 - `--judge-model` and `--generation-model` are both effectively required despite
   reading as optional (Bug 5511012). See Scenarios 1 and 2.
 - `--fail-on` is documented to exit **2**, but `azd` collapses every extension
