@@ -1,7 +1,7 @@
-# Bugbash Instructions: `azd ai eval` and `azd ai dataset`
+﻿# Bugbash Instructions: `azd ai eval` and `azd ai dataset`
 
 Two prerelease `azd` extensions for Foundry evaluations. Everything below runs
-against a **real Foundry project** — these commands create datasets, evaluators,
+against a **real Foundry project** â€” these commands create datasets, evaluators,
 evals and runs in it, and cost real model calls.
 
 | Extension | Namespace | PR |
@@ -37,7 +37,7 @@ azd auth login
 az account show --query "{name:name, id:id}" -o table
 ```
 
-You also need access to the shared bug-bash Foundry project — see below. Access
+You also need access to the shared bug-bash Foundry project â€” see below. Access
 is granted through the **Evaluation Service Team** group (`raisvcteam@microsoft.com`),
 so if you are on the team you already have it.
 
@@ -66,7 +66,7 @@ Confirm both resolve to the `foundry-bugbash` source, not a local build:
 azd extension list --installed
 ```
 
-**Point at the shared project.** Set it once for the session — you will be
+**Point at the shared project.** Set it once for the session â€” you will be
 running a lot of commands, and the endpoint is long enough that retyping it per
 command invites a typo into the wrong project.
 
@@ -78,7 +78,7 @@ Pick the line for the shell you are in:
 $env:FOUNDRY_PROJECT_ENDPOINT="https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral"
 ```
 
-**Command Prompt** (`cmd.exe` on Windows) — no quotes, no spaces around `=`
+**Command Prompt** (`cmd.exe` on Windows) â€” no quotes, no spaces around `=`
 
 ```bat
 set FOUNDRY_PROJECT_ENDPOINT=https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
@@ -106,7 +106,7 @@ environment. Use it only to aim a single command somewhere else.
 The project is shared and already holds other people's work. Prefix anything you
 create with your alias so it is easy to tell apart and clean up.
 
-**Smoke test** — this must print `[` and exit 0 even in an empty project:
+**Smoke test** â€” this must print `[` and exit 0 even in an empty project:
 
 ```bash
 azd ai dataset list -o json
@@ -118,10 +118,10 @@ azd ai eval list -o json
 ## 2. How to test
 
 The hero scenarios in section 3 and the list in section 4 are **examples, not a
-script**. Work through them to get oriented, then go wherever you like — the
+script**. Work through them to get oriented, then go wherever you like â€” the
 most useful findings usually come from something nobody thought to write down.
 
-**File every finding as a bug in Azure DevOps** — not as a PR comment.
+**File every finding as a bug in Azure DevOps** â€” not as a PR comment.
 
 > **Bug template (start here): https://aka.ms/evalsbug**
 >
@@ -140,13 +140,13 @@ Include:
 
 ## 3. Hero scenarios
 
-These follow the spec's own sequence, so run them **in order** — later ones use
+These follow the spec's own sequence, so run them **in order** â€” later ones use
 artifacts earlier ones create. `support-agent` already exists in the shared
 project. Where a model is asked for, use `gpt-4.1-nano`.
 
 Commands are shown one per line so they paste into PowerShell and bash alike.
 
-### Scenario 1 — First evaluation of an agent after manual testing
+### Scenario 1 â€” First evaluation of an agent after manual testing
 
 You have been chatting with an agent and want a first signal, with no dataset
 prepared. This evaluates the traces the agent already produced.
@@ -166,7 +166,9 @@ omitted"), but detection currently leaves the built-in graders without a
 evaluator "builtin.task_adherence" requires "deployment_name"
 ```
 
-So pass it explicitly. Already reported — please don't re-file.
+So pass it explicitly. Tracked as
+[Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012) â€”
+please don't re-file.
 
 **Note on `azd up` vs `azd deploy`.** The spec's scenarios say `azd up`, which
 is provision **plus** deploy. A scratch project created with `azd init` has no
@@ -176,7 +178,7 @@ is provision **plus** deploy. A scratch project created with `azd init` has no
 failed to compile bicep template: ... Could not find a part of the path '...\infra\main.bicep'
 ```
 
-Eval resources are data-plane only — there is nothing to provision — so use
+Eval resources are data-plane only â€” there is nothing to provision â€” so use
 `azd deploy`. If you are working in a real agent project that already has
 `infra/`, `azd up` is fine. Everywhere below that says `azd deploy`, `azd up`
 works too in that case.
@@ -184,7 +186,7 @@ works too in that case.
 **Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
 `azd deploy` reconciles it. The run prints a summary with a row per evaluator.
 
-### Scenario 2 — Turning that signal into a repeatable baseline
+### Scenario 2 â€” Turning that signal into a repeatable baseline
 
 Generate a dataset and a rubric evaluator, then declare an eval over them.
 
@@ -195,7 +197,7 @@ azd deploy
 azd ai eval run start --eval support-agent-regression-eval
 ```
 
-`--generation-model` is **required** — it names the deployment that writes the
+`--generation-model` is **required** â€” it names the deployment that writes the
 samples and the rubric. `gpt-4.1-nano` exists in the shared project.
 
 Then inspect one sample (take an item id from the run output):
@@ -206,9 +208,9 @@ azd ai eval run output show <item-id> --eval support-agent-regression-eval
 
 **Expect:** `generate` submits two jobs, downloads both artifacts, and adds them
 to `evals/azure.eval.yaml`. A second `azd deploy` with no edits must publish
-**nothing** — every line should say `(unchanged)`.
+**nothing** â€” every line should say `(unchanged)`.
 
-### Scenario 3 — Inner loop: change the agent, re-evaluate
+### Scenario 3 â€” Inner loop: change the agent, re-evaluate
 
 ```bash
 # ...edit the agent's instructions, then:
@@ -220,7 +222,7 @@ azd ai eval run list --eval support-agent-regression-eval
 **Expect:** the eval keeps its identity across runs so the history is
 comparable. Editing one eval must not disturb another in the same file.
 
-### Scenario 4 — Tuning the evaluation itself
+### Scenario 4 â€” Tuning the evaluation itself
 
 ```bash
 # ...edit evals/evaluators/support-agent-quality.json, then:
@@ -232,12 +234,12 @@ azd deploy
 **Expect (important):** the evaluator gains a new version, and `azd deploy` must
 report the eval as `Skipped ... (unchanged)`. The eval keeps its id, so runs
 from before and after the rubric edit remain comparable. **If the eval is
-recreated here, that is a bug** — unless you also edited the eval's own entry in
+recreated here, that is a bug** â€” unless you also edited the eval's own entry in
 `evals/azure.eval.yaml`. Changing what the eval *declares* (its evaluator list,
 dataset, target, level, or adding or removing a `version:` pin) is supposed to
 create a new eval. Editing the rubric the evaluator points at is not.
 
-### Scenario 5 — Automation and CI/CD
+### Scenario 5 â€” Automation and CI/CD
 
 This one needs a gate eval. Declare it by adding a second eval to
 `evals/azure.eval.yaml` named `support-agent-gate` and running `azd deploy`, or
@@ -270,7 +272,7 @@ Export results for a build artifact:
 azd ai eval run output export <run-id> --eval support-agent-gate --format csv --output-file results.csv
 ```
 
-**Known rough edges — already reported, please don't re-file**
+**Known rough edges â€” already reported, please don't re-file**
 
 - `WARNING: 1 extension did not start.` It is **`azure.ai.agents`**, and it is
   not one of the two extensions under test. It and `azure.ai.projects` both try
@@ -279,7 +281,7 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
 - `azd up` prompts for a subscription and location even though eval resources are
   data-plane only. Use `azd deploy`, which does not ask.
 - `--judge-model` and `--generation-model` are both effectively required despite
-  reading as optional (see Scenarios 1 and 2).
+  reading as optional (Bug 5511012). See Scenarios 1 and 2.
 - `--fail-on` is documented to exit **2**, but `azd` collapses every extension
   failure to exit **1**. Non-zero vs zero is still correct.
 
@@ -287,7 +289,7 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
 
 ## 4. Other scenarios worth trying
 
-Again — examples, not a checklist. Short descriptions only, so you improvise the
+Again â€” examples, not a checklist. Short descriptions only, so you improvise the
 commands. Anything you invent beyond this list is fair game and welcome.
 
 **Empty and missing state**
@@ -325,8 +327,8 @@ commands. Anything you invent beyond this list is fair game and welcome.
 - `--no-wait`, then cancel the run, then ask for its output
 
 **Cross-extension consistency**
-- The same concept through both extensions — for example
-  `azd ai dataset list` vs `azd ai eval dataset list` — and any command that
+- The same concept through both extensions â€” for example
+  `azd ai dataset list` vs `azd ai eval dataset list` â€” and any command that
   exists in both. They should answer the same way, including exit codes.
 
 ---
@@ -344,15 +346,15 @@ commands. Anything you invent beyond this list is fair game and welcome.
 | `show` | Show an eval definition. |
 | `delete` | Delete an eval and everything under it. |
 
-**`azd ai eval dataset`** — `create`, `update`, `list`, `show`, `delete`, `versions list`
+**`azd ai eval dataset`** â€” `create`, `update`, `list`, `show`, `delete`, `versions list`
 
-**`azd ai eval evaluator`** — `create`, `update`, `list`, `show`, `delete`, `versions list`
+**`azd ai eval evaluator`** â€” `create`, `update`, `list`, `show`, `delete`, `versions list`
 
-**`azd ai eval run`** — `start`, `show`, `list`, `cancel`, `delete`, `output`
+**`azd ai eval run`** â€” `start`, `show`, `list`, `cancel`, `delete`, `output`
 
-**`azd ai eval run output`** — inspect per-sample results (`list`, `show`, `export`)
+**`azd ai eval run output`** â€” inspect per-sample results (`list`, `show`, `export`)
 
-**`azd ai eval job`** — `list`, `show`, `cancel`, `delete` (generation jobs)
+**`azd ai eval job`** â€” `list`, `show`, `cancel`, `delete` (generation jobs)
 
 ### `azd ai dataset`
 
