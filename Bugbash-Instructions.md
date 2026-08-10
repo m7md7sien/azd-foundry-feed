@@ -41,11 +41,18 @@ You also need access to the shared bug-bash Foundry project — see below. Acces
 is granted through the **Evaluation Service Team** group (`raisvcteam@microsoft.com`),
 so if you are on the team you already have it.
 
+**You need an azd project.** The scenarios run from the root of one, because the
+eval service is added to its `azure.yaml`. If you do not have one:
+
+```bash
+mkdir azd-eval-bugbash && cd azd-eval-bugbash
+azd init
+```
+
 **Install from the feed**
 
 ```bash
-azd extension source add -n foundry-bugbash -t url \
-  -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-10/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-10/registry.json
 
 azd extension install azure.ai.evaluations
 azd extension install azure.ai.dataset
@@ -117,48 +124,47 @@ Include:
 
 ## 3. Hero scenarios
 
-`support-agent` already exists in the shared project and is what these use. The
-model to pass where one is asked for is `gpt-4.1-nano`.
+These follow the spec's own sequence, so run them **in order** — later ones use
+artifacts earlier ones create. `support-agent` already exists in the shared
+project. Where a model is asked for, use `gpt-4.1-nano`.
+
+Commands are shown one per line so they paste into PowerShell and bash alike.
 
 ### Scenario 1 — First evaluation of an agent after manual testing
 
 You have been chatting with an agent and want a first signal, with no dataset
-prepared.
+prepared. This evaluates the traces the agent already produced.
 
 ```bash
-# Scaffold config that evaluates the agent's existing traces
-azd ai eval init --source traces
-
-# Generate a dataset and a rubric evaluator from those traces, and download both
-azd ai eval generate --from traces --agent support-agent
-
-# Run it
+azd ai eval init --source traces --target support-agent
+azd up
 azd ai eval run start --eval support-agent-trace-eval
-
-# Look at the per-sample results
 azd ai eval run output list --eval support-agent-trace-eval
 ```
 
-**Expect:** `init` makes no service calls. `generate` reports the job, writes the
-artifacts locally, and names them in `azure.eval.yaml`. The run prints a summary
-table with a row per evaluator.
+**Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
+`azd up` reconciles it. The run prints a summary with a row per evaluator.
 
 ### Scenario 2 — Turning that signal into a repeatable baseline
 
+Generate a dataset and a rubric evaluator, then declare an eval over them.
+
 ```bash
-# Scaffold a named eval over a dataset you keep in the repo
+azd ai eval generate --from traces --dataset-name support-agent-regression --evaluator-name support-agent-quality
 azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression
-
-# Publish datasets, evaluators and the eval itself
 azd up
-
-# Run the baseline
 azd ai eval run start --eval support-agent-regression-eval
 ```
 
-**Expect:** `azd up` reports each artifact as published or skipped. Running it a
-second time with no edits must publish **nothing** — every line should say
-`(unchanged)`.
+Then inspect one sample (take an item id from the run output):
+
+```bash
+azd ai eval run output show <item-id> --eval support-agent-regression-eval
+```
+
+**Expect:** `generate` submits two jobs, downloads both artifacts, and adds them
+to `evals/azure.eval.yaml`. A second `azd up` with no edits must publish
+**nothing** — every line should say `(unchanged)`.
 
 ### Scenario 3 — Inner loop: change the agent, re-evaluate
 
@@ -166,51 +172,60 @@ second time with no edits must publish **nothing** — every line should say
 # ...edit the agent's instructions, then:
 azd up
 azd ai eval run start --eval support-agent-regression-eval
-
-# Compare against previous runs of the same eval
 azd ai eval run list --eval support-agent-regression-eval
 ```
 
 **Expect:** the eval keeps its identity across runs so the history is
-comparable. Editing one eval must not disturb another eval in the same file.
+comparable. Editing one eval must not disturb another in the same file.
 
 ### Scenario 4 — Tuning the evaluation itself
 
 ```bash
-# ...edit the rubric file for support-agent-quality, then:
+# ...edit evals/evaluators/support-agent-quality.json, then:
 azd up
-
-# The evaluator gains a new version
 azd ai eval evaluator versions list support-agent-quality
-
-# Re-run against the same eval
-azd ai eval run start --eval support-agent-regression-eval
+azd up
 ```
 
-**Expect (important):** publishing a new evaluator version must report the eval
-as `Skipped ... (unchanged)`. The eval keeps its id, so runs from before and
-after the rubric edit remain comparable. **If the eval is recreated here, that
-is a bug** — unless you also edited the eval's own entry in `azure.eval.yaml`.
-Changing what the eval *declares* (its evaluator list, dataset, target, level,
-or adding or removing a `version:` pin) is supposed to create a new eval.
-Editing the rubric the evaluator points at is not.
+**Expect (important):** the evaluator gains a new version, and `azd up` must
+report the eval as `Skipped ... (unchanged)`. The eval keeps its id, so runs
+from before and after the rubric edit remain comparable. **If the eval is
+recreated here, that is a bug** — unless you also edited the eval's own entry in
+`evals/azure.eval.yaml`. Changing what the eval *declares* (its evaluator list,
+dataset, target, level, or adding or removing a `version:` pin) is supposed to
+create a new eval. Editing the rubric the evaluator points at is not.
 
 ### Scenario 5 — Automation and CI/CD
 
+This one needs a gate eval. Declare it by adding a second eval to
+`evals/azure.eval.yaml` named `support-agent-gate` and running `azd up`, or just
+substitute `support-agent-regression-eval` below.
+
 ```bash
-# Fail the build below a pass-rate threshold
 azd ai eval run start --eval support-agent-gate --fail-on pass-rate=0.8
-
-# Or fail on any failing sample
 azd ai eval run start --eval support-agent-gate --fail-on any-failure
+```
 
-# Start without blocking, then reattach
+Start without blocking, capture the id, then reattach:
+
+```bash
 azd ai eval run start --eval support-agent-gate --no-wait
-azd ai eval run show "$EVAL_RUN_ID" --eval support-agent-gate
+```
 
-# Export results for a build artifact
-azd ai eval run output export "$EVAL_RUN_ID" --eval support-agent-gate \
-  --format csv --output-file results.csv
+```powershell
+$EVAL_RUN_ID = "<the run id printed above>"
+azd ai eval run show $EVAL_RUN_ID --eval support-agent-gate --wait --fail-on pass-rate=0.8
+```
+
+```bash
+export EVAL_RUN_ID=<the run id printed above>
+azd ai eval run show "$EVAL_RUN_ID" --eval support-agent-gate --wait --fail-on pass-rate=0.8
+```
+
+Export results for a build artifact:
+
+```bash
+azd ai eval run output export <run-id> --eval support-agent-gate --format csv --output-file results.csv
 ```
 
 **Known limitation, not a bug:** `--fail-on` is documented to exit **2**, but
@@ -241,7 +256,7 @@ commands. Anything you invent beyond this list is fair game and welcome.
 - Names that already exist, and names that do not exist, for every verb
 
 **Config editing**
-- A misspelled key in `azure.eval.yaml` (e.g. `evaulators:`)
+- A misspelled key in `evals/azure.eval.yaml` (e.g. `evaulators:`)
 - An evaluator that requires a column the dataset does not have
 - A dataset pinned with `version:` to a version that was deleted
 - Two evals in one file where you edit only one of them
