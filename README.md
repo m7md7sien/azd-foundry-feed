@@ -12,6 +12,11 @@ This is **not** an official Microsoft feed and is not affiliated with the
 compiling one. Both extensions are built from the source in the pull requests
 above, which are public.
 
+## Bug bash
+
+Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** — setup, the
+five hero scenarios, and where to file findings.
+
 ## Use it
 
 ```bash

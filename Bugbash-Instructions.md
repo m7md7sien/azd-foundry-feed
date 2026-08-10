@@ -1,0 +1,316 @@
+# Bugbash Instructions: `azd ai eval` and `azd ai dataset`
+
+Two prerelease `azd` extensions for Foundry evaluations. Everything below runs
+against a **real Foundry project** — these commands create datasets, evaluators,
+evals and runs in it, and cost real model calls.
+
+| Extension | Namespace | PR |
+|---|---|---|
+| `azure.ai.evaluations` | `azd ai eval` | [Azure/azure-dev#9500](https://github.com/Azure/azure-dev/pull/9500) |
+| `azure.ai.dataset` | `azd ai dataset` | [Azure/azure-dev#9499](https://github.com/Azure/azure-dev/pull/9499) |
+
+---
+
+## 1. Setup
+
+**Prerequisites**
+
+```bash
+# azd 1.27.0 or later
+azd version
+
+# if you need to install or upgrade it
+curl -fsSL https://aka.ms/install-azd.sh | bash        # macOS / Linux
+```
+
+```powershell
+# Windows
+powershell -ex AllSigned -c "Invoke-RestMethod 'https://aka.ms/install-azd.ps1' | Invoke-Expression"
+```
+
+```bash
+# sign in to both
+az login
+azd auth login
+
+# confirm you are on the right subscription
+az account show --query "{name:name, id:id}" -o table
+```
+
+You also need access to the shared bug-bash Foundry project — see below. Access
+is granted through the **Evaluation Service Team** group (`raisvcteam@microsoft.com`),
+so if you are on the team you already have it.
+
+**Install from the feed**
+
+```bash
+azd extension source add -n foundry-bugbash -t url \
+  -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-10/registry.json
+
+azd extension install azure.ai.evaluations
+azd extension install azure.ai.dataset
+```
+
+Confirm both resolve to the `foundry-bugbash` source, not a local build:
+
+```bash
+azd extension list --installed
+```
+
+**Point at the shared project** (any one of these; the extensions resolve in this order):
+
+```
+https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
+```
+
+```bash
+# 1. flag, per command
+--project-endpoint https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
+
+# 2. shell environment
+export FOUNDRY_PROJECT_ENDPOINT=https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
+```
+
+On Windows PowerShell:
+
+```powershell
+$env:FOUNDRY_PROJECT_ENDPOINT="https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral"
+```
+
+**What is already there**
+
+| | |
+|---|---|
+| Agents | `support-agent` (the one the scenarios use), `test-agent` (minimal) |
+| Models | `gpt-4.1-nano`, `gpt-4o-mini`, `gpt-4.1`, `gpt-5.1`, `o4-mini`, `text-embedding-3-large` |
+| Region | swedencentral |
+
+The project is shared and already holds other people's work. Prefix anything you
+create with your alias so it is easy to tell apart and clean up.
+
+**Smoke test** — this must print `[` and exit 0 even in an empty project:
+
+```bash
+azd ai dataset list -o json
+azd ai eval list -o json
+```
+
+---
+
+## 2. How to test
+
+The hero scenarios in section 3 and the list in section 4 are **examples, not a
+script**. Work through them to get oriented, then go wherever you like — the
+most useful findings usually come from something nobody thought to write down.
+
+**File every finding as a bug in Azure DevOps** — not as a PR comment:
+
+> **https://msdata.visualstudio.com/Vienna** → area path `Vienna\Observability\Evaluation`
+
+Include:
+
+- Your OS and `azd version`
+- The exact command and its full output
+- If the failure is not self-explanatory, re-run with `--debug` and attach the log
+
+---
+
+## 3. Hero scenarios
+
+`support-agent` already exists in the shared project and is what these use. The
+model to pass where one is asked for is `gpt-4.1-nano`.
+
+### Scenario 1 — First evaluation of an agent after manual testing
+
+You have been chatting with an agent and want a first signal, with no dataset
+prepared.
+
+```bash
+# Scaffold config that evaluates the agent's existing traces
+azd ai eval init --source traces
+
+# Generate a dataset and a rubric evaluator from those traces, and download both
+azd ai eval generate --from traces --agent support-agent
+
+# Run it
+azd ai eval run start --eval support-agent-trace-eval
+
+# Look at the per-sample results
+azd ai eval run output list --eval support-agent-trace-eval
+```
+
+**Expect:** `init` makes no service calls. `generate` reports the job, writes the
+artifacts locally, and names them in `azure.eval.yaml`. The run prints a summary
+table with a row per evaluator.
+
+### Scenario 2 — Turning that signal into a repeatable baseline
+
+```bash
+# Scaffold a named eval over a dataset you keep in the repo
+azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression
+
+# Publish datasets, evaluators and the eval itself
+azd up
+
+# Run the baseline
+azd ai eval run start --eval support-agent-regression-eval
+```
+
+**Expect:** `azd up` reports each artifact as published or skipped. Running it a
+second time with no edits must publish **nothing** — every line should say
+`(unchanged)`.
+
+### Scenario 3 — Inner loop: change the agent, re-evaluate
+
+```bash
+# ...edit the agent's instructions, then:
+azd up
+azd ai eval run start --eval support-agent-regression-eval
+
+# Compare against previous runs of the same eval
+azd ai eval run list --eval support-agent-regression-eval
+```
+
+**Expect:** the eval keeps its identity across runs so the history is
+comparable. Editing one eval must not disturb another eval in the same file.
+
+### Scenario 4 — Tuning the evaluation itself
+
+```bash
+# ...edit the rubric file for support-agent-quality, then:
+azd up
+
+# The evaluator gains a new version
+azd ai eval evaluator versions list support-agent-quality
+
+# Re-run against the same eval
+azd ai eval run start --eval support-agent-regression-eval
+```
+
+**Expect (important):** publishing a new evaluator version must report the eval
+as `Skipped ... (unchanged)`. The eval keeps its id, so runs from before and
+after the rubric edit remain comparable. **If the eval is recreated here, that
+is a bug** — unless you also edited the eval's own entry in `azure.eval.yaml`.
+Changing what the eval *declares* (its evaluator list, dataset, target, level,
+or adding or removing a `version:` pin) is supposed to create a new eval.
+Editing the rubric the evaluator points at is not.
+
+### Scenario 5 — Automation and CI/CD
+
+```bash
+# Fail the build below a pass-rate threshold
+azd ai eval run start --eval support-agent-gate --fail-on pass-rate=0.8
+
+# Or fail on any failing sample
+azd ai eval run start --eval support-agent-gate --fail-on any-failure
+
+# Start without blocking, then reattach
+azd ai eval run start --eval support-agent-gate --no-wait
+azd ai eval run show "$EVAL_RUN_ID" --eval support-agent-gate
+
+# Export results for a build artifact
+azd ai eval run output export "$EVAL_RUN_ID" --eval support-agent-gate \
+  --format csv --output-file results.csv
+```
+
+**Known limitation, not a bug:** `--fail-on` is documented to exit **2**, but
+`azd` currently collapses every extension failure to exit **1**. Non-zero vs
+zero is still correct — only the specific code is wrong. Please do not file it.
+
+---
+
+## 4. Other scenarios worth trying
+
+Again — examples, not a checklist. Short descriptions only, so you improvise the
+commands. Anything you invent beyond this list is fair game and welcome.
+
+**Empty and missing state**
+- Every `list` command in a brand-new, empty project
+- Commands with no Foundry endpoint configured at all
+- Commands with no active `azd` environment
+- An eval config file that does not exist, and one that is completely empty
+
+**Bad input**
+- Dataset and evaluator names containing spaces, unicode, slashes, or `..`
+- A `--from-file` pointing at a directory holding several `.jsonl` files
+- A `--from-file` pointing at a directory holding none, or at a `.csv`
+- An empty `.jsonl`, and one with a malformed row in the middle
+- A dataset file saved by Notepad (UTF-8 with BOM)
+- Names that already exist, and names that do not exist, for every verb
+
+**Config editing**
+- A misspelled key in `azure.eval.yaml` (e.g. `evaulators:`)
+- An evaluator that requires a column the dataset does not have
+- A dataset pinned with `version:` to a version that was deleted
+- Two evals in one file where you edit only one of them
+- Renaming an eval, and editing only its `description:`
+
+**Output and scripting**
+- `-o json` on every command, piped into a parser, including failure cases
+- `--output-file` pointing at a directory, a read-only path, and a deep path
+- Very long names and values, to see whether tables break
+- Terminals at narrow widths
+
+**Concurrency and interruption**
+- Ctrl-C in the middle of `azd up` and of a run, then re-run the same command
+- Two `azd up` runs at once against the same project
+- `--no-wait`, then cancel the run, then ask for its output
+
+**Cross-extension consistency**
+- The same concept through both extensions — for example
+  `azd ai dataset list` vs `azd ai eval dataset list` — and any command that
+  exists in both. They should answer the same way, including exit codes.
+
+---
+
+## 5. Full command reference
+
+### `azd ai eval`
+
+| Command | Purpose |
+|---|---|
+| `init` | Scaffold evaluation config for an agent. Makes no service calls. |
+| `generate` | Generate a dataset and a rubric evaluator, and download them. |
+| `create` | Create one eval declared in the configuration. |
+| `list` | List the project's evals. |
+| `show` | Show an eval definition. |
+| `delete` | Delete an eval and everything under it. |
+
+**`azd ai eval dataset`** — `create`, `update`, `list`, `show`, `delete`, `versions list`
+
+**`azd ai eval evaluator`** — `create`, `update`, `list`, `show`, `delete`, `versions list`
+
+**`azd ai eval run`** — `start`, `show`, `list`, `cancel`, `delete`, `output`
+
+**`azd ai eval run output`** — inspect per-sample results (`list`, `show`, `export`)
+
+**`azd ai eval job`** — `list`, `show`, `cancel`, `delete` (generation jobs)
+
+### `azd ai dataset`
+
+| Command | Purpose |
+|---|---|
+| `create` | Register a dataset, publishing its first version. |
+| `update` | Publish a new version of a dataset. |
+| `list` | List the project's datasets. |
+| `show` | Show a dataset version. |
+| `delete` | Delete a dataset version. |
+| `versions list` | List the versions of a dataset. |
+
+Every command accepts `--project-endpoint`, `-o json`, `--debug`, and `--help`.
+
+---
+
+## 6. Cleanup
+
+The bug bash leaves datasets, evaluators, evals and runs behind. To remove the
+extensions and the feed:
+
+```bash
+azd extension uninstall azure.ai.evaluations
+azd extension uninstall azure.ai.dataset
+azd extension source remove foundry-bugbash
+```
+
+Artifacts created in the Foundry project must be deleted through the project
+itself, or with the `delete` verbs above.
