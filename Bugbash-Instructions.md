@@ -1,4 +1,4 @@
-﻿# Bugbash Instructions: `azd ai eval` and `azd ai dataset`
+# Bugbash Instructions: `azd ai eval` and `azd ai dataset`
 
 Two prerelease `azd` extensions for Foundry evaluations. Everything below runs
 against a **real Foundry project** â€” these commands create datasets, evaluators,
