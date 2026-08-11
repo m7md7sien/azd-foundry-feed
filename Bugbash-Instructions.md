@@ -69,21 +69,24 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.4** of `azure.ai.evaluations`:
+that you are on **1.0.0-beta.5** of `azure.ai.evaluations` and **1.0.0-beta.3**
+of `azure.ai.dataset`:
 
 ```bash
 azd extension list --installed
 ```
 
-**If you installed earlier, upgrade.** beta.2 fixed `azd ai eval show <name>`
-and made `azd ai eval create` publish the dataset and evaluator it references.
-beta.3 made `azd ai eval init` fail with a clear message when it has no judge
-model instead of silently writing a config that cannot be deployed. beta.4 makes
-`--from traces` work, and replaces three confusing errors with ones that name
-the way out:
+**If you installed earlier, upgrade.** Since beta.1 these have been fixed:
+`eval show <name>`; `eval create` now publishes the dataset and evaluator it
+references; `eval init` fails with a clear message when it has no judge model
+rather than writing an undeployable config; `--from traces` works; a mistyped
+key in `azure.eval.yaml` names the key and suggests the right one; Windows paths
+in errors are copyable again; and the dataset extension refuses a malformed
+`.jsonl` row before uploading it.
 
 ```bash
 azd extension upgrade azure.ai.evaluations
+azd extension upgrade azure.ai.dataset
 ```
 
 **Point at the shared project.** Set it once for the session â€” you will be
