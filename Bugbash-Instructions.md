@@ -69,17 +69,18 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.3** of `azure.ai.evaluations`:
+that you are on **1.0.0-beta.4** of `azure.ai.evaluations`:
 
 ```bash
 azd extension list --installed
 ```
 
 **If you installed earlier, upgrade.** beta.2 fixed `azd ai eval show <name>`
-and made `azd ai eval create` publish the dataset and evaluator it references,
-which Scenario 4 depends on. beta.3 makes `azd ai eval init` fail with a clear
-message when it has no judge model, instead of silently writing a config that
-cannot be deployed:
+and made `azd ai eval create` publish the dataset and evaluator it references.
+beta.3 made `azd ai eval init` fail with a clear message when it has no judge
+model instead of silently writing a config that cannot be deployed. beta.4 makes
+`--from traces` work, and replaces three confusing errors with ones that name
+the way out:
 
 ```bash
 azd extension upgrade azure.ai.evaluations
@@ -210,20 +211,19 @@ azd ai eval create
 azd ai eval run start --eval support-agent-regression-eval
 ```
 
-`--generation-model` is **required** â€” it names the deployment that writes the
+`--generation-model` is **required**. It names the deployment that writes the
 samples and the rubric. `gpt-4.1-nano` exists in the shared project.
-`--from agent`, not `--from traces`. Dataset generation from `--from traces`
-is rejected by the service with `Atleast Prompt or prompt agent_name is
-required`: that shape sends only a traces source, carrying neither a prompt nor
-an agent name. `--from agent` seeds from the agent's instructions and works.
-You will see a warning that agent-seeded generation failed and it is retrying
-from the instruction alone — that is expected and it succeeds.
 
-The two `--evaluator` flags are needed. Without them `init` plans a *second*
-rubric named `<target>-quality`, writes it into the config, and never generates
-it — so `azd ai eval create` fails with
-`The evaluator support-agent-quality was not found`. Passing `--evaluator`
-opts out of that and names the evaluator `generate` actually produced.
+`--from traces` also works as of beta.4; before that it was rejected by the
+service. Either is worth exercising. You will see a warning that agent-seeded
+generation failed and that it is retrying from the instruction alone. That is
+expected, it succeeds, and it is a known service-side defect.
+
+The two `--evaluator` flags matter. Without them `init` plans a *second* rubric
+named `<target>-quality` and writes it into the config, so you have to run
+`generate` again for that one before `create` will work. Passing `--evaluator`
+names the evaluator `generate` actually produced and skips that step. If you do
+hit it, the error now names the command that writes the missing definition.
 Then inspect one sample (take an item id from the run output):
 
 ```bash
@@ -313,8 +313,14 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
 - `--judge-model` and `--generation-model` are both effectively required despite
   reading as optional (Bug 5511012). On beta.3 `init` now says so instead of
   failing later. See Scenarios 1 and 2.
+- `-o json` still prints prose on the failure path, so a failing command breaks
+  a JSON pipe. The `ERROR:` line is written by `azd` itself, on stdout, not by
+  these extensions, so it cannot be fixed from here.
 - `--fail-on` is documented to exit **2**, but `azd` collapses every extension
   failure to exit **1**. Non-zero vs zero is still correct.
+- Agent-seeded data generation fails server-side for every agent. `generate`
+  detects it, says so, and retries from the agent's instructions alone, which
+  succeeds. Expected until the service is fixed.
 
 ---
 
