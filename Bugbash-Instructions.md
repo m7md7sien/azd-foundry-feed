@@ -69,7 +69,7 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.6** of `azure.ai.evaluations` and **1.0.0-beta.3**
+that you are on **1.0.0-beta.7** of `azure.ai.evaluations` and **1.0.0-beta.3**
 of `azure.ai.dataset`:
 
 ```bash
@@ -81,8 +81,11 @@ azd extension list --installed
 references; `eval init` fails with a clear message when it has no judge model
 rather than writing an undeployable config; `--from traces` works; a mistyped
 key in `azure.eval.yaml` names the key and suggests the right one; Windows paths
-in errors are copyable again; and the dataset extension refuses a malformed
-`.jsonl` row before uploading it.
+in errors are copyable again; the dataset extension refuses a malformed `.jsonl`
+row before uploading it; a generated rubric keeps its `pass_threshold` instead
+of losing it on the way to disk and being republished without one; and
+`eval create` now reports each artifact as published or unchanged rather than
+claiming it created something every time.
 
 ```bash
 azd extension upgrade azure.ai.evaluations
@@ -178,7 +181,13 @@ Include:
 These follow the spec's own sequence, so run them **in order** â€” later ones use
 artifacts earlier ones create. `support-agent` already exists in the shared
 project. Where a model is asked for, use `gpt-4.1-nano`.
+Scenario 1 stands alone, so give it its own folder. Scenarios 2 to 5 share one:
+3, 4 and 5 read the config and rubric that 2 writes, so starting 3 in a fresh
+directory just fails on a missing file.
 
+The names below are the spec's, and the project is shared, so two people running
+Scenario 2 at once will collide. Prefix them with your alias if you would rather
+not find out.
 Commands are shown one per line so they paste into PowerShell and bash alike.
 
 ### Scenario 1 â€” First evaluation of an agent after manual testing
@@ -246,8 +255,19 @@ azd ai eval run output show <item-id> --eval support-agent-regression-eval
 ```
 
 **Expect:** `generate` submits two jobs, downloads both artifacts, and adds them
-to `evals/azure.eval.yaml`. A second `azd ai eval create` with no edits must publish
-**nothing** â€” every line should say `(unchanged)`.
+to `evals/azure.eval.yaml`. A second `azd ai eval create` with no edits must
+publish **nothing**, and as of beta.7 it says so per artifact:
+
+```
+Dataset support-agent-regression is unchanged at version 1.0
+Evaluator support-agent-quality is unchanged at version 1
+(-) Skipped: Eval support-agent-regression-eval is unchanged (eval_...)
+```
+
+Before beta.7 every create printed `Created eval` whether or not it had created
+anything, and the evaluator really was republished as version 2 on the first
+create, because the downloaded rubric had lost its `pass_threshold`. If you see
+a version 2 appear from an edit you did not make, that is the bug returning.
 
 ### Scenario 3 â€” Inner loop: change the agent, re-evaluate
 
