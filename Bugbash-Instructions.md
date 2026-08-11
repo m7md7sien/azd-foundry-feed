@@ -69,7 +69,7 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.5** of `azure.ai.evaluations` and **1.0.0-beta.3**
+that you are on **1.0.0-beta.6** of `azure.ai.evaluations` and **1.0.0-beta.3**
 of `azure.ai.dataset`:
 
 ```bash
@@ -135,6 +135,18 @@ create with your alias so it is easy to tell apart and clean up.
 azd ai dataset list -o json
 azd ai eval list -o json
 ```
+
+**There is a second eval surface, and it is not this one.** The agents extension
+ships `azd ai agent eval` with its own `generate`, `run`, `list`, `show` and
+`update`. It is a different tool with a different config: it writes an
+`eval.yaml` at the project root, while this extension writes
+`evals/azure.eval.yaml`. The two are not interchangeable and neither reads the
+other's file.
+
+Which to use is worth an opinion from you. Rough shape of the difference:
+`azd ai agent eval` is one agent, one command, sensible defaults; `azd ai eval`
+declares datasets, evaluators and evals in a config you keep in the repo and
+reconcile. Confusion between them is a legitimate finding — please file it.
 
 ---
 
