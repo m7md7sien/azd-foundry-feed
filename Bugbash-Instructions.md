@@ -69,15 +69,17 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.2** of `azure.ai.evaluations`:
+that you are on **1.0.0-beta.3** of `azure.ai.evaluations`:
 
 ```bash
 azd extension list --installed
 ```
 
-**If you installed before and are on beta.1, upgrade** - beta.2 fixes
-`azd ai eval show <name>` and makes `azd ai eval create` actually publish the
-dataset and evaluator it references, which Scenario 4 depends on:
+**If you installed earlier, upgrade.** beta.2 fixed `azd ai eval show <name>`
+and made `azd ai eval create` publish the dataset and evaluator it references,
+which Scenario 4 depends on. beta.3 makes `azd ai eval init` fail with a clear
+message when it has no judge model, instead of silently writing a config that
+cannot be deployed:
 
 ```bash
 azd extension upgrade azure.ai.evaluations
@@ -175,15 +177,14 @@ azd ai eval run start --eval support-agent-trace-eval
 azd ai eval run output list --eval support-agent-trace-eval
 ```
 
-`--judge-model` is documented as optional ("detected from the project when
-omitted"), but detection currently leaves the built-in graders without a
-`deployment_name` and the deploy then fails with:
+`--judge-model` reads as optional ("detected from the project when omitted"),
+but detection only ever worked for a model deployment declared in `azure.yaml`.
+Against a shared project reached by endpoint there is nothing to detect, so pass
+it explicitly.
 
-```
-evaluator "builtin.task_adherence" requires "deployment_name"
-```
-
-So pass it explicitly. Tracked as
+Until beta.3 this failed silently: `init` exited 0 having written a config whose
+graders had no `deployment_name`, and the first sign of trouble came much later
+from the service. beta.3 makes it an error that names the flag. Tracked as
 [Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012) â€”
 please don't re-file.
 
@@ -193,8 +194,8 @@ project scaffolded by `azd init --minimal`: `azd up` fails compiling a bicep
 template that does not exist, and `azd deploy` fails with "infrastructure has
 not been provisioned". Eval resources are data-plane only, so there is nothing to
 provision. `azd ai eval create` reconciles the config directly and is what these
-scenarios use. Tracked as
-[Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012).
+scenarios use. Known, please don't re-file.
+
 **Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
 `azd ai eval create` reconciles it. The run prints a summary with a row per evaluator.
 
@@ -310,7 +311,8 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
   `AzureDeveloperCLICredential: exit status 1` while `azd` reports a valid
   login. Retry the command; it usually succeeds on the next attempt.
 - `--judge-model` and `--generation-model` are both effectively required despite
-  reading as optional (Bug 5511012). See Scenarios 1 and 2.
+  reading as optional (Bug 5511012). On beta.3 `init` now says so instead of
+  failing later. See Scenarios 1 and 2.
 - `--fail-on` is documented to exit **2**, but `azd` collapses every extension
   failure to exit **1**. Non-zero vs zero is still correct.
 
