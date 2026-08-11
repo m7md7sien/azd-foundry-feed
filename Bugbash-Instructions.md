@@ -69,7 +69,7 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.9** of `azure.ai.evaluations` and **1.0.0-beta.4**
+that you are on **1.0.0-beta.10** of `azure.ai.evaluations` and **1.0.0-beta.5**
 of `azure.ai.dataset`:
 
 ```bash
@@ -89,9 +89,13 @@ claiming it created something every time; a misspelled `--target` says the agent
 is not in the project instead of printing the whole 404; a dataset that was
 never generated names the command that writes it; `eval delete` now takes
 the name `eval list` prints, refusing only when that name is carried by more
-than one eval, since deleting one would discard its runs; and
+than one eval, since deleting one would discard its runs;
 `dataset versions list <name>` no longer says "No datasets found." in a project
-full of datasets.
+full of datasets; the evaluation configuration is now replaced atomically, so a
+second command reading it while one writes can no longer see it empty and write
+back a file with every eval missing; `--fail-on` is refused with `--no-wait`
+instead of being silently dropped; and a generation with nothing to seed from
+says so in one line rather than returning thirty lines of JSON.
 
 ```bash
 azd extension upgrade azure.ai.evaluations
