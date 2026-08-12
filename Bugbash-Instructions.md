@@ -60,16 +60,20 @@ name. Both forms hang a script or an agent that cannot answer.
 ```bash
 azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-10/registry.json
 
-azd extension install azure.ai.evaluations
-azd extension install azure.ai.dataset
+azd extension install azure.ai.evaluations --source foundry-bugbash
+azd extension install azure.ai.dataset --source foundry-bugbash
 ```
+
+`--source` matters if you have ever added a local extension registry: without
+it `azd` finds the extension in more than one source and stops on a prompt,
+which will hang a script.
 
 Each extension is about 15 MB and the feed is a GitHub release, so the progress
 bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.0-beta.10** of `azure.ai.evaluations` and **1.0.0-beta.5**
+that you are on **1.0.3-beta** of `azure.ai.evaluations` and **1.0.0-beta.5**
 of `azure.ai.dataset`:
 
 ```bash
@@ -223,13 +227,18 @@ from the service. beta.3 makes it an error that names the flag. Tracked as
 [Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012) â€”
 please don't re-file.
 
-**Why not `azd up`?** The spec's scenarios say `azd up`, and the extension's own
-"Next:" hint says the same, but neither `azd up` nor `azd deploy` works in a
-project scaffolded by `azd init --minimal`: `azd up` fails compiling a bicep
-template that does not exist, and `azd deploy` fails with "infrastructure has
-not been provisioned". Eval resources are data-plane only, so there is nothing to
-provision. `azd ai eval create` reconciles the config directly and is what these
-scenarios use. Known, please don't re-file.
+**Why not `azd up`?** Neither `azd up` nor `azd deploy` works in a project
+scaffolded by `azd init --minimal`. `azd up` fails compiling a bicep template
+that does not exist. `azd deploy` fails with "infrastructure has not been
+provisioned" -- because that scaffold's environment carries no
+`AZURE_SUBSCRIPTION_ID` or `AZURE_LOCATION`, not because of anything to do with
+evals; set both and it does run.
+
+Eval resources are data-plane only, so there is nothing to provision either way.
+`azd ai eval create` reconciles the config directly, needs nothing but an
+endpoint, and is what these scenarios use. As of 1.0.3-beta the extension's own
+"Next:" hint says `azd ai eval create` too, and only says `azd up` in a project
+that really does carry infrastructure. Known, please don't re-file.
 
 **Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
 `azd ai eval create` reconciles it. The run prints a summary with a row per evaluator.
@@ -347,8 +356,11 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
   not one of the two extensions under test. It and `azure.ai.projects` both try
   to register the `microsoft.foundry` provisioning provider; the second one
   loses with `AlreadyExists`. Harmless for eval work.
-- `azd up` needs `infra/main.bicep` and `azd deploy` needs provisioned
-  infrastructure, so neither works in a scratch project. Use
+- `azd extension install <id>` stops on a source-selection prompt if the id is
+  in more than one registry, which is why the install commands above pass
+  `--source foundry-bugbash`. Only bites you if you have added a local registry.
+- `azd up` needs `infra/main.bicep`, and `azd deploy` needs an environment that
+  has provisioned something, so neither works in a scratch project. Use
   `azd ai eval create`. Verified end to end on 2026-08-11.
 - `azd init` and `azd init --minimal` both prompt. Use
   `azd init --minimal --no-prompt -e <name>`.
