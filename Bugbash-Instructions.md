@@ -407,21 +407,16 @@ eval service target, which reconciles the same config `create` would, ending in
 `SUCCESS: Your application was deployed`. No Azure infrastructure is
 provisioned, because eval resources are data-plane only.
 
-The progress lines are one per eval and read the same whether the eval was just
-created or reused:
+The progress lines say what happened, and a second `azd deploy` with no edits
+publishes nothing:
 
 ```
-support-agent-evals: Deploying (Reconciling eval <you>-reg-eval)
-support-agent-evals: Deploying (Eval <you>-reg-eval is eval_...)
+support-agent-evals: Deploying (Created eval <you>-reg-eval (eval_...))
+support-agent-evals: Deploying (Eval <you>-reg-eval is unchanged (eval_...))
 ```
 
-**Known:** under `azd deploy` and `azd up` you cannot tell *created* from
-*unchanged*, and the per-dataset and per-evaluator lines that `azd ai eval
-create` prints do not appear at all. The spec shows the `create` output for
-these steps. Please don't re-file that specific gap; anything else you notice is
-fair game. Running `azd ai eval create` afterwards is the way to see what
-actually changed -- and if the two disagree about what changed, that is a
-finding worth reporting.
+Run `azd ai eval create` afterwards. It should agree, reporting the same eval
+id and the same verdict. A disagreement between the two is a finding.
 
 **Known rough edges â€” already reported, please don't re-file**
 
