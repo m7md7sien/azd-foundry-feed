@@ -73,7 +73,7 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.4-beta** of `azure.ai.evaluations` and **1.0.0-beta.5**
+that you are on **1.0.4-beta** of `azure.ai.evaluations` and **1.0.0-beta.6**
 of `azure.ai.dataset`:
 
 ```bash
@@ -403,13 +403,25 @@ azd deploy
 ```
 
 **Expect:** `azd` packages the `support-agent-evals` service and hands it to the
-eval service target, which reconciles the same config `create` would, reporting
-per-artifact progress and ending in `SUCCESS: Your application was deployed`.
-No Azure infrastructure is provisioned, because eval resources are data-plane
-only. A second `azd deploy` with no edits should publish nothing.
+eval service target, which reconciles the same config `create` would, ending in
+`SUCCESS: Your application was deployed`. No Azure infrastructure is
+provisioned, because eval resources are data-plane only.
 
-Worth comparing: this and `azd ai eval create` should agree on what changed. A
-disagreement is a finding.
+The progress lines are one per eval and read the same whether the eval was just
+created or reused:
+
+```
+support-agent-evals: Deploying (Reconciling eval <you>-reg-eval)
+support-agent-evals: Deploying (Eval <you>-reg-eval is eval_...)
+```
+
+**Known:** under `azd deploy` and `azd up` you cannot tell *created* from
+*unchanged*, and the per-dataset and per-evaluator lines that `azd ai eval
+create` prints do not appear at all. The spec shows the `create` output for
+these steps. Please don't re-file that specific gap; anything else you notice is
+fair game. Running `azd ai eval create` afterwards is the way to see what
+actually changed -- and if the two disagree about what changed, that is a
+finding worth reporting.
 
 **Known rough edges â€” already reported, please don't re-file**
 
