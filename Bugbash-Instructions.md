@@ -503,5 +503,16 @@ azd extension uninstall azure.ai.dataset
 azd extension source remove foundry-bugbash
 ```
 
-Artifacts created in the Foundry project must be deleted through the project
-itself, or with the `delete` verbs above.
+Artifacts created in the Foundry project are not removed by uninstalling. Delete
+them from the project, or with the `delete` verbs. They confirm before deleting,
+so add `--no-prompt` to run them unattended. There is no `--force`.
+
+```bash
+azd ai eval delete <eval-id> --no-prompt
+azd ai eval dataset delete <name> --version <version> --no-prompt
+azd ai eval evaluator delete <name> --version <version> --no-prompt
+```
+
+Delete evals by **id**, not name: `azd ai eval list -o json` gives you the ids,
+and a name shared by more than one eval is refused. Deleting an eval also
+discards its runs.
