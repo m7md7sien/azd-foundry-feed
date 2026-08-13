@@ -16,7 +16,7 @@ evals and runs in it, and cost real model calls.
 **Prerequisites**
 
 ```bash
-# azd 1.27.0 or later
+# azd 1.27.1 or later (both extensions declare requiredAzdVersion ">=1.27.1")
 azd version
 
 # if you need to install or upgrade it
@@ -320,8 +320,13 @@ create a new eval. Editing the rubric the evaluator points at is not.
 ### Scenario 5 â€” Automation and CI/CD
 
 This one needs a gate eval. Declare it by adding a second eval to
-`evals/azure.eval.yaml` named `support-agent-gate` and running `azd ai eval create`, or
-just substitute `support-agent-regression-eval` below.
+`evals/azure.eval.yaml` named `support-agent-gate` and running
+`azd ai eval create support-agent-gate`, or just substitute
+`support-agent-regression-eval` below.
+
+Name the eval explicitly. Once the file declares more than one eval, bare
+`azd ai eval create` refuses rather than guessing which one you meant, so it
+fails instead of creating the gate.
 
 ```bash
 azd ai eval run start --eval support-agent-gate --fail-on pass-rate=0.8
@@ -435,7 +440,7 @@ commands. Anything you invent beyond this list is fair game and welcome.
 |---|---|
 | `init` | Scaffold evaluation config for an agent. Makes no service calls. |
 | `generate` | Generate a dataset and a rubric evaluator, and download them. |
-| `create` | Create one eval declared in the configuration. |
+| `create [name]` | Create one eval declared in the configuration. Name it when the config declares more than one; `--from-file` creates from a file instead of a project. |
 | `list` | List the project's evals. |
 | `show` | Show an eval definition. |
 | `delete` | Delete an eval and everything under it. |
@@ -461,7 +466,14 @@ commands. Anything you invent beyond this list is fair game and welcome.
 | `delete` | Delete a dataset version. |
 | `versions list` | List the versions of a dataset. |
 
-Every command accepts `--project-endpoint`, `-o json`, `--debug`, and `--help`.
+Every command accepts `-o json`, `--debug`, and `--help`. All of them except
+`init` also accept `--project-endpoint`; `init` makes no service calls, so it
+has no endpoint to point at and rejects the flag. `--no-prompt` is `azd`'s own
+global flag, and these commands honor it by skipping their prompts.
+
+Two more worth knowing: `azd ai eval job` needs `--dataset` or `--evaluator`
+(it fails if you run it bare), and `azd ai eval evaluator list --builtin` is how
+you discover the `builtin.*` names used in Scenario 2.
 
 ---
 
