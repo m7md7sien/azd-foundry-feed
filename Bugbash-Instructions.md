@@ -199,9 +199,14 @@ Scenario 1 stands alone, so give it its own folder. Scenarios 2 to 5 share one:
 3, 4 and 5 read the config and rubric that 2 writes, so starting 3 in a fresh
 directory just fails on a missing file.
 
-The names below are the spec's, and the project is shared, so two people running
-Scenario 2 at once will collide. Prefix them with your alias if you would rather
-not find out.
+The names below are the spec's, but the project is shared and evals persist, so
+**put your alias in every name you create**. This is not politeness, it is the
+difference between the scenarios working and not: once two evals share a name,
+`run start` refuses to guess between them, and the id it tells you to use is
+rejected by `run start --eval <id>` until that eval has already run once. The
+two errors point at each other and there is no way out except a unique name.
+The project already holds five evals called `support-agent-trace-eval`, so the
+spec's literal names are already in that state.
 Commands are shown one per line so they paste into PowerShell and bash alike.
 
 ### Scenario 1 â€” First evaluation of an agent after manual testing
@@ -210,11 +215,18 @@ You have been chatting with an agent and want a first signal, with no dataset
 prepared. This evaluates the traces the agent already produced.
 
 ```bash
-azd ai eval init --source traces --target support-agent --judge-model gpt-4.1-nano
+azd ai eval init --source traces --target support-agent --judge-model gpt-4.1-nano --name <you>-trace-eval
 azd ai eval create
-azd ai eval run start --eval support-agent-trace-eval
-azd ai eval run output list --eval support-agent-trace-eval
+azd ai eval run start
+azd ai eval run output list --eval <you>-trace-eval
 ```
+
+Replace `<you>` with your alias. `init` asks which evaluators to grade with, so
+it stops for input; add `--no-prompt` to take the detected default
+(`builtin.task_adherence`) and paste the block straight through.
+
+`run start` reads the eval out of the config, so it needs no `--eval`.
+`run output list` does not read the config, so it does.
 
 `--judge-model` reads as optional ("detected from the project when omitted"),
 but detection only ever worked for a model deployment declared in `azure.yaml`.
@@ -240,8 +252,11 @@ endpoint, and is what these scenarios use. As of 1.0.3-beta the extension's own
 "Next:" hint says `azd ai eval create` too, and only says `azd up` in a project
 that really does carry infrastructure. Known, please don't re-file.
 
-**Expect:** `init` makes no service calls and writes `evals/azure.eval.yaml`.
-`azd ai eval create` reconciles it. The run prints a summary with a row per evaluator.
+**Expect:** `init` makes no service calls and writes two things:
+`evals/azure.eval.yaml`, and a `support-agent-evals` service entry added to
+`azure.yaml`. `azd ai eval create` reconciles the config. The run prints a
+summary with a row per evaluator; a healthy first run is 20 samples in about a
+minute.
 
 ### Scenario 2 â€” Turning that signal into a repeatable baseline
 
