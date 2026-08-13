@@ -249,18 +249,22 @@ from the service. beta.3 makes it an error that names the flag. Tracked as
 [Bug 5511012](https://msdata.visualstudio.com/Vienna/_workitems/edit/5511012) â€”
 please don't re-file.
 
-**Why not `azd up`?** Neither `azd up` nor `azd deploy` works in a project
-scaffolded by `azd init --minimal`. `azd up` fails compiling a bicep template
-that does not exist. `azd deploy` fails with "infrastructure has not been
-provisioned" -- because that scaffold's environment carries no
-`AZURE_SUBSCRIPTION_ID` or `AZURE_LOCATION`, not because of anything to do with
-evals; set both and it does run.
+**Which deploy command applies.** All three were run against this project; this
+is what each actually does.
 
-Eval resources are data-plane only, so there is nothing to provision either way.
-`azd ai eval create` reconciles the config directly, needs nothing but an
-endpoint, and is what these scenarios use. As of 1.0.3-beta the extension's own
-"Next:" hint says `azd ai eval create` too, and only says `azd up` in a project
-that really does carry infrastructure. Known, please don't re-file.
+| Project | `azd up` | `azd deploy` | `azd ai eval create` |
+|---|---|---|---|
+| No `infra/`, no env values (the scaffold above) | Fails: `1 required input is missing: subscription` | Fails: `infrastructure has not been provisioned` | Works |
+| No `infra/`, `AZURE_SUBSCRIPTION_ID` and `AZURE_LOCATION` set | Fails: cannot find `infra/main.bicep` | **Works**, and runs the eval service target | Works |
+| Has `infra/`, not yet provisioned | Provisions, then deploys | Fails: `infrastructure has not been provisioned` | Works |
+
+Eval resources are data-plane only, so there is nothing to provision. That is
+why these scenarios use `azd ai eval create`: it reconciles the config directly
+and needs nothing but an endpoint. `azd up` is only the right verb in a project
+that genuinely carries infrastructure, and the extension's own `Next:` hint
+follows the same rule -- it says `azd ai eval create` in the scaffold above and
+`azd up` once an `infra/` folder exists. Both were verified. Known, please
+don't re-file.
 
 **Expect:** `init` makes no service calls and writes two things:
 `evals/azure.eval.yaml`, and a `support-agent-evals` service entry added to
@@ -379,8 +383,33 @@ azd ai eval run show "$EVAL_RUN_ID" --eval support-agent-gate --wait --fail-on p
 Export results for a build artifact:
 
 ```bash
-azd ai eval run output export <run-id> --eval support-agent-gate --format csv --output-file results.csv
+azd ai eval run output export <run-id> --eval <you>-gate --format csv --output-file results.csv
 ```
+
+### Scenario 6 - Deploying evals as an azd service
+
+The scenarios above reconcile with `azd ai eval create`. The extension also
+registers an `azure.ai.eval` **service target**, which is what runs when `azd`
+deploys the service that `init` added to `azure.yaml`. Nothing else in this bug
+bash exercises that path, so please spend a few minutes here.
+
+In the Scenario 2-5 folder, give the environment the two values `azd deploy`
+requires, then deploy:
+
+```bash
+azd env set AZURE_SUBSCRIPTION_ID <your-subscription-id>
+azd env set AZURE_LOCATION swedencentral
+azd deploy
+```
+
+**Expect:** `azd` packages the `support-agent-evals` service and hands it to the
+eval service target, which reconciles the same config `create` would, reporting
+per-artifact progress and ending in `SUCCESS: Your application was deployed`.
+No Azure infrastructure is provisioned, because eval resources are data-plane
+only. A second `azd deploy` with no edits should publish nothing.
+
+Worth comparing: this and `azd ai eval create` should agree on what changed. A
+disagreement is a finding.
 
 **Known rough edges â€” already reported, please don't re-file**
 
@@ -391,9 +420,10 @@ azd ai eval run output export <run-id> --eval support-agent-gate --format csv --
 - `azd extension install <id>` stops on a source-selection prompt if the id is
   in more than one registry, which is why the install commands above pass
   `--source foundry-bugbash`. Only bites you if you have added a local registry.
-- `azd up` needs `infra/main.bicep`, and `azd deploy` needs an environment that
-  has provisioned something, so neither works in a scratch project. Use
-  `azd ai eval create`. Verified end to end on 2026-08-11.
+- `azd up` needs `infra/main.bicep`, so it does not work in a scratch project.
+  `azd deploy` does, once the environment carries `AZURE_SUBSCRIPTION_ID` and
+  `AZURE_LOCATION`; see Scenario 6. Otherwise use `azd ai eval create`.
+  Verified end to end on 2026-08-13.
 - `azd init` and `azd init --minimal` both prompt. Use
   `azd init --minimal --no-prompt -e <name>`.
 - Token acquisition fails intermittently with
