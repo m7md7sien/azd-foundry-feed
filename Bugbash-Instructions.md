@@ -73,7 +73,7 @@ bar can sit still for several minutes on the first install. That is expected.
 Let it finish rather than interrupting it.
 
 Confirm both resolve to the `foundry-bugbash` source, not a local build, and
-that you are on **1.0.3-beta** of `azure.ai.evaluations` and **1.0.0-beta.5**
+that you are on **1.0.4-beta** of `azure.ai.evaluations` and **1.0.0-beta.5**
 of `azure.ai.dataset`:
 
 ```bash
@@ -351,9 +351,9 @@ This one needs a gate eval. Add a second eval to `evals/azure.eval.yaml` named
 azd ai eval create <you>-gate
 ```
 
-Once the file declares two evals, bare `azd ai eval create` refuses. Its error
-says to "choose one with --eval", but `create` has no `--eval` flag: the name is
-a positional argument, as above. Known, please don't re-file.
+Once the file declares two evals, bare `azd ai eval create` refuses and names
+both forms: the argument for `create`, `--eval` for the run commands. Before
+1.0.4-beta it said "choose one with --eval", which `create` does not accept.
 
 ```bash
 azd ai eval run start --eval <you>-gate --fail-on pass-rate=0.8
