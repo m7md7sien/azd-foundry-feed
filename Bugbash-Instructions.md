@@ -64,7 +64,13 @@ These are **examples, not a script**. Work through them to get oriented, then go
 wherever you like — the most useful findings come from things nobody wrote down.
 
 Quick start above is scenario 1. Give it its own folder. Scenarios 2 to 6 share
-a second folder, because 3 onwards read what 2 writes.
+a second folder, because 3 onwards read what 2 writes. Scaffold it the same way:
+
+```bash
+mkdir azd-eval-bugbash-2
+cd azd-eval-bugbash-2
+azd init --minimal --no-prompt -e bugbash
+```
 
 ### 2. A repeatable baseline
 
@@ -77,9 +83,11 @@ azd ai eval create
 azd ai eval run start
 ```
 
-**Expect:** `generate` submits two jobs and downloads both artifacts into
-`evals/`. A second `azd ai eval create` with no edits publishes nothing and says
-so per artifact.
+**Expect:** `generate` submits two jobs, downloads both artifacts into `evals/`,
+and registers them in Foundry as it goes. So the `create` that follows reports
+the dataset and evaluator as already **unchanged** and only creates the eval —
+that is correct, not a missed publish. A second `create` with no edits skips
+everything, the eval included.
 
 ### 3. Inner loop
 
