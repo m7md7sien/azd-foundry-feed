@@ -205,8 +205,18 @@ difference between the scenarios working and not: once two evals share a name,
 `run start` refuses to guess between them, and the id it tells you to use is
 rejected by `run start --eval <id>` until that eval has already run once. The
 two errors point at each other and there is no way out except a unique name.
-The project already holds five evals called `support-agent-trace-eval`, so the
+The project already holds four evals called `support-agent-trace-eval`, so the
 spec's literal names are already in that state.
+
+**If you are already stuck**, list the ids and delete the ones that are yours:
+
+```bash
+azd ai eval list -o json
+azd ai eval delete <eval-id> --no-prompt
+```
+
+This applies to anything you invent too, not just the scenarios below. Any eval
+name you reuse from someone else lands you in the same place.
 Commands are shown one per line so they paste into PowerShell and bash alike.
 
 ### Scenario 1 â€” First evaluation of an agent after manual testing
@@ -263,10 +273,10 @@ minute.
 Generate a dataset and a rubric evaluator, then declare an eval over them.
 
 ```bash
-azd ai eval generate --from agent --target support-agent --generation-model gpt-4.1-nano --dataset-name support-agent-regression --evaluator-name support-agent-quality
-azd ai eval init --name support-agent-regression-eval --dataset support-agent-regression --target support-agent --judge-model gpt-4.1-nano --evaluator builtin.task_adherence --evaluator support-agent-quality
+azd ai eval generate --from agent --target support-agent --generation-model gpt-4.1-nano --dataset-name <you>-regression --evaluator-name <you>-quality
+azd ai eval init --name <you>-regression-eval --dataset <you>-regression --target support-agent --judge-model gpt-4.1-nano --evaluator builtin.task_adherence --evaluator <you>-quality --no-prompt
 azd ai eval create
-azd ai eval run start --eval support-agent-regression-eval
+azd ai eval run start
 ```
 
 `--generation-model` is **required**. It names the deployment that writes the
@@ -334,18 +344,20 @@ create a new eval. Editing the rubric the evaluator points at is not.
 
 ### Scenario 5 â€” Automation and CI/CD
 
-This one needs a gate eval. Declare it by adding a second eval to
-`evals/azure.eval.yaml` named `support-agent-gate` and running
-`azd ai eval create support-agent-gate`, or just substitute
-`support-agent-regression-eval` below.
-
-Name the eval explicitly. Once the file declares more than one eval, bare
-`azd ai eval create` refuses rather than guessing which one you meant, so it
-fails instead of creating the gate.
+This one needs a gate eval. Add a second eval to `evals/azure.eval.yaml` named
+`<you>-gate`, then create it **by name**:
 
 ```bash
-azd ai eval run start --eval support-agent-gate --fail-on pass-rate=0.8
-azd ai eval run start --eval support-agent-gate --fail-on any-failure
+azd ai eval create <you>-gate
+```
+
+Once the file declares two evals, bare `azd ai eval create` refuses. Its error
+says to "choose one with --eval", but `create` has no `--eval` flag: the name is
+a positional argument, as above. Known, please don't re-file.
+
+```bash
+azd ai eval run start --eval <you>-gate --fail-on pass-rate=0.8
+azd ai eval run start --eval <you>-gate --fail-on any-failure
 ```
 
 Start without blocking, capture the id, then reattach:
