@@ -313,7 +313,8 @@ Already reported. Please don't re-file these; anything else is fair game.
    every command that loads the config then fails the same way — including
    read-only ones you pointed at a specific eval, like
    `run list --eval <name>`. Edit `evals/azure.eval.yaml` and delete or change
-   the duplicate to get moving again.
+   the duplicate to get moving again. Fixed after this build: a lookup by name
+   no longer runs the checks that only deploying needs.
 
 8. **`eval show` prints `Created` as a number** like `1.78690163e+09` rather
    than a date. Fixed after this build.
