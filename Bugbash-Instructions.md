@@ -307,3 +307,13 @@ Already reported. Please don't re-file these; anything else is fair game.
 6. **A gated run exits 1, not 2.** `azd` does not propagate an extension's exit
    code, so gating and operational failure share 1. Tell them apart by the gate
    message. Non-zero vs zero is still correct.
+
+7. **Two evals that differ only by name lock the folder.** Running `eval init`
+   twice with the same settings writes a second eval the config refuses, and
+   every command that loads the config then fails the same way — including
+   read-only ones you pointed at a specific eval, like
+   `run list --eval <name>`. Edit `evals/azure.eval.yaml` and delete or change
+   the duplicate to get moving again.
+
+8. **`eval show` prints `Created` as a number** like `1.78690163e+09` rather
+   than a date. Fixed after this build.
