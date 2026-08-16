@@ -208,6 +208,10 @@ Short prompts, no commands — improvise.
 **`azd ai eval run`** — `start`, `show`, `list`, `cancel`, `delete`, and
 `output list|show|export`
 
+- `run list` shows one pass rate per run. The per-evaluator breakdown is in
+  `-o json`, under `per_testing_criteria_results`, because a column per
+  evaluator stops being readable once two runs score different ones.
+
 **`azd ai eval job`** — `list`, `show`, `cancel`, `delete` for generation jobs.
 `--dataset` and `--evaluator` are switches choosing which kind of job to act
 on, not filters taking a name. One is required, so a bare `job list` fails.
