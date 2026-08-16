@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-16/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-16-2/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,7 +53,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.5-beta** and `azure.ai.dataset` **1.0.0-beta.7**,
+`azure.ai.evaluations` **1.0.6-beta** and `azure.ai.dataset` **1.0.0-beta.7**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 ---
@@ -310,14 +310,3 @@ Already reported. Please don't re-file these; anything else is fair game.
 6. **A gated run exits 1, not 2.** `azd` does not propagate an extension's exit
    code, so gating and operational failure share 1. Tell them apart by the gate
    message. Non-zero vs zero is still correct.
-
-7. **Two evals that differ only by name lock the folder.** Running `eval init`
-   twice with the same settings writes a second eval the config refuses, and
-   every command that loads the config then fails the same way — including
-   read-only ones you pointed at a specific eval, like
-   `run list --eval <name>`. Edit `evals/azure.eval.yaml` and delete or change
-   the duplicate to get moving again. Fixed after this build: a lookup by name
-   no longer runs the checks that only deploying needs.
-
-8. **`eval show` prints `Created` as a number** like `1.78690163e+09` rather
-   than a date. Fixed after this build.
