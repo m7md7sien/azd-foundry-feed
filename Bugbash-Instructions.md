@@ -152,15 +152,17 @@ azd deploy
 ```
 
 **Expect:** the same reconciliation `create` does, ending in `SUCCESS`. No Azure
-infrastructure is provisioned — eval resources are data-plane only. The progress
-lines say what happened, and a second `azd deploy` publishes nothing:
+infrastructure is provisioned — eval resources are data-plane only. While it
+runs, progress lines say what happened; they are replaced by the service table
+when it finishes, so watch as it goes rather than reading the summary:
 
 ```
 support-agent-evals: Deploying (Created eval <you>-reg-eval (eval_...))
 support-agent-evals: Deploying (Eval <you>-reg-eval is unchanged (eval_...))
 ```
 
-`azd ai eval create` afterwards should agree. A disagreement is a finding.
+`azd ai eval create` afterwards should agree, and prints the same detail without
+the hurry. A disagreement is a finding.
 
 ### 7. `azd up` in a project that has infrastructure
 
@@ -207,7 +209,8 @@ Short prompts, no commands — improvise.
 `output list|show|export`
 
 **`azd ai eval job`** — `list`, `show`, `cancel`, `delete` for generation jobs.
-Needs `--dataset` or `--evaluator`; it fails if you run it bare.
+`--dataset` and `--evaluator` are switches choosing which kind of job to act
+on, not filters taking a name. One is required, so a bare `job list` fails.
 
 **`azd ai dataset`** — `create`, `update`, `list`, `show`, `delete`,
 `versions list`
