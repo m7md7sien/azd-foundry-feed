@@ -258,7 +258,10 @@ so the progress bar may sit still for a few minutes on first install. Let it
 finish.
 
 **`--source` matters.** Without it, `azd` may find the id in more than one
-registry and stop on a prompt, which hangs a script.
+registry and stop on a prompt, which hangs a script. `azd extension upgrade`
+has no `--source` flag at all, so if it asks, answer `foundry-bugbash`; to
+avoid the question entirely, `azd extension uninstall <id>` then install again
+with `--source`.
 
 **`azd init` prompts.** Always use `azd init --minimal --no-prompt -e <name>`;
 plain `azd init` and even `--minimal` ask questions.
