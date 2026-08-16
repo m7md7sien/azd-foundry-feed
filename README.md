@@ -21,10 +21,10 @@ five hero scenarios, and where to file findings.
 
 ```bash
 azd extension source add -n foundry-bugbash -t url \
-  -l https://raw.githubusercontent.com/m7md7sien/azd-foundry-feed/main/registry.json
+  -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-16/registry.json
 
-azd extension install azure.ai.evaluations
-azd extension install azure.ai.dataset
+azd extension install azure.ai.evaluations --source foundry-bugbash
+azd extension install azure.ai.dataset --source foundry-bugbash
 ```
 
 ## Stop using it
