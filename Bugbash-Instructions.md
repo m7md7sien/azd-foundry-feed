@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-16-2/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-18-2/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,8 +53,34 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.6-beta** and `azure.ai.dataset` **1.0.0-beta.7**,
+`azure.ai.evaluations` **1.0.7-beta** and `azure.ai.dataset` **1.0.0-beta.8**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
+
+### Fixed since the last round
+
+Worth a second look — please re-test these and reopen if they are still wrong.
+
+- `init` no longer stops mid-sentence when the project declares no model
+  deployment, and it now reads one from `AZURE_AI_MODEL_DEPLOYMENT_NAME` in the
+  azd environment. (5530206, 5530213)
+- The `Next:` command `init` prints now runs as printed — it carries `--target`
+  and `--generation-model`. (5530243)
+- `--evaluator` takes a comma-separated list. It used to accept `a,b` and write
+  one evaluator literally named `a,b`, which only failed at `create`. A
+  reference that cannot name an evaluator is now refused by `init`. (5530208)
+- `job`'s `--dataset` and `--evaluator` say they are required. (5530208)
+- `create` and `run start` ask which eval you mean when several are declared,
+  instead of refusing. `--no-prompt` still refuses. (5530246)
+- The debug log is written to your temp directory, not your project root, so
+  `git add -A` can no longer commit it. (5530213)
+
+Also worth exercising, found in review rather than reported:
+
+- `--fail-on pass-rate=NaN` is refused. It used to be accepted and then never
+  fire, so a pipeline believed it was gated and was not.
+- A run that scored nothing now breaches `--fail-on any-failure`.
+- `run show --fail-on` needs `--wait`. Gating a run that is still going judged
+  it on partial counts.
 
 ---
 
@@ -297,7 +323,9 @@ Already reported. Please don't re-file these; anything else is fair game.
 2. **`--judge-model` and `--generation-model` read as optional but are
    effectively required** against a shared project reached by endpoint, because
    there is no `azure.yaml` model deployment to detect. `init` says so rather
-   than writing an undeployable config. (Bug 5511012.)
+   than writing an undeployable config. It now also reads
+   `AZURE_AI_MODEL_DEPLOYMENT_NAME` from the azd environment, which the bug bash
+   flow does not set, so pass the flag here. (Bug 5511012.)
 
 3. **Agent-seeded generation fails server-side for every agent.** `generate`
    detects it, says so, and retries from the agent's instructions alone, which
