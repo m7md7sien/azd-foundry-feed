@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-18-3/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-18-6/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,12 +53,54 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.7-beta** and `azure.ai.dataset` **1.0.0-beta.8**,
+`azure.ai.evaluations` **1.0.10-beta** and `azure.ai.dataset` **1.0.0-beta.10**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
+
+If you took part in an earlier round, the feed URL above is new. Point the
+source at it again — `azd extension source remove foundry-bugbash` then the
+`add` above — or `azd extension upgrade` will keep offering you the old build.
 
 ### Fixed since the last round
 
 Worth a second look — please re-test these and reopen if they are still wrong.
+
+New in this build:
+
+- **`-e/--environment` is acted on.** It was parsed and then discarded, so
+  `azd -e staging ai eval create` read its endpoint out of your *default*
+  environment and wrote the eval id back there. A name azd does not have was
+  accepted in silence too. Both extensions now read and write the environment
+  you name, and an environment that does not exist is reported. Worth
+  exercising: two environments with different `FOUNDRY_PROJECT_ENDPOINT`
+  values, and `-e` on everything.
+- **A scaffold outside `evals/` is found by every command.** After
+  `azd ai eval init --path ./quality`, `azd ai eval create` reported no
+  configuration and `azd ai eval generate` billed a job and wrote a *second*
+  configuration under `evals/`, splitting the project in two. Only `run` looked
+  where `init` had recorded. Worth exercising: scaffold somewhere other than
+  `evals/` and then run everything without repeating `--path`.
+- **`init`'s `Next:` lines run as printed** when it scaffolded outside
+  `evals/` — they now carry `--path`, quoted when the directory has a space in
+  it.
+- **A directory holding both `azure.eval.yaml` and a legacy `eval.yaml` is
+  refused by `create` too.** `run`, `init` and `generate` all refused it;
+  `create` picked one silently, which is the one case where the CLI and
+  `azd up` could act on different files.
+- **Running outside an `azd` project works again.** With
+  `FOUNDRY_PROJECT_ENDPOINT` set, commands run in a plain folder with no
+  `azure.yaml`. A previous fix narrowed too far and made that folder report
+  there was no endpoint configured.
+- **A broken `azd` says so.** Errors from the `azd` daemon used to be read as
+  "there is no environment here" whatever they said, so an expired login or an
+  unreadable project surfaced as advice to create an environment. Only azd's
+  three actual "nothing is selected" answers are read that way now; anything
+  else is reported as itself. Please file any message that still looks like the
+  wrong diagnosis.
+- The `--debug` log file is created directly with a random name and owner-only
+  permissions, rather than in a shared, predictable directory. On Linux and
+  macOS the old location was writable by other users on the same machine.
+
+From the last round:
 
 - `init` no longer stops mid-sentence when the project declares no model
   deployment, and it now reads one from `AZURE_AI_MODEL_DEPLOYMENT_NAME` in the
@@ -79,8 +121,22 @@ Also worth exercising, found in review rather than reported:
 - `--fail-on pass-rate=NaN` is refused. It used to be accepted and then never
   fire, so a pipeline believed it was gated and was not.
 - A run that scored nothing now breaches `--fail-on any-failure`.
-- `run show --fail-on` needs `--wait`. Gating a run that is still going judged
-  it on partial counts.
+- `run show --fail-on` needs a run that has finished. Add `--wait` if it might
+  not have; gating a run that is still going judged it on partial counts.
+
+And two we know about and have **not** fixed. Please confirm them rather than
+assuming, and say how much they matter to you — that is what decides whether
+they are fixed next:
+
+- **Comments in `evals/azure.eval.yaml` do not survive a rewrite.** `generate`
+  and `init` re-serialize the file, so hand-written `#` comments and your field
+  ordering are lost. Editing the file by hand is a normal thing to do here
+  (Scenario 5 asks you to), so tell us if this bites.
+- **Deleting a key from an evaluator may publish nothing** if that evaluator
+  has never been deployed from *your* checkout. Change detection compares the
+  keys you wrote against the service, and a key you removed is still on the
+  service to be matched; the local fingerprint that would catch it does not
+  exist yet in a fresh clone. Adding or changing a key is detected normally.
 
 ---
 
@@ -209,6 +265,13 @@ Short prompts, no commands — improvise.
   a malformed row; a file saved by Notepad (UTF-8 with BOM).
 - **Config edits:** an evaluator needing a column the dataset lacks; a dataset
   pinned to a deleted version; renaming an eval; editing only a description.
+- **Somewhere other than `evals/`:** `init --path ./quality`, then run the rest
+  without `--path`; a `--path` that is absolute, nested, or already holds a
+  config; two `init`s in one project.
+- **More than one environment:** `azd env new`, give each a different
+  `FOUNDRY_PROJECT_ENDPOINT`, then run with `-e` and check the right project
+  was touched and the right environment recorded the ids
+  (`azd env get-values -e <name>`).
 - **Scripting:** `-o json` everywhere including failures; `--output-file` at a
   directory, a read-only path, a deep path; very long names; narrow terminals.
 - **Interruption:** Ctrl-C mid-`create` and mid-run, then re-run; two `create`s
