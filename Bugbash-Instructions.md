@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-18-6/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-18-10/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,7 +53,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.10-beta** and `azure.ai.dataset` **1.0.0-beta.10**,
+`azure.ai.evaluations` **1.0.14-beta** and `azure.ai.dataset` **1.0.0-beta.14**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -66,6 +66,29 @@ Worth a second look — please re-test these and reopen if they are still wrong.
 
 New in this build:
 
+- **An invalid evaluator name is refused before the round trip.** The guard
+  had reached the dataset commands only, so `azd ai eval dataset show "my set"`
+  explained itself while `azd ai eval evaluator show "my rubric"` handed back
+  the service's 400 wrapped in four levels of JSON. Names are letters, digits,
+  dashes and underscores.
+- **A run that ended in `error` can be gated.** `azd ai eval run show <id>
+  --fail-on any-failure` used to answer that the run was still in progress and
+  tell you to pass `--wait`, on a run that had already stopped for good. With
+  `--wait` it now reports the run's real status and exits non-zero.
+- **`-e <a name azd does not have>` is refused** even when
+  `--project-endpoint` is also given. It used to be refused only without that
+  flag, and on the accepted path every recorded id and version read as absent,
+  so the command behaved as though nothing had ever been deployed.
+- **`run output list` no longer prints `NaN` in the SCORE column.** An
+  evaluator that errors on a row still sends a result, and averaging that in
+  made the whole sample unreadable. Rows nothing scored now show `-`.
+- **`job list` showed only the first page.** Against this project that was 20 of
+  102 dataset jobs and 20 of 31 evaluator jobs, with nothing to say the rest
+  existed. Both listings now read to the end.
+- **`dataset create` could publish over a dataset that already existed.** The
+  check for "is this name taken" threw away read errors, so a 403 or a timeout
+  read as "not taken" and the create went ahead as an update. A read that
+  failed now stops the command.
 - **`-e/--environment` is acted on.** It was parsed and then discarded, so
   `azd -e staging ai eval create` read its endpoint out of your *default*
   environment and wrote the eval id back there. A name azd does not have was
