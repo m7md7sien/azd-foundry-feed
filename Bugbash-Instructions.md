@@ -291,9 +291,27 @@ the dataset and evaluator as already **unchanged** and only creates the eval —
 that is correct, not a missed publish. A second `create` with no edits skips
 everything, the eval included.
 
+Then open one sample. This is the only place a rubric's per-dimension scores and
+the judge's full reasons are visible; the listing truncates them to a cell.
+
+```bash
+azd ai eval run output list --eval <you>-regression-eval
+azd ai eval run output show <item-id> --eval <you>-regression-eval
+```
+
 ### 3. Inner loop
 
-Re-run and compare. Nothing changed, so nothing should be republished.
+First re-run unchanged. Nothing changed, so nothing should be republished.
+
+```bash
+azd ai eval create
+azd ai eval run start
+```
+
+Now change what is being evaluated and run it again — that is the loop this
+scenario exists for, and it is what makes the comparison below mean something.
+Edit the agent's instructions in the Foundry portal, or edit a dimension's
+description in `evals/evaluators/<you>-quality.json`, then:
 
 ```bash
 azd ai eval create
@@ -301,8 +319,9 @@ azd ai eval run start
 azd ai eval run list --eval <you>-regression-eval
 ```
 
-**Expect:** `create` skips everything; `run list` shows both runs side by side
-with their pass rates, so you can see quality move.
+**Expect:** the first `create` skips everything; the second publishes only what
+you edited. `run list` shows the runs side by side with their pass rates, so you
+can see quality move.
 
 ### 4. Tuning the evaluation
 
@@ -317,29 +336,41 @@ azd ai eval evaluator versions list <you>-quality
 edit must not split the run history. A further `create` with no edits skips
 everything.
 
+Then edit the same evaluator **in the Foundry portal** and run `create` again.
+
+**Expect:** it stops rather than publishing over the portal's version, saying
+the remote version is ahead of the one this environment deployed. Publishing
+anyway would overwrite an edit nobody in the repo can see.
+
 ### 5. Automation and CI/CD
 
 Add a second eval named `<you>-gate` to `evals/azure.eval.yaml`, then:
 
 ```bash
 azd ai eval create <you>-gate
-azd ai eval run start --eval <you>-gate --fail-on pass-rate=0.8
-azd ai eval run start --eval <you>-gate --fail-on any-failure
+azd ai eval run start --eval <you>-gate --no-prompt --fail-on pass-rate=0.8
+azd ai eval run start --eval <you>-gate --no-prompt --fail-on any-failure
 ```
 
 Name the eval on `create`: once the file declares more than one, a bare
-`azd ai eval create` refuses rather than guessing.
+`azd ai eval create` refuses rather than guessing. `--no-prompt` is what a
+pipeline passes, and this scenario is the one that should be exercised the way a
+pipeline would run it.
 
-Start without blocking, then reattach and export:
+Start without blocking, take the run id out of the JSON, then reattach and
+export:
 
 ```bash
-azd ai eval run start --eval <you>-gate --no-wait
-azd ai eval run show <run-id> --eval <you>-gate --wait --fail-on pass-rate=0.8
+azd ai eval run start --eval <you>-gate --no-prompt --no-wait -o json
+# the run_id field of that JSON is what the next two commands take
+azd ai eval run show <run-id> --eval <you>-gate --no-prompt --wait --fail-on pass-rate=0.8
 azd ai eval run output export <run-id> --eval <you>-gate --output-file results.csv
 ```
 
-**Expect:** a breached gate exits non-zero; a completed run with failing samples
-exits 0 unless you asked for a gate.
+**Expect:** `--no-wait -o json` returns as soon as the run is accepted, carrying
+`run_id`, `eval_id`, `eval_name`, `dataset`, `dataset_version`, `status` and
+`created_at`. A breached gate exits non-zero; a completed run with failing
+samples exits 0 unless you asked for a gate.
 
 ### 6. Deploying evals as an azd service
 
