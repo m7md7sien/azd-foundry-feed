@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-19-11/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-19-12/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,7 +53,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.15-beta** and `azure.ai.dataset` **1.0.0-beta.15**,
+`azure.ai.evaluations` **1.0.16-beta** and `azure.ai.dataset` **1.0.0-beta.16**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -65,6 +65,54 @@ source at it again — `azd extension source remove foundry-bugbash` then the
 Worth a second look — please re-test these and reopen if they are still wrong.
 
 New in this build:
+
+- **Anchors and merge keys work in `evals/azure.eval.yaml` again.** Sharing one
+  judge configuration between entries with `&judge` / `*judge`, or inheriting an
+  entry with `<<: *base`, had started failing a file that used to load. An entry
+  that is itself an alias — `- *base` — now resolves too, and a shape the file
+  cannot use is named in words rather than as a number.
+- **`azd up` works from a subdirectory of the project.** Paths in the
+  configuration were resolved against wherever you were standing, so deploying
+  from anywhere but the folder holding `azure.yaml` reported every dataset as
+  not yet generated and offered to bill a generation job to rewrite a file
+  already on disk.
+- **Editing `max_samples` or a `source:` window no longer forks an eval.**
+  Neither reaches the eval the service stores, and recreating it pointed the
+  declaration at a new id and left every earlier run reachable only through the
+  old one. Worth exercising: change `lookback_hours`, redeploy, and check
+  `run list` still shows the runs from before.
+- **Two evals over the same dataset and evaluators stay two evals**, whichever
+  order the file lists them in. One could adopt the other's eval, rename it, and
+  end up sharing its runs.
+- **A run says which run it settled on.** `run output list`, `run output show`
+  and `run cancel` fall back to the last run when you do not name one, and now
+  print `Using last run: <id>` on stderr so a redirected listing is unchanged.
+- **`run show` reads like every other detail view** — two columns, Title Case —
+  and says `Status  not reported` rather than dropping the row when the service
+  sends none.
+- **One word for the link.** The line at the bottom of a run said `Report:`
+  while the same link under `dataset show` said `Portal:`. Both say `Portal:`.
+- **`generate --wait` exists**, and `--wait=false` means what `--no-wait` means
+  rather than being accepted and ignored. `--from` no longer offers `file`,
+  which the same command always refused. An `--output-dir` naming a file is
+  refused when generating both artifacts, because both would have been written
+  to it.
+- **`init`'s printed steps run as printed** even when a name has a space in it.
+  `--name "my eval"` printed a step passing `--dataset-name my` and a stray
+  `eval`. The suggested commands in error messages carry the same quoting now.
+- **A run is labelled with the version its rows came from**, and with nothing
+  when that cannot be said, rather than with whatever the last deploy recorded.
+- **`azd ai dataset` tells an expired login from an unrelated failure.** Any
+  error whose text happened to contain "failed to acquire a token" was reported
+  as an expired login; and `azd` missing from PATH advised `azd auth login`,
+  which cannot be run without it.
+- **`--from-file` that does not exist says so** in both extensions, instead of
+  handing back a syscall name.
+- **`instruction_file` in optimize metadata has to stay inside the project**,
+  including through a symlink or a Windows directory junction. An agent service
+  declared outside the project still reads its own instructions.
+
+From the build before:
 
 - **The pass rate is measured over the rows that were scored**, which is what
   the portal shows. A run where some rows errored used to divide by every row,
