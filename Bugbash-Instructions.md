@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-18-10/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-19-11/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,7 +53,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.14-beta** and `azure.ai.dataset` **1.0.0-beta.14**,
+`azure.ai.evaluations` **1.0.15-beta** and `azure.ai.dataset` **1.0.0-beta.15**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -66,6 +66,55 @@ Worth a second look — please re-test these and reopen if they are still wrong.
 
 New in this build:
 
+- **The pass rate is measured over the rows that were scored**, which is what
+  the portal shows. A run where some rows errored used to divide by every row,
+  so the CLI disagreed with the portal and with its own evaluator table two
+  lines above it. The rate now names its denominator — `78.6% (11 of 14
+  scored; 4 not scored)` — and `--fail-on any-failure` still counts the
+  errored rows, so nothing that used to breach stops breaching. A
+  `--fail-on pass-rate=` gate that judged only part of a run says so on
+  stderr. Worth exercising: a run with a mix of passes, failures and errors,
+  read through `run show`, `run list`, `run output list` and both gates.
+- **The `SAMPLE` column is gone from `run output list`.** It numbered rows
+  within the current filter, so the same sample was 4 plain and 2 under
+  `--failed-only` while reading like an identifier. `ITEM` already carries the
+  id that `run output show` accepts.
+- **An evaluator that returned no verdict is no longer listed as one the
+  sample failed.** The row still shows — it reads `(no verdict)` — but the
+  footer counts the two apart instead of reporting "13 sample(s) failed"
+  under totals of 5 failed and 8 errored.
+- **A misspelt key inside an evaluator entry is named.** Strict parsing only
+  reached the top level, so `verison:` on a nested entry was dropped in
+  silence and the eval graded against whatever version was latest, reporting
+  success. Worth exercising: misspell a key at each depth of
+  `evals/azure.eval.yaml`.
+- **`init --path` fixes up an `azure.yaml` that already names the service.**
+  It compared the service by name and host but not by the file it points at,
+  so scaffolding to a second location left `azd deploy` deploying the
+  configuration you had moved away from.
+- **A listing that stopped early says so on screen.** It was reported through
+  the debug log, which is discarded unless you pass `--debug`, so a short
+  evaluator listing quietly resolved an older version.
+- **`run output export` reports a file that did not finish writing.** The CSV
+  writer buffers, and the error was collected after the last flush and thrown
+  away, so a full disk exited 0 over a truncated file.
+- **`run output list -o json` prints `[]` when there is nothing**, not `null`,
+  matching every other listing.
+- **Portal links** are built only for an actual eval or run, and names are
+  escaped into the URL — a name with a space or a slash produced a broken or
+  wrong link.
+- **A read of an evaluator that failed is no longer read as "no such
+  evaluator".** A 403 or a timeout published a new version with no drift
+  check. The dataset path was fixed last build; this is its twin.
+- **`dataset versions list <a name that does not exist>` says so**, instead
+  of reporting on every dataset in the project.
+- **Ctrl-C while the configuration is being written stops.** Cancellation was
+  read as "someone else holds the lock", which is deliberately advisory, so
+  the write went ahead anyway.
+- **`instruction_file` in optimize metadata has to point inside the project.**
+  An absolute path, or one climbing out with `..`, read a file the project
+  does not contain and sent it to the service as agent instructions — so
+  cloning a repository and running `generate` could leak a named local file.
 - **An invalid evaluator name is refused before the round trip.** The guard
   had reached the dataset commands only, so `azd ai eval dataset show "my set"`
   explained itself while `azd ai eval evaluator show "my rubric"` handed back
