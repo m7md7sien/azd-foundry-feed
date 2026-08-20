@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-19-12/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-20-13/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,7 +53,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.16-beta** and `azure.ai.dataset` **1.0.0-beta.16**,
+`azure.ai.evaluations` **1.0.17-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -62,203 +62,30 @@ source at it again — `azd extension source remove foundry-bugbash` then the
 
 ### Fixed since the last round
 
-Worth a second look — please re-test these and reopen if they are still wrong.
+Please re-test these and reopen if any is still wrong.
 
-New in this build:
+- **`--version` now means the version to publish.** `azd ai dataset update
+  --version 4.0` used to publish **5.0**. It publishes 4.0. The flag works on
+  `create` too, and a version that already exists is refused rather than bumped.
+- **An evaluator can carry its rubric.** A `$ref` to a rubric file, or a
+  `definition:` block written in place, now publishes. It silently published
+  nothing before, and the eval then scored against an evaluator the service had
+  never been told about.
+- **`$ref` means the same thing everywhere.** A configuration that deployed with
+  `azd up` but failed every `azd ai eval` command, or the reverse, should not
+  happen now. YAML anchors (`&judge` / `*judge`) survive resolution.
+- **Editor validation.** `azure.yaml` and `azure.eval.yaml` are described by a
+  published schema, so a mistyped key is underlined as you type.
+- **Pass rate counts only the rows that were scored.** Errored rows are reported
+  separately instead of counting as failures. `--fail-on any-failure` still
+  counts them against the run.
 
-- **Anchors and merge keys work in `evals/azure.eval.yaml` again.** Sharing one
-  judge configuration between entries with `&judge` / `*judge`, or inheriting an
-  entry with `<<: *base`, had started failing a file that used to load. An entry
-  that is itself an alias — `- *base` — now resolves too, and a shape the file
-  cannot use is named in words rather than as a number.
-- **`azd up` works from a subdirectory of the project.** Paths in the
-  configuration were resolved against wherever you were standing, so deploying
-  from anywhere but the folder holding `azure.yaml` reported every dataset as
-  not yet generated and offered to bill a generation job to rewrite a file
-  already on disk.
-- **Editing `max_samples` or a `source:` window no longer forks an eval.**
-  Neither reaches the eval the service stores, and recreating it pointed the
-  declaration at a new id and left every earlier run reachable only through the
-  old one. Worth exercising: change `lookback_hours`, redeploy, and check
-  `run list` still shows the runs from before.
-- **Two evals over the same dataset and evaluators stay two evals**, whichever
-  order the file lists them in. One could adopt the other's eval, rename it, and
-  end up sharing its runs.
-- **A run says which run it settled on.** `run output list`, `run output show`
-  and `run cancel` fall back to the last run when you do not name one, and now
-  print `Using last run: <id>` on stderr so a redirected listing is unchanged.
-- **`run show` reads like every other detail view** — two columns, Title Case —
-  and says `Status  not reported` rather than dropping the row when the service
-  sends none.
-- **One word for the link.** The line at the bottom of a run said `Report:`
-  while the same link under `dataset show` said `Portal:`. Both say `Portal:`.
-- **`generate --wait` exists**, and `--wait=false` means what `--no-wait` means
-  rather than being accepted and ignored. `--from` no longer offers `file`,
-  which the same command always refused. An `--output-dir` naming a file is
-  refused when generating both artifacts, because both would have been written
-  to it.
-- **`init`'s printed steps run as printed** even when a name has a space in it.
-  `--name "my eval"` printed a step passing `--dataset-name my` and a stray
-  `eval`. The suggested commands in error messages carry the same quoting now.
-- **A run is labelled with the version its rows came from**, and with nothing
-  when that cannot be said, rather than with whatever the last deploy recorded.
-- **`azd ai dataset` tells an expired login from an unrelated failure.** Any
-  error whose text happened to contain "failed to acquire a token" was reported
-  as an expired login; and `azd` missing from PATH advised `azd auth login`,
-  which cannot be run without it.
-- **`--from-file` that does not exist says so** in both extensions, instead of
-  handing back a syscall name.
-- **`instruction_file` in optimize metadata has to stay inside the project**,
-  including through a symlink or a Windows directory junction. An agent service
-  declared outside the project still reads its own instructions.
+### One thing that is not a bug
 
-From the build before:
-
-- **The pass rate is measured over the rows that were scored**, which is what
-  the portal shows. A run where some rows errored used to divide by every row,
-  so the CLI disagreed with the portal and with its own evaluator table two
-  lines above it. The rate now names its denominator — `78.6% (11 of 14
-  scored; 4 not scored)` — and `--fail-on any-failure` still counts the
-  errored rows, so nothing that used to breach stops breaching. A
-  `--fail-on pass-rate=` gate that judged only part of a run says so on
-  stderr. Worth exercising: a run with a mix of passes, failures and errors,
-  read through `run show`, `run list`, `run output list` and both gates.
-- **The `SAMPLE` column is gone from `run output list`.** It numbered rows
-  within the current filter, so the same sample was 4 plain and 2 under
-  `--failed-only` while reading like an identifier. `ITEM` already carries the
-  id that `run output show` accepts.
-- **An evaluator that returned no verdict is no longer listed as one the
-  sample failed.** The row still shows — it reads `(no verdict)` — but the
-  footer counts the two apart instead of reporting "13 sample(s) failed"
-  under totals of 5 failed and 8 errored.
-- **A misspelt key inside an evaluator entry is named.** Strict parsing only
-  reached the top level, so `verison:` on a nested entry was dropped in
-  silence and the eval graded against whatever version was latest, reporting
-  success. Worth exercising: misspell a key at each depth of
-  `evals/azure.eval.yaml`.
-- **`init --path` fixes up an `azure.yaml` that already names the service.**
-  It compared the service by name and host but not by the file it points at,
-  so scaffolding to a second location left `azd deploy` deploying the
-  configuration you had moved away from.
-- **A listing that stopped early says so on screen.** It was reported through
-  the debug log, which is discarded unless you pass `--debug`, so a short
-  evaluator listing quietly resolved an older version.
-- **`run output export` reports a file that did not finish writing.** The CSV
-  writer buffers, and the error was collected after the last flush and thrown
-  away, so a full disk exited 0 over a truncated file.
-- **`run output list -o json` prints `[]` when there is nothing**, not `null`,
-  matching every other listing.
-- **Portal links** are built only for an actual eval or run, and names are
-  escaped into the URL — a name with a space or a slash produced a broken or
-  wrong link.
-- **A read of an evaluator that failed is no longer read as "no such
-  evaluator".** A 403 or a timeout published a new version with no drift
-  check. The dataset path was fixed last build; this is its twin.
-- **`dataset versions list <a name that does not exist>` says so**, instead
-  of reporting on every dataset in the project.
-- **Ctrl-C while the configuration is being written stops.** Cancellation was
-  read as "someone else holds the lock", which is deliberately advisory, so
-  the write went ahead anyway.
-- **`instruction_file` in optimize metadata has to point inside the project.**
-  An absolute path, or one climbing out with `..`, read a file the project
-  does not contain and sent it to the service as agent instructions — so
-  cloning a repository and running `generate` could leak a named local file.
-- **An invalid evaluator name is refused before the round trip.** The guard
-  had reached the dataset commands only, so `azd ai eval dataset show "my set"`
-  explained itself while `azd ai eval evaluator show "my rubric"` handed back
-  the service's 400 wrapped in four levels of JSON. Names are letters, digits,
-  dashes and underscores.
-- **A run that ended in `error` can be gated.** `azd ai eval run show <id>
-  --fail-on any-failure` used to answer that the run was still in progress and
-  tell you to pass `--wait`, on a run that had already stopped for good. With
-  `--wait` it now reports the run's real status and exits non-zero.
-- **`-e <a name azd does not have>` is refused** even when
-  `--project-endpoint` is also given. It used to be refused only without that
-  flag, and on the accepted path every recorded id and version read as absent,
-  so the command behaved as though nothing had ever been deployed.
-- **`run output list` no longer prints `NaN` in the SCORE column.** An
-  evaluator that errors on a row still sends a result, and averaging that in
-  made the whole sample unreadable. Rows nothing scored now show `-`.
-- **`job list` showed only the first page.** Against this project that was 20 of
-  102 dataset jobs and 20 of 31 evaluator jobs, with nothing to say the rest
-  existed. Both listings now read to the end.
-- **`dataset create` could publish over a dataset that already existed.** The
-  check for "is this name taken" threw away read errors, so a 403 or a timeout
-  read as "not taken" and the create went ahead as an update. A read that
-  failed now stops the command.
-- **`-e/--environment` is acted on.** It was parsed and then discarded, so
-  `azd -e staging ai eval create` read its endpoint out of your *default*
-  environment and wrote the eval id back there. A name azd does not have was
-  accepted in silence too. Both extensions now read and write the environment
-  you name, and an environment that does not exist is reported. Worth
-  exercising: two environments with different `FOUNDRY_PROJECT_ENDPOINT`
-  values, and `-e` on everything.
-- **A scaffold outside `evals/` is found by every command.** After
-  `azd ai eval init --path ./quality`, `azd ai eval create` reported no
-  configuration and `azd ai eval generate` billed a job and wrote a *second*
-  configuration under `evals/`, splitting the project in two. Only `run` looked
-  where `init` had recorded. Worth exercising: scaffold somewhere other than
-  `evals/` and then run everything without repeating `--path`.
-- **`init`'s `Next:` lines run as printed** when it scaffolded outside
-  `evals/` — they now carry `--path`, quoted when the directory has a space in
-  it.
-- **A directory holding both `azure.eval.yaml` and a legacy `eval.yaml` is
-  refused by `create` too.** `run`, `init` and `generate` all refused it;
-  `create` picked one silently, which is the one case where the CLI and
-  `azd up` could act on different files.
-- **Running outside an `azd` project works again.** With
-  `FOUNDRY_PROJECT_ENDPOINT` set, commands run in a plain folder with no
-  `azure.yaml`. A previous fix narrowed too far and made that folder report
-  there was no endpoint configured.
-- **A broken `azd` says so.** Errors from the `azd` daemon used to be read as
-  "there is no environment here" whatever they said, so an expired login or an
-  unreadable project surfaced as advice to create an environment. Only azd's
-  three actual "nothing is selected" answers are read that way now; anything
-  else is reported as itself. Please file any message that still looks like the
-  wrong diagnosis.
-- The `--debug` log file is created directly with a random name and owner-only
-  permissions, rather than in a shared, predictable directory. On Linux and
-  macOS the old location was writable by other users on the same machine.
-
-From the last round:
-
-- `init` no longer stops mid-sentence when the project declares no model
-  deployment, and it now reads one from `AZURE_AI_MODEL_DEPLOYMENT_NAME` in the
-  azd environment. (5530206, 5530213)
-- The `Next:` command `init` prints now runs as printed — it carries `--target`
-  and `--generation-model`. (5530243)
-- `--evaluator` takes a comma-separated list. It used to accept `a,b` and write
-  one evaluator literally named `a,b`, which only failed at `create`. A
-  reference that cannot name an evaluator is now refused by `init`. (5530208)
-- `job`'s `--dataset` and `--evaluator` say they are required. (5530208)
-- `create` and `run start` ask which eval you mean when several are declared,
-  instead of refusing. `--no-prompt` still refuses. (5530246)
-- The debug log is written to your temp directory, not your project root, so
-  `git add -A` can no longer commit it. (5530213)
-
-Also worth exercising, found in review rather than reported:
-
-- `--fail-on pass-rate=NaN` is refused. It used to be accepted and then never
-  fire, so a pipeline believed it was gated and was not.
-- A run that scored nothing now breaches `--fail-on any-failure`.
-- `run show --fail-on` needs a run that has finished. Add `--wait` if it might
-  not have; gating a run that is still going judged it on partial counts.
-
-And two we know about and have **not** fixed. Please confirm them rather than
-assuming, and say how much they matter to you — that is what decides whether
-they are fixed next:
-
-- **Comments in `evals/azure.eval.yaml` do not survive a rewrite.** `generate`
-  and `init` re-serialize the file, so hand-written `#` comments and your field
-  ordering are lost. Editing the file by hand is a normal thing to do here
-  (Scenario 5 asks you to), so tell us if this bites.
-- **Deleting a key from an evaluator may publish nothing** if that evaluator
-  has never been deployed from *your* checkout. Change detection compares the
-  keys you wrote against the service, and a key you removed is still on the
-  service to be matched; the local fingerprint that would catch it does not
-  exist yet in a fresh clone. Adding or changing a key is detected normally.
-
----
+A fresh clone republishes every dataset and evaluator on its first deploy.
+Version identity lives in the azd environment, which is not in the repository,
+so a new clone cannot know what is already registered. Noisy, not wrong, and
+already tracked.
 
 ## Scenarios
 
