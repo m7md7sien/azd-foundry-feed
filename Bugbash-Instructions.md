@@ -1,7 +1,7 @@
 # Bug bash: `azd ai eval` and `azd ai dataset`
 
 Two prerelease `azd` extensions for Foundry evaluations. Everything here runs
-against a **real, shared Foundry project** — these commands create datasets,
+against a **real, shared Foundry project** â€” these commands create datasets,
 evaluators, evals and runs in it, and cost real model calls.
 
 | Extension | Namespace | PR |
@@ -18,13 +18,13 @@ Include your OS, `azd version`, the exact command and its full output.
 
 You need `azd` 1.27.1 or later, and `az login` + `azd auth login` done.
 
-Everywhere below, replace `<you>` with your alias. **Names must be unique** —
+Everywhere below, replace `<you>` with your alias. **Names must be unique** â€”
 the project is shared and evals persist, so reusing a name someone else used
 leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-20-13/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-21-14/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,18 +53,37 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.17-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
+`azure.ai.evaluations` **1.0.18-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
-source at it again — `azd extension source remove foundry-bugbash` then the
-`add` above — or `azd extension upgrade` will keep offering you the old build.
+source at it again â€” `azd extension source remove foundry-bugbash` then the
+`add` above â€” or `azd extension upgrade` will keep offering you the old build.
 
 ### Fixed since the last round
 
 Please re-test these and reopen if any is still wrong.
 
-- **`--version` now means the version to publish.** `azd ai dataset update
+- **An evaluator that carries its rubric is published.** Both publish paths
+  selected on `source:` alone, and a rubric written under `definition:` leaves
+  `source:` empty, so it was skipped without a word: the eval was created bound
+  to an evaluator the service had never been told about.
+- **`generate` no longer corrupts an entry it cannot edit.** An entry reached
+  through `$ref`, one already carrying its rubric under `definition:`, and one
+  pinned to a `version:` are each refused with an explanation. Before, it wrote
+  a second declaration of the same rubric beside the first and the next command
+  rejected the whole file â€” after the generation job had been billed.
+- **A `$ref` on one entry no longer changes what another entry means.** A
+  directive on an unrelated dataset used to turn a mistyped `dimensions:` into
+  rubric content and publish it.
+- **`$ref` works on datasets and evals, not just evaluators**, so a file that
+  deploys can also be opened by the commands that edit it.
+- **`azd up` from a subdirectory** no longer reports every dataset as not yet
+  generated.
+
+### Fixed in the round before
+
+- **`--version` means the version to publish.** `azd ai dataset update
   --version 4.0` used to publish **5.0**. It publishes 4.0. The flag works on
   `create` too, and a version that already exists is refused rather than bumped.
 - **An evaluator can carry its rubric.** A `$ref` to a rubric file, or a
@@ -80,17 +99,27 @@ Please re-test these and reopen if any is still wrong.
   separately instead of counting as failures. `--fail-on any-failure` still
   counts them against the run.
 
-### One thing that is not a bug
+### Two things that are not bugs
 
 A fresh clone republishes every dataset and evaluator on its first deploy.
 Version identity lives in the azd environment, which is not in the repository,
 so a new clone cannot know what is already registered. Noisy, not wrong, and
 already tracked.
 
+Editing `evals/azure.eval.yaml` with `generate` or `init` drops the comments you
+wrote and reindents the file. Known, tracked, and being fixed properly rather
+than patched â€” but do report anything else it changes.
+
+### Known gap worth avoiding
+
+`$ref` on an eval's `source:`, its `target:`, or an item of its `evaluators:`
+list deploys, but `generate` and `init` then refuse the file with `unknown key
+"$ref"`. Keep the directive on a whole dataset, evaluator or eval entry. Tracked.
+
 ## Scenarios
 
 These are **examples, not a script**. Work through them to get oriented, then go
-wherever you like — the most useful findings come from things nobody wrote down.
+wherever you like â€” the most useful findings come from things nobody wrote down.
 
 Quick start above is scenario 1. Give it its own folder. Scenarios 2 to 6 share
 a second folder, because 3 onwards read what 2 writes. Scaffold it the same way:
@@ -114,7 +143,7 @@ azd ai eval run start
 
 **Expect:** `generate` submits two jobs, downloads both artifacts into `evals/`,
 and registers them in Foundry as it goes. So the `create` that follows reports
-the dataset and evaluator as already **unchanged** and only creates the eval —
+the dataset and evaluator as already **unchanged** and only creates the eval â€”
 that is correct, not a missed publish. A second `create` with no edits skips
 everything, the eval included.
 
@@ -135,7 +164,7 @@ azd ai eval create
 azd ai eval run start
 ```
 
-Now change what is being evaluated and run it again — that is the loop this
+Now change what is being evaluated and run it again â€” that is the loop this
 scenario exists for, and it is what makes the comparison below mean something.
 Edit the agent's instructions in the Foundry portal, or edit a dimension's
 description in `evals/evaluators/<you>-quality.json`, then:
@@ -159,7 +188,7 @@ azd ai eval create
 azd ai eval evaluator versions list <you>-quality
 ```
 
-**Expect:** the evaluator gains version 2 and the eval is left alone — a rubric
+**Expect:** the evaluator gains version 2 and the eval is left alone â€” a rubric
 edit must not split the run history. A further `create` with no edits skips
 everything.
 
@@ -212,7 +241,7 @@ azd deploy
 ```
 
 **Expect:** the same reconciliation `create` does, ending in `SUCCESS`. No Azure
-infrastructure is provisioned — eval resources are data-plane only. While it
+infrastructure is provisioned â€” eval resources are data-plane only. While it
 runs, progress lines say what happened; they are replaced by the service table
 when it finishes, so watch as it goes rather than reading the summary:
 
@@ -234,7 +263,7 @@ rather than `azd ai eval create`.
 
 ### More to try
 
-Short prompts, no commands — improvise.
+Short prompts, no commands â€” improvise.
 
 - **Empty state:** every `list` in a new project; no endpoint configured; no azd
   environment; a config file that is missing, empty, or has a misspelled key.
@@ -261,29 +290,29 @@ Short prompts, no commands — improvise.
 
 ## Command reference
 
-**`azd ai eval`** — `init`, `generate`, `create [name]`, `list`, `show <eval>`,
+**`azd ai eval`** â€” `init`, `generate`, `create [name]`, `list`, `show <eval>`,
 `delete <eval>`
 
 - `create [name]` takes the name as an argument, not a flag. `--from-file`
   creates from a file instead of a project.
 
-**`azd ai eval dataset`** and **`azd ai eval evaluator`** — `create`, `update`,
+**`azd ai eval dataset`** and **`azd ai eval evaluator`** â€” `create`, `update`,
 `list`, `show`, `delete`, `versions list`
 
 - `evaluator list --builtin` is how you discover the `builtin.*` names.
 
-**`azd ai eval run`** — `start`, `show`, `list`, `cancel`, `delete`, and
+**`azd ai eval run`** â€” `start`, `show`, `list`, `cancel`, `delete`, and
 `output list|show|export`
 
 - `run list` shows one pass rate per run. The per-evaluator breakdown is in
   `-o json`, under `per_testing_criteria_results`, because a column per
   evaluator stops being readable once two runs score different ones.
 
-**`azd ai eval job`** — `list`, `show`, `cancel`, `delete` for generation jobs.
+**`azd ai eval job`** â€” `list`, `show`, `cancel`, `delete` for generation jobs.
 `--dataset` and `--evaluator` are switches choosing which kind of job to act
 on, not filters taking a name. One is required, so a bare `job list` fails.
 
-**`azd ai dataset`** — `create`, `update`, `list`, `show`, `delete`,
+**`azd ai dataset`** â€” `create`, `update`, `list`, `show`, `delete`,
 `versions list`
 
 Every command takes `-o json`, `--debug` and `--help`. All except `init` also
@@ -293,8 +322,8 @@ take `--project-endpoint`, which wins over the environment variable.
 
 ## Cleanup
 
-Artifacts are not removed by uninstalling. Delete evals by **id** — `azd ai eval
-list -o json` gives you them — because a name shared by more than one eval is
+Artifacts are not removed by uninstalling. Delete evals by **id** â€” `azd ai eval
+list -o json` gives you them â€” because a name shared by more than one eval is
 refused. Deleting an eval also discards its runs.
 
 ```bash
