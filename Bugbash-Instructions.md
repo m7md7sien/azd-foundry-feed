@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-24-16/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-24-17/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -55,7 +55,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.20-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
+`azure.ai.evaluations` **1.0.21-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -85,6 +85,15 @@ Please re-test these and reopen if any is still wrong.
   choose traces anyway.
 - **A rubric you cannot record is refused before the generation job runs**, not
   after it has been billed and written.
+- **Answering `no` to a delete exits 0.** It came back as an error, so a
+  deliberate `no` looked to any script exactly like a delete that broke.
+- **A listing the service cannot finish is an error rather than a short list.**
+  A repeated page link used to leave you a partial catalog that looked
+  complete -- and those rows are what pick the latest version.
+- **Two `generate`s at once no longer lose one another's entry.** A lock that
+  could not be taken was reported and the work went ahead anyway, which is
+  the lost update the lock exists to stop. It now fails and tells you to
+  wait and retry.
 
 ### Fixed in the round before
 
