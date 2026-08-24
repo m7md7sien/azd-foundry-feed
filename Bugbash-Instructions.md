@@ -42,6 +42,19 @@ azd ai eval create
 azd ai eval run start
 ```
 
+**If that run fails with `No trace data found`**, the shared agent has not run
+recently, so there is nothing to evaluate. That is the state of the project, not
+a bug in the tool. A dataset needs nothing but the file you write:
+
+```bash
+mkdir -p evals/datasets
+printf '%s\n' '{"query":"How do I reset my password?","response":"Settings, then Security, then Reset password."}' '{"query":"What are your support hours?","response":"Weekdays, 9am to 5pm."}' > evals/datasets/<you>-rows.jsonl
+
+azd ai eval init --source dataset --dataset ./evals/datasets/<you>-rows.jsonl --target support-agent --judge-model gpt-4.1-nano --name <you>-ds-eval --evaluator builtin.relevance --no-prompt
+azd ai eval create
+azd ai eval run start
+```
+
 That evaluates the traces `support-agent` has already produced. A first run of
 around 20 samples usually takes a few minutes -- roughly half a minute per
 sample, since every one of them is a model call -- and ends with a table of
@@ -318,6 +331,10 @@ Short prompts, no commands -- improvise.
   a malformed row; a file saved by Notepad (UTF-8 with BOM).
 - **Config edits:** an evaluator needing a column the dataset lacks; a dataset
   pinned to a deleted version; renaming an eval; editing only a description.
+- **Two `init`s in one project:** both evals land in the one configuration. Give
+  the second a different evaluator or dataset -- two evals identical apart from
+  their name are refused, and `create` then refuses the whole file rather than
+  just the duplicate.
 - **Somewhere other than `evals/`:** `init --path ./quality`, then run the rest
   without `--path`; a `--path` that is absolute, nested, or already holds a
   config; two `init`s in one project.
