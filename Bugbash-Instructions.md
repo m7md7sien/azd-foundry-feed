@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-21-14/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-24-15/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -53,7 +53,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.18-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
+`azure.ai.evaluations` **1.0.19-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -64,25 +64,36 @@ source at it again â€” `azd extension source remove foundry-bugbash` then t
 
 Please re-test these and reopen if any is still wrong.
 
-- **An evaluator that carries its rubric is published.** Both publish paths
-  selected on `source:` alone, and a rubric written under `definition:` leaves
-  `source:` empty, so it was skipped without a word: the eval was created bound
-  to an evaluator the service had never been told about.
-- **`generate` no longer corrupts an entry it cannot edit.** An entry reached
-  through `$ref`, one already carrying its rubric under `definition:`, and one
-  pinned to a `version:` are each refused with an explanation. Before, it wrote
-  a second declaration of the same rubric beside the first and the next command
-  rejected the whole file â€” after the generation job had been billed.
-- **A `$ref` on one entry no longer changes what another entry means.** A
-  directive on an unrelated dataset used to turn a mistyped `dimensions:` into
-  rubric content and publish it.
-- **`$ref` works on datasets and evals, not just evaluators**, so a file that
-  deploys can also be opened by the commands that edit it.
-- **`azd up` from a subdirectory** no longer reports every dataset as not yet
-  generated.
+- **`generate` and `init` no longer rewrite your file.** They read the
+  configuration, changed a field and wrote the whole thing back, which deleted
+  every comment you had written and changed the indentation. Only the entries
+  they add are written now. If you kept notes in `azure.eval.yaml` and lost
+  them, that is why, and it should not happen again.
+- **`$ref` works on an eval''s `source:`, its `target:`, and the items of its
+  `evaluators:` list.** Those deployed, then failed the moment `generate` or
+  `init` read the same file. The known gap from the last round is closed.
+- **A deploy that cannot find the project directory now says so** instead of
+  resolving every relative path against whatever directory you started in,
+  which could publish a same-named dataset from the wrong place.
+- **A listing the service cannot finish is now an error**, not a short answer.
+  A truncated catalog looked identical to a complete one, and those rows decide
+  whether a name is ambiguous.
 
 ### Fixed in the round before
 
+
+- **An evaluator that carries its rubric is published.** Both publish paths
+  selected on `source:` alone, and a rubric written under `definition:` leaves
+  `source:` empty, so it was skipped without a word.
+- **`generate` no longer corrupts an entry it cannot edit.** An entry reached
+  through `$ref`, one already carrying its rubric under `definition:`, and one
+  pinned to a `version:` are each refused with an explanation.
+- **A `$ref` on one entry no longer changes what another entry means.** A
+  directive on an unrelated dataset used to turn a mistyped `dimensions:` into
+  rubric content and publish it.
+- **`$ref` works on datasets and evals, not just evaluators.**
+- **`azd up` from a subdirectory** no longer reports every dataset as not yet
+  generated.
 - **`--version` means the version to publish.** `azd ai dataset update
   --version 4.0` used to publish **5.0**. It publishes 4.0. The flag works on
   `create` too, and a version that already exists is refused rather than bumped.
@@ -99,22 +110,12 @@ Please re-test these and reopen if any is still wrong.
   separately instead of counting as failures. `--fail-on any-failure` still
   counts them against the run.
 
-### Two things that are not bugs
+### One thing that is not a bug
 
 A fresh clone republishes every dataset and evaluator on its first deploy.
 Version identity lives in the azd environment, which is not in the repository,
 so a new clone cannot know what is already registered. Noisy, not wrong, and
 already tracked.
-
-Editing `evals/azure.eval.yaml` with `generate` or `init` drops the comments you
-wrote and reindents the file. Known, tracked, and being fixed properly rather
-than patched â€” but do report anything else it changes.
-
-### Known gap worth avoiding
-
-`$ref` on an eval's `source:`, its `target:`, or an item of its `evaluators:`
-list deploys, but `generate` and `init` then refuse the file with `unknown key
-"$ref"`. Keep the directive on a whole dataset, evaluator or eval entry. Tracked.
 
 ## Scenarios
 
