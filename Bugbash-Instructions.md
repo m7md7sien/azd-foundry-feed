@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-24-18/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-24-19/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -55,7 +55,7 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.22-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
+`azure.ai.evaluations` **1.0.23-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
@@ -97,6 +97,9 @@ Please re-test these and reopen if any is still wrong.
 - **A dataset whose file sits on a later page of the container is found.**
   The blob listing stopped early and reported success, so a generated
   dataset could resolve to the wrong file, or to none at all.
+- **A second `init` in the same project works.** It failed outright with
+  `mkdir evals/azure.eval.yaml`, which is the flow the ideas list asks you
+  to try.
 - **The README's command table names only commands that exist.** It
   advertised `evaluator upload`, `evaluator builtins` and an
   `azd ai eval results` group, none of which are real, and left out the
