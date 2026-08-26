@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-26-22/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-26-23/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -68,12 +68,22 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.26-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
+`azure.ai.evaluations` **1.0.27-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
 source at it again -- `azd extension source remove foundry-bugbash` then the
 `add` above -- or `azd extension upgrade` will keep offering you the old build.
+
+## Fixed since the last build
+
+- **`run cancel` no longer picks a run for you.** It acts on the run you name,
+  or the one your environment started. It used to fall back to the newest run
+  the service lists, which on this shared project can be someone else's -- so a
+  bare `azd ai eval run cancel` could stop another person's run. With neither
+  available it now says so.
+- **A run that cannot be read is reported, not swapped.** Any failure reading
+  the remembered run used to move the command quietly onto a different one.
 
 ## One thing that changed in this build
 
