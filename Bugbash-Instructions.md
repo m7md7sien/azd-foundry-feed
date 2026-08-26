@@ -24,7 +24,7 @@ leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-26-21/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-26-22/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
@@ -68,12 +68,27 @@ azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.25-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
+`azure.ai.evaluations` **1.0.26-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
 both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
 
 If you took part in an earlier round, the feed URL above is new. Point the
 source at it again -- `azd extension source remove foundry-bugbash` then the
 `add` above -- or `azd extension upgrade` will keep offering you the old build.
+
+## One thing that changed in this build
+
+A rubric kept in its own file is now referenced at the field it fills:
+
+```yaml
+evaluators:
+  - name: <you>-quality
+    definition:
+      $ref: ./evaluators/<you>-quality.json
+```
+
+Writing `` beside `name:` instead is now refused, and the message says so.
+Nothing that `init` or `generate` writes uses that shape, so this only affects a
+configuration you hand-edited in an earlier round.
 
 ## Scenarios
 
