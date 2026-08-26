@@ -75,31 +75,6 @@ If you took part in an earlier round, the feed URL above is new. Point the
 source at it again -- `azd extension source remove foundry-bugbash` then the
 `add` above -- or `azd extension upgrade` will keep offering you the old build.
 
-## Fixed since the last build
-
-- **`run cancel` no longer picks a run for you.** It acts on the run you name,
-  or the one your environment started. It used to fall back to the newest run
-  the service lists, which on this shared project can be someone else's -- so a
-  bare `azd ai eval run cancel` could stop another person's run. With neither
-  available it now says so.
-- **A run that cannot be read is reported, not swapped.** Any failure reading
-  the remembered run used to move the command quietly onto a different one.
-
-## One thing that changed in this build
-
-A rubric kept in its own file is now referenced at the field it fills:
-
-```yaml
-evaluators:
-  - name: <you>-quality
-    definition:
-      $ref: ./evaluators/<you>-quality.json
-```
-
-Writing `` beside `name:` instead is now refused, and the message says so.
-Nothing that `init` or `generate` writes uses that shape, so this only affects a
-configuration you hand-edited in an earlier round.
-
 ## Scenarios
 
 These are **examples, not a script**. Work through them to get oriented, then go
