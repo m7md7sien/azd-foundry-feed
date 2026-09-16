@@ -19,27 +19,42 @@ Include your OS, `azd version`, the exact command and its full output.
 You need `azd` 1.27.1 or later, and `az login` + `azd auth login` done.
 
 Everywhere below, replace `<you>` with your alias. **Names must be unique** --
-the project is shared and evals persist, so reusing a name someone else used
-leaves you unable to run it. See [Appendix A](#appendix-a-known-issues).
+the project is shared and evals persist, so prefix your datasets, evaluators
+and evals to avoid collisions with other testers.
+
+**Returning testers:** if `foundry-bugbash` points at a dated release, run
+`azd extension source remove foundry-bugbash` once, then add the source below.
+This removes only the saved source configuration, not your Foundry resources.
+
+The source URL follows GitHub's **Latest** release, so it does not change with
+each build. New bug-bash releases must include `registry.json` and be marked
+Latest; GitHub releases marked only as prereleases are not selected.
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-31-25/registry.json
+azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/latest/download/registry.json
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 
-# 2. point at the shared project (PowerShell; other shells in Notes)
-$env:FOUNDRY_PROJECT_ENDPOINT="https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral"
-
-# 3. make a project to work in
+# 2. make a project to work in
 mkdir azd-eval-bugbash
 cd azd-eval-bugbash
 azd init --minimal --no-prompt -e bugbash
+
+# 3. point this environment at the shared project
+azd env set FOUNDRY_PROJECT_ENDPOINT https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
 
 # 4. your first evaluation
 azd ai eval init --source traces --target support-agent --judge-model gpt-4.1-nano --name <you>-trace-eval --no-prompt
 azd ai eval create
 azd ai eval run start
+```
+
+That evaluates the traces `support-agent` has already produced. Runtime depends
+on sample count, model latency and service load. Then read the per-sample results:
+
+```bash
+azd ai eval run output list --eval <you>-trace-eval
 ```
 
 **If that run fails with `No trace data found`**, the shared agent has not run
@@ -51,31 +66,53 @@ mkdir -p evals/datasets
 printf '%s\n' '{"query":"How do I reset my password?","response":"Settings, then Security, then Reset password."}' '{"query":"What are your support hours?","response":"Weekdays, 9am to 5pm."}' > evals/datasets/<you>-rows.jsonl
 
 azd ai eval init --source dataset --dataset ./evals/datasets/<you>-rows.jsonl --target support-agent --judge-model gpt-4.1-nano --name <you>-ds-eval --evaluator builtin.relevance --no-prompt
-azd ai eval create
-azd ai eval run start
+azd ai eval create <you>-ds-eval
+azd ai eval run start --eval <you>-ds-eval
+azd ai eval run output list --eval <you>-ds-eval
 ```
 
-That evaluates the traces `support-agent` has already produced. A first run of
-around 20 samples usually takes a few minutes -- roughly half a minute per
-sample, since every one of them is a model call -- and ends with a table of
-evaluators and an overall pass rate. If it finishes in seconds, or is still
-going after fifteen minutes, that is worth reporting.
+The endpoint is saved in this azd environment. `--project-endpoint` overrides it;
+otherwise the environment value takes precedence over a machine-wide
+`azd ai project` selection and over variables exported in your shell.
 
-Then read the per-sample results:
+**Check what you installed:** both extensions should use `foundry-bugbash` and
+match the versions in the [current registry][registry].
+
+[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/latest/download/registry.json
 
 ```bash
-azd ai eval run output list --eval <you>-trace-eval
+azd extension list --installed
+azd ai eval version
+azd ai dataset version
 ```
 
-**Check you are current:** `azd extension list --installed` should show
-`azure.ai.evaluations` **1.0.29-beta** and `azure.ai.dataset` **1.0.0-beta.17**,
-both from `foundry-bugbash`. If not, `azd extension upgrade <id>`.
+The rolling source does not replace installed binaries automatically. For a
+newer version, use `azd extension upgrade <id>` and select `foundry-bugbash` if
+asked. To refresh a build republished with the same version, or avoid a source
+selection prompt, reinstall explicitly:
 
-If you took part in an earlier round, the feed URL above is new. Point the
-source at it again -- `azd extension source remove foundry-bugbash` then the
-`add` above -- or `azd extension upgrade` will keep offering you the old build.
+```bash
+azd extension uninstall azure.ai.evaluations
+azd extension uninstall azure.ai.dataset
+azd extension install azure.ai.evaluations --source foundry-bugbash
+azd extension install azure.ai.dataset --source foundry-bugbash
+```
 
-## Scenarios
+## Command surface
+
+| Group | Commands |
+| --- | --- |
+| `azd ai eval` | `init`, `generate`, `create [name]`, `list`, `show <eval>`, `delete <eval>` |
+| `azd ai eval dataset` | `create`, `update`, `list`, `show`, `download`, `delete`, `versions list` |
+| `azd ai eval evaluator` | `create`, `update`, `list`, `show`, `delete`, `versions list` |
+| `azd ai eval run` | `start`, `list`, `show`, `cancel`, `delete`, `output list`, `output show`, `output export` |
+| `azd ai eval job` | `list`, `show`, `cancel`, `delete` |
+| `azd ai dataset` | `create`, `update`, `list`, `show`, `download`, `delete`, `versions list` |
+
+Every command takes `-o json` and `--no-prompt`. Use `--help` for command-specific
+flags.
+
+## Surface
 
 These are **examples, not a script**. Work through them to get oriented, then go
 wherever you like -- the most useful findings come from things nobody wrote down.
@@ -87,6 +124,7 @@ a second folder, because 3 onwards read what 2 writes. Scaffold it the same way:
 mkdir azd-eval-bugbash-2
 cd azd-eval-bugbash-2
 azd init --minimal --no-prompt -e bugbash
+azd env set FOUNDRY_PROJECT_ENDPOINT https://asayedahmed-ngen-swcentral-resou.services.ai.azure.com/api/projects/asayedahmed-ngen-swcentral
 ```
 
 ### 2. A repeatable baseline
@@ -207,7 +245,7 @@ infrastructure is provisioned -- eval resources are data-plane only. While it
 runs, progress lines say what happened; they are replaced by the service table
 when it finishes, so watch as it goes rather than reading the summary:
 
-```
+```text
 support-agent-evals: Deploying (Created eval <you>-reg-eval (eval_...))
 support-agent-evals: Deploying (Eval <you>-reg-eval is unchanged (eval_...))
 ```
@@ -243,46 +281,14 @@ Short prompts, no commands -- improvise.
   config; two `init`s in one project.
 - **More than one environment:** `azd env new`, give each a different
   `FOUNDRY_PROJECT_ENDPOINT`, then run with `-e` and check the right project
-  was touched and the right environment recorded the ids
-  (`azd env get-values -e <name>`).
+  was touched and lookups in each environment keep reaching that project's
+  evals.
 - **Scripting:** `-o json` everywhere including failures; `--output-file` at a
   directory, a read-only path, a deep path; very long names; narrow terminals.
 - **Interruption:** Ctrl-C mid-`create` and mid-run, then re-run; two `create`s
   at once; `--no-wait`, cancel, then ask for output.
 - **Cross-extension:** `azd ai dataset list` vs `azd ai eval dataset list`, and
   anything else in both. They should answer the same way, exit codes included.
-
----
-
-## Command reference
-
-**`azd ai eval`** -- `init`, `generate`, `create [name]`, `list`, `show <eval>`,
-`delete <eval>`
-
-- `create [name]` takes the name as an argument, not a flag. `--from-file`
-  creates from a file instead of a project.
-
-**`azd ai eval dataset`** and **`azd ai eval evaluator`** -- `create`, `update`,
-`list`, `show`, `delete`, `versions list`
-
-- `evaluator list --builtin` is how you discover the `builtin.*` names.
-
-**`azd ai eval run`** -- `start`, `show`, `list`, `cancel`, `delete`, and
-`output list|show|export`
-
-- `run list` shows one pass rate per run. The per-evaluator breakdown is in
-  `-o json`, under `per_testing_criteria_results`, because a column per
-  evaluator stops being readable once two runs score different ones.
-
-**`azd ai eval job`** -- `list`, `show`, `cancel`, `delete` for generation jobs.
-`--dataset` and `--evaluator` are switches choosing which kind of job to act
-on, not filters taking a name. One is required, so a bare `job list` fails.
-
-**`azd ai dataset`** -- `create`, `update`, `list`, `show`, `delete`,
-`versions list`
-
-Every command takes `-o json`, `--debug` and `--help`. All except `init` also
-take `--project-endpoint`, which wins over the environment variable.
 
 ---
 
@@ -308,76 +314,3 @@ azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
 azd extension source remove foundry-bugbash
 ```
-
----
-
-## Notes
-
-**Other shells.** Command Prompt takes no quotes and no spaces around `=`:
-`set FOUNDRY_PROJECT_ENDPOINT=https://...`. bash and zsh use
-`export FOUNDRY_PROJECT_ENDPOINT=https://...`.
-
-**Check the endpoint took:** `azd ai eval list -o json` should print `[` and
-exit 0, even in an empty project.
-
-**What is already in the project.** Agents `support-agent` (used by the
-scenarios) and `test-agent`. Models `gpt-4.1-nano`, `gpt-4o-mini`, `gpt-4.1`,
-`gpt-5.1`, `o4-mini`, `text-embedding-3-large`. Region swedencentral. Access is
-via the Evaluation Service Team group (`raisvcteam@microsoft.com`).
-
-**Install can look stuck.** Each extension is about 15 MB from a GitHub release,
-so the progress bar may sit still for a few minutes on first install. Let it
-finish.
-
-**`--source` matters.** Without it, `azd` may find the id in more than one
-registry and stop on a prompt, which hangs a script. `azd extension upgrade`
-has no `--source` flag at all, so if it asks, answer `foundry-bugbash`; to
-avoid the question entirely, `azd extension uninstall <id>` then install again
-with `--source`.
-
-**`azd init` prompts.** Always use `azd init --minimal --no-prompt -e <name>`;
-plain `azd init` and even `--minimal` ask questions.
-
-**There is a second eval surface, and it is not this one.** The agents extension
-ships `azd ai agent eval`, with its own config at `eval.yaml` in the project
-root, while this extension writes `evals/azure.eval.yaml`. They are not
-interchangeable and neither reads the other's file. `azd ai agent eval` is one
-agent, one command, sensible defaults; `azd ai eval` declares datasets,
-evaluators and evals in a config you keep in the repo and reconcile. Which to
-use is worth an opinion from you, and confusion between them is a legitimate
-finding.
-
----
-
-## Appendix A: known issues
-
-Already reported. Please don't re-file these; anything else is fair game.
-
-1. **Names must be unique.** Two evals with the same name cannot be run: `run
-   start` refuses to guess, and the id it offers is rejected by
-   `run start --eval <id>` until that eval has already run once. The two errors
-   point at each other. Prefix everything with your alias. If you are stuck,
-   `azd ai eval list -o json` then `azd ai eval delete <eval-id> --force`.
-
-2. **`--judge-model` and `--generation-model` read as optional but are
-   effectively required** against a shared project reached by endpoint, because
-   there is no `azure.yaml` model deployment to detect. `init` says so rather
-   than writing an undeployable config. It now also reads
-   `AZURE_AI_MODEL_DEPLOYMENT_NAME` from the azd environment, which the bug bash
-   flow does not set, so pass the flag here. (Bug 5511012.)
-
-3. **Agent-seeded generation fails server-side for every agent.** `generate`
-   detects it, says so, and retries from the agent's instructions alone, which
-   succeeds. Expected until the service is fixed.
-
-4. **`-o json` still prints prose on the failure path**, so a failing command
-   breaks a JSON pipe. The `ERROR:` line comes from `azd` itself, not these
-   extensions.
-
-5. **`WARNING: 1 extension did not start.`** That is `azure.ai.agents`, not
-   either extension under test. It and `azure.ai.projects` both try to register
-   the same provisioning provider and the second loses. Harmless here.
-
-6. **A gated run exits 1, not 2.** `azd` does not propagate an extension's exit
-   code, so gating and operational failure share 1. Tell them apart by the gate
-   message. Non-zero vs zero is still correct.
