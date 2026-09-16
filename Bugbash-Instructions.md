@@ -105,7 +105,7 @@ azd extension install azure.ai.dataset --source foundry-bugbash
 | --- | --- |
 | `azd ai eval` | `init`, `generate`, `create [name]`, `list`, `show <eval>`, `delete <eval>` |
 | `azd ai eval dataset` | `create`, `update`, `list`, `show`, `download`, `delete`, `versions list` |
-| `azd ai eval evaluator` | `create`, `update`, `list`, `show`, `delete`, `versions list` |
+| `azd ai eval evaluator` | `create`, `update`, `list`, `show`, `download`, `delete`, `versions list` |
 | `azd ai eval run` | `start`, `list`, `show`, `cancel`, `delete`, `output list`, `output show`, `output export` |
 | `azd ai eval job` | `list`, `show`, `cancel`, `delete` |
 | `azd ai dataset` | `create`, `update`, `list`, `show`, `download`, `delete`, `versions list` |
