@@ -16,7 +16,8 @@ Include your OS, `azd version`, the exact command and its full output.
 
 ## Quick start
 
-You need `azd` 1.27.1 or later, and `az login` + `azd auth login` done.
+Install the latest stable Azure Developer CLI before starting. Check with
+`azd version`, then authenticate using `az login` and `azd auth login`.
 
 Everywhere below, replace `<you>` with your alias. **Names must be unique** --
 the project is shared and evals persist, so prefix your datasets, evaluators
