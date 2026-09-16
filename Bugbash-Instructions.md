@@ -112,7 +112,7 @@ azd extension install azure.ai.dataset --source foundry-bugbash
 Every command takes `-o json` and `--no-prompt`. Use `--help` for command-specific
 flags.
 
-## Surface
+## Hero Scenarios
 
 These are **examples, not a script**. Work through them to get oriented, then go
 wherever you like -- the most useful findings come from things nobody wrote down.
