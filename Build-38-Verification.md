@@ -101,10 +101,10 @@ No temporary subset dataset is automatically published.
 | Gate | Status |
 | --- | --- |
 | Combined source checks at the pinned SHA | Parent rerunning; new result pending |
-| Both extensions built from the pinned SHA | In progress in fresh source-specific staging |
-| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Pending for the new packages |
-| Fresh isolated Windows installation and versions | Pending for the new packages |
-| Matching-candidate live scenarios | Pending: all nine previous negative cases must reject without asset/state writes, plus a bounded one-seed simulation |
+| Both extensions built from the pinned SHA | Passed in fresh source-specific staging; dependency manifests unchanged |
+| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary VCS revision/platform and matching build bytes |
+| Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
+| Matching-candidate live scenarios | Pending: revised eleven-case negative matrix must reject without asset/state writes, plus a bounded one-seed simulation |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
@@ -113,7 +113,7 @@ The earlier `9a27cd20` source could publish dependency assets for some invalid
 seed/query inputs and was not approved for publication. The new source checks
 non-whitespace seed descriptions, positive whole-number `desired_num_turns`,
 turn ceilings, seed/message mode mixing, target query fields, whole-number rubric
-weights from 1 to 10, and numeric pass thresholds from 0 to 1. The nine-case
+weights from 1 to 10, and numeric pass thresholds from 0 to 1. The eleven-case
 package matrix must confirm these guards before publication. Source code or
 earlier bounded-run success alone does not close the mutation blocker.
 
