@@ -94,6 +94,7 @@ No temporary subset dataset is automatically published.
 
 | Gate | Status |
 | --- | --- |
+| Combined source checks at the pinned SHA | Parent-reported pass: evaluation build, full short suite with `NO_COLOR=1` and no skips, tagged vet, lint, and clean `go fix` diff; dataset build, full short suite, and vet |
 | Both extensions built from the pinned SHA | Passed; dependencies unchanged, package-only version overrides |
 | Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed locally; extracted binary VCS revision and platform metadata checked |
 | Fresh isolated Windows installation and versions | Passed with azd 1.33.0; bundle source, exact runtime versions |
