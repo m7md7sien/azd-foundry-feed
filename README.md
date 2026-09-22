@@ -17,15 +17,25 @@ above, which are public.
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** — setup, the
 five hero scenarios, and where to file findings.
 
+Closing out specific bugs from the last round?
+**[Build 37 — verification pass](./Build-37-Verification.md)** lists what each
+fix should now do, and which findings are already settled.
+
 ## Use it
+
+The source URL below follows GitHub's **Latest** release, so it does not change
+with each build.
 
 ```bash
 azd extension source add -n foundry-bugbash -t url \
-  -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-08-16-2/registry.json
+  -l https://github.com/m7md7sien/azd-foundry-feed/releases/latest/download/registry.json
 
 azd extension install azure.ai.evaluations --source foundry-bugbash
 azd extension install azure.ai.dataset --source foundry-bugbash
 ```
+
+If you added this source before and pinned it to a dated release, remove it once
+with `azd extension source remove foundry-bugbash` and add it again as above.
 
 ## Stop using it
 
@@ -35,4 +45,6 @@ azd extension uninstall azure.ai.dataset
 azd extension source remove foundry-bugbash
 ```
 
-Requires `azd` 1.27.0 or later.
+Requires `azd` **1.33.0 or later**. Both extensions declare
+`requiredAzdVersion: >=1.33.0` in the published registry, so an older `azd`
+will not resolve this build at all.
