@@ -1,9 +1,9 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Corrected source build approved; acceptance pending.** The
+**Not published. Corrected source and scoped package acceptance passed; publication pending.** The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
-The new source below includes the semantic preflight fix and requires fresh
-package verification before any publication.
+The new source below includes the semantic preflight fix and has fresh
+package verification. Publication still requires an explicit release decision.
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -105,7 +105,7 @@ No temporary subset dataset is automatically published.
 | Both extensions built from the pinned SHA | Passed in fresh source-specific staging; dependency manifests unchanged |
 | Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary VCS revision/platform and matching build bytes |
 | Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
-| Matching-candidate live scenarios | Pending: revised eleven-case negative matrix must reject without asset/state writes, plus a bounded one-seed simulation |
+| Matching-candidate live scenarios | Passed 17/17 measured negative cases without dataset-version/private-state changes; independent evaluator/eval absence checks; bounded one-seed simulation passed |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
@@ -114,9 +114,17 @@ The earlier `9a27cd20` source could publish dependency assets for some invalid
 seed/query inputs and was not approved for publication. The new source checks
 non-whitespace seed descriptions, positive whole-number `desired_num_turns`,
 turn ceilings, seed/message mode mixing, target query fields, whole-number rubric
-weights from 1 to 10, and numeric pass thresholds from 0 to 1. The eleven-case
-package matrix must confirm these guards before publication. Source code or
-earlier bounded-run success alone does not close the mutation blocker.
+weights from 1 to 10, and numeric pass thresholds from 0 to 1. The verifier's
+expanded 17-case matrix exercised the exact new packages and confirmed rejection
+without dataset-version or private-state changes. Independent checks found no
+created custom rubric/eval resources for those cases. This closes the measured
+preflight blocker; it is not a claim that every possible invalid input was tested.
+
+Both new bundle hashes and installed Windows binary hashes matched the packaging
+manifest, with exact JSON versions `1.0.38-beta` and `1.0.0-beta.26`.
+The new package's one-seed run
+`evalrun_b8d8f6d62a624d9f97e9f2ba2e658f66` completed with one passed evaluation
+and zero errors in 20 seconds. No new 15-row generation was needed.
 
 **Dataset download issue confirmed on the earlier `9a27cd20` package of
 `1.0.0-beta.26`:** for a CLI-uploaded
