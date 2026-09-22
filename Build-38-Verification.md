@@ -101,6 +101,7 @@ No temporary subset dataset is automatically published.
 | Gate | Status |
 | --- | --- |
 | Combined source checks at the pinned SHA | Parent rerunning; new result pending |
+| Source race-test run | [Evaluation command tests failed with a data race; dataset race tests passed](https://github.com/m7md7sien/azure-dev/actions/runs/35798951876). This is not passing package CI evidence. |
 | Both extensions built from the pinned SHA | Passed in fresh source-specific staging; dependency manifests unchanged |
 | Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary VCS revision/platform and matching build bytes |
 | Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
