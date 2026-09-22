@@ -1,6 +1,6 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Build complete; live package acceptance and publication pending.**
+**Not published. Scoped local package acceptance passed; publication pending.**
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -98,7 +98,7 @@ No temporary subset dataset is automatically published.
 | Both extensions built from the pinned SHA | Passed; dependencies unchanged, package-only version overrides |
 | Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed locally; extracted binary VCS revision and platform metadata checked |
 | Fresh isolated Windows installation and versions | Passed with azd 1.33.0; bundle source, exact runtime versions |
-| Matching-candidate live scenarios | Pending |
+| Matching-candidate live scenarios | Scoped pass: bounded one-seed simulation, explicit-zero loader rejection, and invalid-built-in preflight with no publication/private-state change |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
@@ -107,9 +107,18 @@ No temporary subset dataset is automatically published.
 invalid seed/query inputs can still cause `create` to publish dependency assets.
 The invalid-built-in-evaluator preflight case passed without publication, but
 that does not establish an all-invalid-inputs/no-publication guarantee.
-Package-level acceptance remains separate and pending. Do not use this
+The scoped package checks below do not close this broader gap. Do not use this
 candidate's preflight validation as a blanket assurance that rejected input
 cannot leave shared versions behind.
+
+The verifier installed both exact local bundles, matched their SHA256 hashes
+and both installed Windows binary hashes, and confirmed versions with azd
+1.33.0. Package run `evalrun_9c33ef7f3a234d8c93bcbc7d71687ec5` completed with
+one passed conversation evaluation and zero errors. The requested configuration
+was one seed, one repetition, and maximum two turns. Generated/completed
+conversation counters and actual turn counts were honestly **not reported**.
+This verifies that bounded scenario on the packaged source SHA, not every
+scenario, platform, output path, or negative case.
 
 Record the exact candidate version, source SHA, scenario, observed result, and
 sanitized evidence. A successful request submission is not a completed/scored
