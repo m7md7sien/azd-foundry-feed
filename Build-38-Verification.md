@@ -1,6 +1,6 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Build approved; package acceptance and publication pending.**
+**Not published. Build complete; live package acceptance and publication pending.**
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -94,9 +94,9 @@ No temporary subset dataset is automatically published.
 
 | Gate | Status |
 | --- | --- |
-| Both extensions built from the pinned SHA | In progress |
-| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Pending |
-| Fresh isolated Windows installation and versions | Pending |
+| Both extensions built from the pinned SHA | Passed; dependencies unchanged, package-only version overrides |
+| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed locally; extracted binary VCS revision and platform metadata checked |
+| Fresh isolated Windows installation and versions | Passed with azd 1.33.0; bundle source, exact runtime versions |
 | Matching-candidate live scenarios | Pending |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
