@@ -1,9 +1,9 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Publication denied for this source attempt.** Preventable
-preflight mutations remain a release blocker. The package checks below establish
-packaging behavior only; a newly approved source SHA and fresh build are required
-before publication.
+**Not published. Corrected source build approved; acceptance pending.** The
+earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
+The new source below includes the semantic preflight fix and requires fresh
+package verification before any publication.
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -13,8 +13,8 @@ verified from baseline evidence or from the presence of these instructions.
 | Evaluations | `1.0.38-beta` |
 | Dataset | `1.0.0-beta.26` |
 | Required azd | `>=1.33.0` |
-| Source commit for both extensions | [`9a27cd20a63d51e8459584e2a4dd167683e4b54c`](https://github.com/m7md7sien/azure-dev/commit/9a27cd20a63d51e8459584e2a4dd167683e4b54c) |
-| Publication decision | Withheld for this source; all evidence below belongs to this unpublished attempt |
+| Source commit for both extensions | [`e6f86f9605511c8448bff8114275ac1a160cf479`](https://github.com/m7md7sien/azure-dev/commit/e6f86f9605511c8448bff8114275ac1a160cf479) |
+| Publication decision | Not yet approved; earlier attempt's results are not this source's acceptance |
 
 Package-only version overrides are applied in an isolated checkout.
 Source dependency manifests and changelogs are unchanged. Each extension is
@@ -28,10 +28,12 @@ The source combines the original
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116), and
 [Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102)
 with the following
-[incremental source changes](https://github.com/m7md7sien/azure-dev/compare/0361f347eb28c5f2e756225115318393b1dad28a...9a27cd20a63d51e8459584e2a4dd167683e4b54c):
+[incremental source changes](https://github.com/m7md7sien/azure-dev/compare/0361f347eb28c5f2e756225115318393b1dad28a...e6f86f9605511c8448bff8114275ac1a160cf479):
 
 - Validate dependencies before publication; retain successful versions and print
   recovery information after a partial failure.
+- Validate local seed semantics, target query columns, and rubric parameter
+  bounds before dependency reconciliation.
 - Preserve service-issued registered dataset version identity, including for
   declared local files that have already been published.
 - Scaffold static conversations or simulation explicitly, keep model roles
@@ -98,34 +100,35 @@ No temporary subset dataset is automatically published.
 
 | Gate | Status |
 | --- | --- |
-| Combined source checks at the pinned SHA | Parent-reported pass: evaluation build, full short suite with `NO_COLOR=1` and no skips, tagged vet, lint, and clean `go fix` diff; dataset build, full short suite, and vet |
-| Both extensions built from the pinned SHA | Passed; dependencies unchanged, package-only version overrides |
-| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed locally; extracted binary VCS revision and platform metadata checked |
-| Fresh isolated Windows installation and versions | Passed with azd 1.33.0; bundle source, exact runtime versions |
-| Matching-candidate live scenarios | Scoped pass: bounded one-seed simulation, explicit-zero loader rejection, and invalid-built-in preflight with no publication/private-state change |
+| Combined source checks at the pinned SHA | Parent rerunning; new result pending |
+| Both extensions built from the pinned SHA | In progress in fresh source-specific staging |
+| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Pending for the new packages |
+| Fresh isolated Windows installation and versions | Pending for the new packages |
+| Matching-candidate live scenarios | Pending: all nine previous negative cases must reject without asset/state writes, plus a bounded one-seed simulation |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
 
-**Blocking source-validation gap:** checks of the frozen source found that some
-invalid seed/query inputs can still cause `create` to publish dependency assets.
-The invalid-built-in-evaluator preflight case passed without publication, but
-that does not establish an all-invalid-inputs/no-publication guarantee.
-The scoped package checks below do not close this broader gap. Do not use this
-candidate's preflight validation as a blanket assurance that rejected input
-cannot leave shared versions behind.
-Disclosing these preventable mutations is not sufficient to approve publication.
+The earlier `9a27cd20` source could publish dependency assets for some invalid
+seed/query inputs and was not approved for publication. The new source checks
+non-whitespace seed descriptions, positive whole-number `desired_num_turns`,
+turn ceilings, seed/message mode mixing, target query fields, whole-number rubric
+weights from 1 to 10, and numeric pass thresholds from 0 to 1. The nine-case
+package matrix must confirm these guards before publication. Source code or
+earlier bounded-run success alone does not close the mutation blocker.
 
-**Confirmed dataset download issue in `1.0.0-beta.26`:** for a CLI-uploaded
+**Dataset download issue confirmed on the earlier `9a27cd20` package of
+`1.0.0-beta.26`:** for a CLI-uploaded
 single-file JSONL dataset, `download --output-file` exits 1 saying the dataset
 holds one file but has no single path. The tested workaround is
 `download --output-dir <directory>`: it downloaded one file whose SHA256 matched
 the uploaded bytes. In this case `show` reports `isSingleFile: true` and
 `type: uri_file`, while download JSON reports `singleFile: false`.
 This discrepancy is a known issue, not evidence that the dataset is corrupt.
+The new source changes evaluation preflight only, not dataset download code.
 Other dataset shapes and output paths are not all verified.
 
-The verifier installed both exact local bundles, matched their SHA256 hashes
+**Earlier attempt only:** the verifier installed both `9a27cd20` local bundles, matched their SHA256 hashes
 and both installed Windows binary hashes, and confirmed versions with azd
 1.33.0. Package run `evalrun_9c33ef7f3a234d8c93bcbc7d71687ec5` completed with
 one passed conversation evaluation and zero errors. The requested configuration
@@ -134,8 +137,8 @@ conversation counters and actual turn counts were honestly **not reported**.
 Separate inspection of this bounded run's transcript found two user messages
 and two assistant messages; that does not make the CLI's missing aggregate
 counters available.
-This verifies that bounded scenario on the packaged source SHA, not every
-scenario, platform, output path, or negative case.
+These results remain evidence for the withheld `9a27cd20` packages, not acceptance
+of the new source or every scenario, platform, output path, or negative case.
 
 Record the exact candidate version, source SHA, scenario, observed result, and
 sanitized evidence. A successful request submission is not a completed/scored
