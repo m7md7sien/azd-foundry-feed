@@ -102,6 +102,14 @@ No temporary subset dataset is automatically published.
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
 
+**Known source-validation gap:** checks of the frozen source found that some
+invalid seed/query inputs can still cause `create` to publish dependency assets.
+The invalid-built-in-evaluator preflight case passed without publication, but
+that does not establish an all-invalid-inputs/no-publication guarantee.
+Package-level acceptance remains separate and pending. Do not use this
+candidate's preflight validation as a blanket assurance that rejected input
+cannot leave shared versions behind.
+
 Record the exact candidate version, source SHA, scenario, observed result, and
 sanitized evidence. A successful request submission is not a completed/scored
 simulation. For simulation output, requested seeds/repetitions/turn ceilings
