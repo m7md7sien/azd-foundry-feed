@@ -382,6 +382,11 @@ the run acceptance status.
 
 ### Sample caps and registered dataset identity
 
+**Build 37 behavior:** the following describes the currently published build.
+The prepared candidate changes registered-dataset caps and explicit-zero
+overrides; see [the candidate 38 checklist](./Build-38-Verification.md).
+Do not apply candidate instructions to an installed build 37.
+
 | Mode | Supported bound and expected behavior |
 | --- | --- |
 | Ordinary local dataset run | Positive `--max-samples` or eval `max_samples` bounds the rows sent. A positive command-line value takes precedence over the YAML value. |
