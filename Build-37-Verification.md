@@ -1,9 +1,11 @@
 # Build 37 — verification pass
 
-**Published 2026-09-22.** This build is installable from the feed and bundles fixes for
-13 bugs found in the last bug bash. The job here is narrower than
-[Bugbash-Instructions.md](./Bugbash-Instructions.md): confirm each fix actually holds
-against a live Foundry project, and record what you find.
+**Published 2026-09-22. Historical build checklist, not a readiness certificate.**
+This build bundles changes intended to address findings from the last bug bash.
+There is no blanket claim that 13 bugs are fixed or verified. The job here is
+narrower than [Bugbash-Instructions.md](./Bugbash-Instructions.md): confirm the
+behavior against a live Foundry project and record the exact installed versions.
+Evidence from another source tree or a later candidate does not verify this build.
 
 Start from the hero scenarios if you want breadth. Use this doc if you want to close out
 specific bugs.
@@ -31,12 +33,16 @@ azd version                     # must be >= 1.33.0
 If it is older, reinstall `azd` first — see
 [Install the Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd).
 
-The feed source is stable and does not change per build:
+To reproduce this historical build, use its immutable release URL, not the rolling
+Latest source (which will eventually resolve a newer candidate). These commands
+replace the two installed extensions in the current azd configuration:
 
 ```bash
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/latest/download/registry.json
-azd extension upgrade azure.ai.evaluations
-azd extension upgrade azure.ai.dataset
+azd extension source add -n foundry-bugbash-37 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-22-37/registry.json
+azd extension uninstall azure.ai.evaluations
+azd extension uninstall azure.ai.dataset
+azd extension install azure.ai.evaluations --source foundry-bugbash-37
+azd extension install azure.ai.dataset --source foundry-bugbash-37
 ```
 
 Confirm you are actually on this build — read `installedVersion`, not `version`:
@@ -47,17 +53,19 @@ azd ai eval version             # must print 1.0.37-beta
 azd ai dataset version          # must print 1.0.0-beta.25
 ```
 
-**Returning testers:** if you still have sources pinned to dated releases (`bugbash30`,
-`bugbash31`, or a `foundry-bugbash` pointing at a dated URL), they will surface older
-versions alongside this one. Remove the stale ones with
-`azd extension source delete <name>` and keep only the `latest/download` source above.
+Skip an uninstall command if that extension is not installed. For the rolling
+candidate rather than build 37, use the Latest instructions in the
+[README](./README.md). Always name the desired source explicitly.
 
 ---
 
 ## 2. What is in this build
 
-Three pull requests, merged onto `main` and packed together. All three pass the same gate
-as a combined tree — `gofmt`, `go fix`, `go vet`, tests, `golangci-lint`, `cspell`.
+Three pull requests were **bundled into the feed build**, not asserted to be merged
+into upstream `main`. The release description does not identify a single source
+commit or a matching CI run for the shipped archives. Do not infer those from a
+feed tag's target commit, which identifies this feed repository, not the source
+repository. Source-only checks and later baseline tests are separate evidence.
 
 | PR | Carries |
 |---|---|
@@ -69,8 +77,8 @@ as a combined tree — `gofmt`, `go fix`, `go vet`, tests, `golangci-lint`, `csp
 
 ## 3. Bugs to verify
 
-Each row is a fix this build claims. Reproduce the old behaviour only if you have an
-older build handy — otherwise just confirm **Expected**.
+Each row is a verification target, not a recorded pass. Confirm **Expected** with
+these installed versions and record pass, failure, or a specific service blocker.
 
 ### Generate and dataset
 
@@ -78,8 +86,8 @@ older build handy — otherwise just confirm **Expected**.
 |---|---|---|
 | **5631329** | `azd ai eval generate --dataset --evaluation-level conversation --from prompt --agent-instruction "..." --generation-model <model> --max-samples 15` | Rows are **seeds** (`test_case_description`, optional `desired_num_turns`), not query/response pairs. The job's `options.type` is `simulation_seed`. |
 | **5631288** | The same, with `--target <service-key>` where the `azure.yaml` key differs from the deployed agent name | Seeds are generated from the **deployed agent**, not from the local service key |
-| **5631478** | Declare an eval with a `simulation:` block over a seed dataset, `azd ai eval create`, then `azd ai eval run start` | A conversation simulation actually runs. Before this build there was no run path at all. |
-| **5631468** | Run an agent-target eval over a **registered** dataset | The request references the dataset by id and version. Foundry must **not** show `Inline data`. |
+| **5631478** | Declare an eval with a `simulation:` block over a seed dataset, `azd ai eval create`, then `azd ai eval run start` | A conversation simulation completes and scores its transcript. Merely accepting the request does not verify this. |
+| **5631468** | Run an agent-target eval over a **registered** dataset, uncapped and capped separately | An uncapped run uses the service-issued identity when available. A capped run intentionally sends bounded rows inline; `Inline data` is expected in that case. Verify the row count and selected dataset version. |
 
 ### Run
 
@@ -103,21 +111,21 @@ older build handy — otherwise just confirm **Expected**.
 
 | Bug | Note |
 |---|---|
-| **5631330** | `max_samples` overshoot. Fixed service-side, **not** in this extension build. |
-| **5595119** | Needs no change in these extensions. |
+| **5631330** | A service-side fix has merged, but deployment to the test project is unknown. Recheck the actual count; do not mark fixed from merge status alone. |
+| **5595119** | No extension change is claimed here. Record the current service outcome separately. |
 
 ---
 
-## 4. Already settled — please do not re-litigate
+## 4. Historical observations and external gates
 
-These were confirmed against a live project while the build was being put together.
-Re-test if you want, but the conclusions below are load-bearing, and at least two of them
-look like bugs if you do not know the backstory.
+The observations below were reported during earlier source/live investigations.
+They explain the contract but are not a per-scenario verification record for
+every archive in this release or for a future candidate.
 
-**The data-generation discriminator is `simulation_seed`.** Confirmed twice over: in the
-published contract (`azure-rest-api-specs`, `data_generation_jobs/models.tsp`,
-`DataGenerationJobType`) and by a live job that ran to `succeeded`.
-`conversation_simulation` is **not** a member of that enum.
+**The seed-generation request uses `simulation_seed`.** This has contract and
+successful baseline job evidence. The simulation *run* uses
+`azure_ai_user_conversation_simulation_preview`, a separate discriminator.
+The final GA discriminator remains unconfirmed.
 
 **The request and the dataset tag deliberately use different words.** The service accepts
 `options.type: simulation_seed` on the way in, and then writes
@@ -125,8 +133,10 @@ published contract (`azure-rest-api-specs`, `data_generation_jobs/models.tsp`,
 are correct in their own place. **If you see `conversation_simulation` in dataset tags,
 that is expected, not a regression.**
 
-**The `5530209` wire shape is confirmed.** A genuine rubric edit published **version 2,
-HTTP 201**, retaining `display_name`, `categories` and `supported_evaluation_levels`.
+**Rubric metadata preservation has baseline live evidence.** A rubric edit
+published a new version retaining `display_name`, `categories` and
+`supported_evaluation_levels`. Repeat the edit/read-back on the candidate before
+marking its `5530209` scenario verified.
 
 **Two undocumented service constraints turned up while confirming that:**
 
@@ -135,16 +145,18 @@ HTTP 201**, retaining `display_name`, `categories` and `supported_evaluation_lev
 | `categories` is a **closed enum** | `quality`, `safety`, `agents`, `business` | HTTP 400 |
 | `pass_threshold` is **normalized** | `0.0` to `1.0` | HTTP 400 — e.g. `3` is rejected |
 
-Nothing user-facing in either extension violates these, but they are easy to trip over
-when hand-writing a request.
+Use these constraints when authoring an evaluator; validate the returned metadata
+as well as the status code. Official release readiness also remains gated on
+privacy signoff. This unofficial feed is not an official release approval.
 
 ---
 
-## 5. Known rough edges — expected, not bugs to file
+## 5. Known rough edges to distinguish from regressions
 
-- **`--max-samples` is approximate.** A request for 15 returned **14** rows. The service
-  treats it as an upper bound and best effort, not an exact count. Worth a doc-wording
-  fix; please do **not** file it as data loss.
+- **Generation count is not a run cap.** An earlier generation request for 15
+  returned 14 rows. Generation is service-dependent and may return fewer rows;
+  record overshoot rather than assuming a service fix is deployed. A dataset run's
+  `--max-samples` bounds the input rows and is a separate behavior.
 - **Standalone `--no-wait` prints a state warning.** Run outside an `azd` project you will
   see `cannot record EVAL_FINGERPRINT_DATA_JOB_..._LEVEL: no project exists`. Harmless —
   the level is recovered from the service when you reattach, which is exactly the case
@@ -157,6 +169,7 @@ when hand-writing a request.
 File findings as bugs, not PR comments: **<https://aka.ms/evalsbug>**
 
 For each bug above, report one of **verified**, **still broken**, or **blocked, and why**.
-If something is still broken, include your OS, `azd version`, the exact command, the full
-output, and the job or run id — those are what make a service-side claim checkable. One
-live run beats an argument from reading the source.
+If something is still broken, include your OS, `azd version`, the exact command,
+sanitized output, and the job or run id. Do not post tokens, private prompts,
+customer rows, or full raw service responses. Include the release tag, both
+extension versions, and the exact source SHA when the release provides it.

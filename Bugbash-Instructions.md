@@ -1,23 +1,46 @@
 # Bug bash: `azd ai eval` and `azd ai dataset`
 
-Two prerelease `azd` extensions for Foundry evaluations. Everything here runs
-against a **real, shared Foundry project** -- these commands create datasets,
-evaluators, evals and runs in it, and cost real model calls.
+Two prerelease `azd` extensions for Foundry evaluations. Publishing and running
+against a **real, shared Foundry project** creates resources and can cost real
+model calls. Scaffolding with `init` is not a live evaluation.
 
-| Extension | Namespace | PR |
+| Extension | Namespace | Original proposal |
 |---|---|---|
 | `azure.ai.evaluations` | `azd ai eval` | [Azure/azure-dev#9500](https://github.com/Azure/azure-dev/pull/9500) |
 | `azure.ai.dataset` | `azd ai dataset` | [Azure/azure-dev#9499](https://github.com/Azure/azure-dev/pull/9499) |
 
 **File findings as bugs, not PR comments: https://aka.ms/evalsbug**
-Include your OS, `azd version`, the exact command and its full output.
+Include your OS, `azd version`, both extension versions, the release tag, and the
+exact command with sanitized output. Never post tokens, private prompts,
+customer data, or full raw live-service responses.
+
+**Release status:** the published versions and bundled PRs are listed in the
+[README](./README.md). Bundled means included in a feed build, not merged
+upstream. These scenarios are test instructions, not a claim that every scenario
+has passed. Baseline simulation and rubric evidence does not verify a newer
+candidate. Service deployment, the final GA simulation discriminator, and
+privacy signoff remain separate gates.
 
 ---
 
 ## Quick start
 
-Install the latest stable Azure Developer CLI before starting. Check with
+Install Azure Developer CLI **1.33.0 or later** before starting. Check with
 `azd version`, then authenticate using `az login` and `azd auth login`.
+
+The shell examples below use Bash. On PowerShell, use the same single-line azd
+commands and create the shown UTF-8 JSONL files in your editor rather than using
+`printf` or Bash line continuations.
+
+For a fresh-user check that does not alter your normal installed extensions,
+set `AZD_CONFIG_DIR` to a new, empty directory before any azd command. Keep that
+value for the whole check and authenticate in that configuration. For example,
+in PowerShell:
+
+```powershell
+$env:AZD_CONFIG_DIR = Join-Path $env:TEMP ("azd-foundry-bugbash-" + [guid]::NewGuid())
+$env:AZURE_DEV_COLLECT_TELEMETRY = "no"
+```
 
 Everywhere below, replace `<you>` with your alias. **Names must be unique** --
 the project is shared and evals persist, so prefix your datasets, evaluators
@@ -89,8 +112,8 @@ azd ai dataset version
 
 The rolling source does not replace installed binaries automatically. For a
 newer version, use `azd extension upgrade <id>` and select `foundry-bugbash` if
-asked. To refresh a build republished with the same version, or avoid a source
-selection prompt, reinstall explicitly:
+asked. Releases and versions must not be overwritten. To avoid a source
+selection prompt when moving to a new candidate, reinstall explicitly:
 
 ```bash
 azd extension uninstall azure.ai.evaluations
@@ -165,7 +188,10 @@ azd ai eval run start
 Now change **what is being evaluated** -- not how it is judged, which is
 scenario 4 -- and run it again. That is the loop this scenario exists for, and
 it is what makes the comparison below mean something. Edit the agent's
-instructions in the Foundry portal, then:
+instructions in the Foundry portal **only for a separate agent you own**.
+Never edit or redeploy the shared `support-agent`, its versions, or shared model
+deployments. Point your eval at your owned agent before this step, or skip the
+mutation and record the coverage gap. Then:
 
 ```bash
 azd ai eval create
@@ -173,9 +199,10 @@ azd ai eval run start
 azd ai eval run list --eval <you>-regression-eval
 ```
 
-**Expect:** the first `create` skips everything; the second publishes only what
-you edited. `run list` shows the runs side by side with their pass rates, so you
-can see quality move.
+**Expect:** an unchanged `create` skips everything. Editing an agent in the portal
+does not make `eval create` deploy the agent. It reconciles only evaluation
+resources; the next run invokes the configured agent. `run list` shows the runs
+side by side. Record the agent version used so the comparison is meaningful.
 
 ### 4. Tuning the evaluation
 
@@ -259,8 +286,120 @@ the hurry. A disagreement is a finding.
 `azd up` is the right verb only where the project really provisions something.
 In a folder with an `infra/` template that creates at least one resource, `azd
 up` provisions and then runs the same eval service target. Worth a pass if you
-already have such a project; `azd ai eval init` should recommend `azd up` there
-rather than `azd ai eval create`.
+already have such a project. `azd ai eval init` recommends a named
+`azd ai eval create` for the added eval; `azd up` is a whole-project alternative,
+not a prerequisite for deploying data-plane evaluation resources.
+
+### 8. Full authoring: static conversations and simulation
+
+`init` is an add-only scaffold, not a complete editor for every supported YAML
+shape. It does not generate data or start a run. Its bounded, best-effort
+built-in evaluator catalogue check is not an assurance that the project, agent,
+models, or every evaluator will work at run time. `generate` produces artifacts;
+it must not silently attach them to an existing eval or replace its configuration.
+Read its next steps, then explicitly declare or initialize the eval you want.
+
+Author the full configuration when the scaffold does not expose the desired
+mode. Add a service to `azure.yaml` without replacing existing services:
+
+```yaml
+services:
+  evals:
+    host: azure.ai.eval
+    $ref: ./evals/azure.eval.yaml
+```
+
+In a new scenario folder, create `evals/datasets/<you>-recorded.jsonl` containing
+a completed conversation:
+
+```jsonl
+{"messages":[{"role":"user","content":"What are your support hours?"},{"role":"assistant","content":"Weekdays, 9am to 5pm."}]}
+```
+
+Create `evals/datasets/<you>-seeds.jsonl` containing a scenario, not a completed
+exchange:
+
+```jsonl
+{"test_case_description":"Ask for support hours, then ask whether weekend support is available.","desired_num_turns":2}
+```
+
+Create `evals/azure.eval.yaml` as below. If using an existing config, merge the
+catalog entries and evals into their existing lists instead of overwriting it.
+Paths are relative to that file. The judge and simulation models must both be
+deployed in your project, and the evaluator must support conversation level.
+
+```yaml
+datasets:
+  - name: <you>-recorded
+    file: ./datasets/<you>-recorded.jsonl
+  - name: <you>-seeds
+    file: ./datasets/<you>-seeds.jsonl
+evals:
+  - name: <you>-static-conversation
+    dataset: <you>-recorded
+    evaluation_level: conversation
+    evaluators:
+      - evaluator: builtin.task_completion
+        initialization_parameters:
+          model: gpt-4.1-nano
+  - name: <you>-simulated-conversation
+    dataset: <you>-seeds
+    evaluation_level: conversation
+    target:
+      type: agent
+      name: support-agent
+    simulation:
+      model: gpt-4o-mini
+      num_conversations: 1
+      max_turns: 2
+    evaluators:
+      - evaluator: builtin.task_completion
+        initialization_parameters:
+          model: gpt-4.1-nano
+```
+
+Run each eval explicitly:
+
+```bash
+azd ai eval create <you>-static-conversation
+azd ai eval run start --eval <you>-static-conversation --no-prompt
+azd ai eval create <you>-simulated-conversation
+azd ai eval run start --eval <you>-simulated-conversation --no-prompt
+```
+
+**Expect:** the static eval scores the stored `messages` without invoking an
+agent. It intentionally has neither `target` nor `simulation`. The simulation
+eval uses the seed to create an interaction with the agent, then scores the
+resulting transcript. A seed row is not an agent `query`; do not bind it to
+`{{item.query}}`. Keep generation, simulation, and judge models separate.
+
+`num_conversations` accepts 1 through 5 per seed and defaults to 1 when omitted.
+`max_turns` accepts 1 through 20; omission preserves the service default.
+Explicit zero is invalid. `desired_num_turns` cannot exceed an explicit
+`max_turns`. Start with one seed and a small turn budget because every
+conversation invokes models. Inspect run output and transcript shape, not just
+the run acceptance status.
+
+### Sample caps and registered dataset identity
+
+| Mode | Supported bound and expected behavior |
+| --- | --- |
+| Ordinary local dataset run | Positive `--max-samples` or eval `max_samples` bounds the rows sent. A positive command-line value takes precedence over the YAML value. |
+| Ordinary registered dataset run | A positive cap is supported by reading bounded rows and sending them inline. `Inline data` in the portal is expected for this mode; verify the count and selected version. |
+| Uncapped registered dataset run | Uses the service-issued dataset identity when available. Do not construct or guess an `azureai://` identity. |
+| Conversation simulation | Does not accept a sample cap. Bound the number of seed rows, `num_conversations`, and `max_turns` instead. Do not combine it with a `source` block. |
+| Traces | Use the trace source's `max_traces` and time window. A dataset sample cap is not a substitute. |
+| Data generation | `generate --max-samples` requests a service generation count, not a dataset-run cap. Record the resulting count; merged service code does not prove deployment. |
+
+For ordinary dataset runs, zero or an omitted cap means no cap at that level;
+negative values are invalid. An explicit CLI zero does not clear a positive
+YAML cap. A capped registered run deliberately trades direct file reference for
+a bounded inline subset. Do not report that distinction alone as a bug.
+
+These authoring examples require a matching-candidate live pass before being
+marked verified. A missing deployment, unavailable evaluator, or service
+rejection is a recorded blocker, not a successful test. The current simulation
+run contract is preview-only; the final GA discriminator is unconfirmed.
 
 ### More to try
 
@@ -297,7 +436,9 @@ Short prompts, no commands -- improvise.
 
 Artifacts are not removed by uninstalling. Delete evals by **id** -- `azd ai eval
 list -o json` gives you them -- because a name shared by more than one eval is
-refused. Deleting an eval also discards its runs.
+refused. Deleting an eval also discards its runs. Delete only resources and
+versions you can prove this test created. Never delete shared agents, models,
+or another tester's dataset/evaluator versions.
 
 ```bash
 azd ai eval delete <eval-id> --force
