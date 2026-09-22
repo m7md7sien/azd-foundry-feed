@@ -111,12 +111,24 @@ The scoped package checks below do not close this broader gap. Do not use this
 candidate's preflight validation as a blanket assurance that rejected input
 cannot leave shared versions behind.
 
+**Confirmed dataset download issue in `1.0.0-beta.26`:** for a CLI-uploaded
+single-file JSONL dataset, `download --output-file` exits 1 saying the dataset
+holds one file but has no single path. The tested workaround is
+`download --output-dir <directory>`: it downloaded one file whose SHA256 matched
+the uploaded bytes. In this case `show` reports `isSingleFile: true` and
+`type: uri_file`, while download JSON reports `singleFile: false`.
+This discrepancy is a known issue, not evidence that the dataset is corrupt.
+Other dataset shapes and output paths are not all verified.
+
 The verifier installed both exact local bundles, matched their SHA256 hashes
 and both installed Windows binary hashes, and confirmed versions with azd
 1.33.0. Package run `evalrun_9c33ef7f3a234d8c93bcbc7d71687ec5` completed with
 one passed conversation evaluation and zero errors. The requested configuration
 was one seed, one repetition, and maximum two turns. Generated/completed
 conversation counters and actual turn counts were honestly **not reported**.
+Separate inspection of this bounded run's transcript found two user messages
+and two assistant messages; that does not make the CLI's missing aggregate
+counters available.
 This verifies that bounded scenario on the packaged source SHA, not every
 scenario, platform, output path, or negative case.
 
