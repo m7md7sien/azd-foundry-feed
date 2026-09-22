@@ -1,6 +1,9 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Scoped local package acceptance passed; publication pending.**
+**Not published. Publication denied for this source attempt.** Preventable
+preflight mutations remain a release blocker. The package checks below establish
+packaging behavior only; a newly approved source SHA and fresh build are required
+before publication.
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -11,6 +14,7 @@ verified from baseline evidence or from the presence of these instructions.
 | Dataset | `1.0.0-beta.26` |
 | Required azd | `>=1.33.0` |
 | Source commit for both extensions | [`9a27cd20a63d51e8459584e2a4dd167683e4b54c`](https://github.com/m7md7sien/azure-dev/commit/9a27cd20a63d51e8459584e2a4dd167683e4b54c) |
+| Publication decision | Withheld for this source; all evidence below belongs to this unpublished attempt |
 
 Package-only version overrides are applied in an isolated checkout.
 Source dependency manifests and changelogs are unchanged. Each extension is
@@ -103,13 +107,14 @@ No temporary subset dataset is automatically published.
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
 
-**Known source-validation gap:** checks of the frozen source found that some
+**Blocking source-validation gap:** checks of the frozen source found that some
 invalid seed/query inputs can still cause `create` to publish dependency assets.
 The invalid-built-in-evaluator preflight case passed without publication, but
 that does not establish an all-invalid-inputs/no-publication guarantee.
 The scoped package checks below do not close this broader gap. Do not use this
 candidate's preflight validation as a blanket assurance that rejected input
 cannot leave shared versions behind.
+Disclosing these preventable mutations is not sufficient to approve publication.
 
 **Confirmed dataset download issue in `1.0.0-beta.26`:** for a CLI-uploaded
 single-file JSONL dataset, `download --output-file` exits 1 saying the dataset
