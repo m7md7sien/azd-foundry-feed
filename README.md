@@ -14,21 +14,21 @@ for a later build. Each release identifies its bundled changes; a PR bundled int
 this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
-[38](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-38):
-evaluations `1.0.38-beta` and dataset `1.0.0-beta.26`, both built from
-[`c5be500196d66bb4326bb62700a1dde83c1f92a5`](https://github.com/m7md7sien/azure-dev/commit/c5be500196d66bb4326bb62700a1dde83c1f92a5).
+[39](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-39):
+evaluations `1.0.39-beta` and dataset `1.0.0-beta.27`, both built from
+[`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898).
 It bundles
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116),
 [Azure/azure-dev#10113](https://github.com/Azure/azure-dev/pull/10113), and
-[Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102).
+[Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102)
 plus the follow-up fixes described in the
-[build 38 acceptance record](./Build-38-Verification.md).
+[build 39 acceptance record](./Build-39-Verification.md).
 
-**Build 38 is Latest.** Anonymous downloads and fresh pinned/Latest Windows
-installs passed. [Final CI](https://github.com/m7md7sien/azure-dev/actions/runs/35802906993)
-passed 64/64 installed-CLI checks on each of Linux and Windows, plus both full
-source-race suites. Use the stable Latest URL below or the
-[pinned build 38 instructions](./Build-38-Verification.md#install-this-build).
+**Build 39 is published but not Latest yet.** Its anonymous asset checks and
+fresh published-source Windows installation passed. Final installed-CLI and
+hosted race CI are pending. Use the
+[pinned build 39 instructions](./Build-39-Verification.md#install-this-build)
+to test it now; the stable Latest URL below still selects build 38.
 
 ## Bug bash
 
@@ -36,14 +36,17 @@ Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
 For current candidate evidence and known limitations, use
-**[Build 38 verification](./Build-38-Verification.md)**. The standalone dataset
-`--output-file` issue has a verified `--output-dir` workaround. Truly unregistered
-local-file runs can fail with `has no versions to read`; curate rows, explicitly
-publish the dataset, and run its registered version without a positive cap.
-Per-dimension rubric details can be lost by build 38's typed CLI projection;
-the original fresh-user scenario's coverage remains unverified. Richer observed
-simulation counters and an all-scenarios fresh-user pass remain follow-up work.
-Hosted source/offline CLI checks are not live-cloud CI approval.
+**[Build 39 verification](./Build-39-Verification.md)**. Targeted exact-package
+checks cover both single-file download surfaces, local-file caps, registered
+identity guards, and preservation/rendering of returned rubric details.
+Observed conversation-output identities/statuses are not generation totals or
+inferred actual turns. Broader fresh-user work remains build 38 evidence, not a
+complete build 39 rerun. Hosted source/offline checks are not live-cloud CI.
+
+**[Build 38 verification](./Build-38-Verification.md)** retains that immutable
+release's evidence and known issues, including its download workaround,
+unregistered-local-file failure, and rubric projection gap. Its assets are
+unchanged.
 
 Closing out specific bugs in the older build?
 **[Build 37 verification checklist](./Build-37-Verification.md)** distinguishes

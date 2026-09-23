@@ -1,30 +1,44 @@
-# Candidate 39: source and acceptance checklist
+# Build 39: source and acceptance checklist
 
-**Publication approved, not yet published.** Local packaging, parent source
-checks, and scoped exact-package acceptance passed. The release will be
-published non-Latest first; final hosted CI and anonymous checks gate promotion.
-Both extensions use the exact source SHA below. Build 38 remains the published
-Latest release, and its registry, packages, and historical findings are unchanged.
+**Published non-Latest on 2026-09-23.** Local packaging, parent source checks,
+scoped exact-package acceptance, anonymous asset verification, and a fresh
+published-source Windows install passed. Final installed-CLI and hosted race CI
+gate promotion. Both extensions use the exact source SHA below. Build 38
+remains Latest, and its release assets and historical findings are unchanged.
 
-The live release/tag inventory and Latest registry were checked on 2026-09-23.
-Build 38 currently carries evaluations `1.0.38-beta` and dataset
-`1.0.0-beta.26`; no build 39 release or tag was present. The following names are
-provisional, not reserved, and must be checked again before build/publication.
-
-| Item | Draft value |
+| Item | Published value |
 | --- | --- |
-| Planned tag | `extensions-2026-09-23-39` |
+| Release | [extensions-2026-09-23-39](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-39) |
 | Evaluations | `1.0.39-beta` |
 | Dataset | `1.0.0-beta.27` |
 | Required azd | `>=1.33.0`, confirmed in both packaged manifests and the registry |
 | Source commit for both extensions | [`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898) |
-| Registry SHA256 | `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44` (local, not published) |
-| Publication and Latest promotion | Separate pending gates |
+| Registry SHA256 | `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44` |
+| Latest promotion | Pending final installed-CLI and hosted race CI |
 
-No install URL is offered until real assets exist. Do not use this document as
-evidence that a build 38 issue has been fixed in a published package.
+## Install this build
 
-## Approved source scope, not shipped fixes
+Use a fresh `AZD_CONFIG_DIR` so an old development registry or installed binary
+cannot mask the published package. The pinned source is independent of Latest:
+
+```bash
+azd extension source add -n foundry-candidate-39 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/registry.json
+azd extension install azure.ai.evaluations --source foundry-candidate-39 --version 1.0.39-beta
+azd extension install azure.ai.dataset --source foundry-candidate-39 --version 1.0.0-beta.27
+azd ai eval version -o json
+azd ai dataset version -o json
+```
+
+Changing a source does not automatically replace installed extensions. Use an
+isolated configuration or explicitly upgrade; check an existing source's URL
+instead of silently reusing the name.
+
+[SHA256SUMS](https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/SHA256SUMS)
+and [source-provenance.json](https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/source-provenance.json)
+describe the immutable artifacts. Provenance verification fields are a build-time
+snapshot; the acceptance record below includes later results.
+
+## Included source changes
 
 The [six integrated follow-up commits](https://github.com/m7md7sien/azure-dev/compare/c5be500196d66bb4326bb62700a1dde83c1f92a5...9a549449c2d5c2b4c6661f0ee8f8da7e3036c898)
 address:
@@ -32,7 +46,7 @@ address:
 - Single-file downloads in both `azd ai dataset` and `azd ai eval dataset`.
 - Observed conversation-output identities and lifecycle statuses from a complete
   output listing, distinct from requested settings and evaluation verdicts.
-- Human-readable handoff guidance for unattended runs.
+- Generated init handoff guidance for unattended use.
 - Truly unregistered local files whose remote version listing is empty.
 - Actual returned rubric dimension data and preservation of nested result/sample
   fields, without deriving missing values from rubric definitions.
@@ -65,9 +79,10 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | Candidate-specific regression/live acceptance | Scoped pass on the exact packages: both download surfaces, local/registered static runs, rubric properties/sample/export, and lookup IDs; details below |
 | Owned verification-fixture cleanup | Passed: owned eval, both runs, dataset version, and evaluator version returned 404; the local-only dataset remained unpublished |
 | Separate PUBLISH approval | Approved for exact source and registry hash above, non-Latest first |
-| Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Not started |
-| Non-Latest publication and anonymous pinned registry/all-asset verification | Not started |
-| Fresh published-source installs and final Linux/Windows CLI/source CI with exact pins | Not started |
+| Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Passed: all 15 remote sizes, SHA256 digests, and upload states matched |
+| Non-Latest publication and anonymous pinned registry/all-asset verification | Passed: all 15 assets anonymously downloaded and SHA256 matched |
+| Fresh published-source Windows install | Passed on azd 1.33.0; exact JSON versions and installed binary bytes match final archives |
+| Final Linux/Windows CLI/source CI with exact published pins | Pending: 68 CLI checks per OS and both full race suites requested |
 | Latest promotion, anonymous stable URL, and fresh stable-source install | Not started |
 
 The release should contain 12 platform archives, `source-provenance.json`,
@@ -93,7 +108,7 @@ source, versions, package hashes, commands, and sanitized outcomes for each resu
 | Observed conversation outputs | A waited run that already fetched all rows reports unique conversation IDs and output-item lifecycle statuses. Duplicates count once; unknown/conflicting statuses and rows without IDs stay separate. Paged/filtered or unfetched detail views must not imply complete coverage. No new fetch, generated/completed-conversation total, or transcript-based actual-turn inference is promised. |
 | Rubric detail and raw fields | Display dimension values only when actually returned. Verify applicable scores, weights and reasons against sanitized retained service evidence; preserve nested JSON fields rather than silently dropping them. |
 | Detail lookup identifiers | A human-displayed lookup ID works with the detail command; JSON retains the service identity. |
-| Unattended handoff | Confirm the human next-step hint and runnable reattachment command without contaminating JSON output or resubmitting work. |
+| Unattended handoff | Confirm generated interactive `init` guidance explains the explicit independent judge/simulator inputs required with `--no-prompt`, without contaminating JSON output or resubmitting generation. |
 | Existing behavior | Retain the prior semantic preflight/no-mutation, static-versus-simulation, pinning, cap-zero, and JSON-output guarantees using evidence tied to the candidate or an explicitly justified source boundary. |
 
 The approved README specifies that rubric detail uses returned

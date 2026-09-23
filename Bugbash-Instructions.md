@@ -21,9 +21,12 @@ has passed. Baseline simulation and rubric evidence does not verify a newer
 candidate. Service deployment, the final GA simulation discriminator, and
 privacy signoff remain separate gates.
 
-These instructions target **build 38**, evaluations `1.0.38-beta` and dataset
-`1.0.0-beta.26`. The source below pins that release for reproducible results.
-The README separately documents the rolling Latest source.
+These instructions target **build 39**, evaluations `1.0.39-beta` and dataset
+`1.0.0-beta.27`. The source below pins that release for reproducible results.
+The README separately documents the rolling Latest source. Broader fresh-user
+scenario evidence belongs to build 38; build 39 has
+[targeted exact-package acceptance](./Build-39-Verification.md), not a complete
+fresh-user rerun. Keep the two evidence sets separate.
 
 ---
 
@@ -51,15 +54,15 @@ the project is shared and evals persist, so prefix your datasets, evaluators
 and evals to avoid collisions with other testers.
 
 **Returning testers:** use a fresh azd configuration or explicitly reinstall
-the two extensions from `foundry-candidate-38` below. Adding a source does not
+the two extensions from `foundry-candidate-39` below. Adding a source does not
 replace installed binaries. If this source name already exists, check that its
 URL matches rather than silently using an older registry.
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-candidate-38 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/registry.json
-azd extension install azure.ai.evaluations --source foundry-candidate-38 --version 1.0.38-beta
-azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1.0.0-beta.26
+azd extension source add -n foundry-candidate-39 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/registry.json
+azd extension install azure.ai.evaluations --source foundry-candidate-39 --version 1.0.39-beta
+azd extension install azure.ai.dataset --source foundry-candidate-39 --version 1.0.0-beta.27
 
 # 2. make a project to work in
 mkdir azd-eval-bugbash
@@ -105,10 +108,10 @@ The endpoint is saved in this azd environment. `--project-endpoint` overrides it
 otherwise the environment value takes precedence over a machine-wide
 `azd ai project` selection and over variables exported in your shell.
 
-**Check what you installed:** both extensions should use `foundry-candidate-38`
+**Check what you installed:** both extensions should use `foundry-candidate-39`
 and match the versions in the [pinned registry][registry].
 
-[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/registry.json
+[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/registry.json
 
 ```bash
 azd extension list --installed
@@ -124,8 +127,8 @@ source (skip an uninstall if that extension is absent):
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension install azure.ai.evaluations --source foundry-candidate-38 --version 1.0.38-beta
-azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1.0.0-beta.26
+azd extension install azure.ai.evaluations --source foundry-candidate-39 --version 1.0.39-beta
+azd extension install azure.ai.dataset --source foundry-candidate-39 --version 1.0.0-beta.27
 ```
 
 ## Optional: owned-agent and own-trace setup
@@ -133,7 +136,7 @@ azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1
 The bug-bash feed installs only evaluations and datasets. Seeing only `eval`
 and `dataset` under `azd ai --help` is expected. Agent management is a separate,
 independently versioned [official extension][agents-install]. Install it from
-`azd`, **not** `foundry-candidate-38`, in the same isolated configuration:
+`azd`, **not** `foundry-candidate-39`, in the same isolated configuration:
 
 ```bash
 azd extension install azure.ai.agents --source azd --version 1.0.0-beta.16
@@ -145,7 +148,7 @@ azd ai agent invoke --help
 
 These agent commands were checked against installed `azure.ai.agents`
 `1.0.0-beta.16` with azd 1.33.0. Its dependencies install separately; it is not
-part of build 38. Help verification is not an end-to-end agent deployment pass.
+part of this feed. Help verification is not an end-to-end agent deployment pass.
 
 ### Existing project and uniquely owned agent
 
@@ -216,7 +219,7 @@ azd ai eval init --name <you>-own-traces --source traces --target <you>-bugbash-
 
 In this eval's generated `source` block, replace the broad lookback with your
 actual version and request window. The following fields are verified against
-the build 38 schema; replace every placeholder with an observed value:
+the evaluation schema retained from build 38; replace every placeholder with an observed value:
 
 ```yaml
 source:
@@ -297,14 +300,12 @@ the dataset and evaluator as already **unchanged** and only creates the eval --
 that is correct, not a missed publish. A second `create` with no edits skips
 everything, the eval included.
 
-Then open one sample to inspect the scores and reasons available in that
-result. Do not assume a rubric definition guarantees per-dimension output:
-the build 38 fresh-user check found no dimension fields in the tested CLI JSON.
-The original run has no retained raw response establishing its service shape.
-Separate sanitized evidence from another generated-rubric run contained
-`properties.dimension_scores` and `evaluator_version`, which the build 38
-typed projection drops. That confirms a CLI reporting gap, not a general claim
-that the service lacks dimension scores.
+Then open one sample to inspect the scores and reasons actually returned.
+Build 39 displays returned `properties.dimension_scores` and preserves nested
+result/sample fields in JSON. Its scoped two-dimension package check matched
+numeric values, applicability, full reasons, and JSON/export data to retained
+service evidence. A rubric definition alone still does not guarantee dimension
+output. Missing values must not be inferred as zero, false, or a failed verdict.
 
 ```bash
 azd ai eval run output list --eval <you>-regression-eval
@@ -312,11 +313,15 @@ azd ai eval run output show <item-id> --eval <you>-regression-eval
 azd ai eval run output show <item-id> --eval <you>-regression-eval -o json
 ```
 
-Record which metrics and explanations are actually present. The detail view
-can show dimensions when the returned evaluator results contain dimension
-metrics; it does not derive them from the rubric definition. Per-dimension
-coverage for the original scenario remains unverified. Do not invent scores
-or reasons that are absent from the result.
+Record which metrics and explanations are present. Applicability is not a
+pass/fail verdict, and the detail view does not derive dimensions from the rubric
+definition. JSON may include sensitive prompts and answers; keep it in private
+outputs, not public bug reports or shared CI logs. Use the human lookup ID with
+`output show`; JSON preserves the service's returned identity.
+
+Build 38's original fresh-user run had no retained raw response, so its
+per-dimension coverage remains unverified. That history is not replaced by the
+new package's separately measured result.
 
 ### 3. Inner loop
 
@@ -370,7 +375,7 @@ anyway would overwrite an edit nobody in the repo can see.
 
 Add a second eval named `<you>-gate` to `evals/azure.eval.yaml`. **Give it
 something of its own** -- a different dataset or evaluator. Do not use a positive
-sample cap to distinguish evals over registered datasets: build 38 rejects that
+sample cap to distinguish evals over registered datasets: build 39 rejects that
 unsupported subset request. An eval
 copied from the first with only the name changed is refused, on the grounds
 that two identical evals are almost always a copy-paste slip. Then:
@@ -448,9 +453,11 @@ built-in evaluator catalogue check is not an assurance that the project, agent,
 models, or every evaluator will work at run time. `generate` produces artifacts;
 it must not silently attach them to an existing eval or replace its configuration.
 Read its next steps, then explicitly declare or initialize the eval you want.
-Build 38 also exposes `--conversation-mode static|simulation` and explicit
-simulator limits; the [build 38 checklist](./Build-38-Verification.md#candidate-authoring)
-shows those command-line forms. Full YAML remains useful beyond the scaffold.
+The `--conversation-mode static|simulation` flags and explicit simulator limits
+introduced in build 38 remain supported. Its
+[authoring examples](./Build-38-Verification.md#candidate-authoring) show those
+unchanged command forms; install build 39 using this guide's pinned source.
+Full YAML remains useful beyond the scaffold.
 
 Author the full configuration when the scaffold does not expose the desired
 mode. Add a service to `azure.yaml` without replacing existing services:
@@ -535,13 +542,13 @@ the run acceptance status.
 
 ### Sample caps and registered dataset identity
 
-The following describes **build 38**. Build 37 allowed bounded inline subsets
+The following describes **build 39**. Build 37 allowed bounded inline subsets
 of registered data and did not treat an explicit CLI zero as an override; that
 historical behavior is not the current contract.
 
 | Mode | Supported bound and expected behavior |
 | --- | --- |
-| Genuinely unregistered local dataset run | **Known build 38 failure:** fresh-user checks returned `has no versions to read` for both a dataset override and a direct local declaration, despite confirmed remote absence. Intended inline/cap support is not a working-path guarantee in this build. |
+| Genuinely unregistered local dataset run | Inline rows and a positive cap are allowed only after confirmed remote absence. A complete valid empty listing requires not-found confirmation; malformed/incomplete listings and authorization/service failures stop the run. Build 39's scoped local-cap case scored one row without publishing a dataset. |
 | Registered dataset, including an already published `file:` declaration | Uses the service-issued version identity. Positive sample caps are rejected because this source has no supported subset option. Publish/select a smaller dataset deliberately instead. |
 | Identity lookup, authorization, or missing-ID failure | Stop rather than silently send inline rows. Do not construct or guess an `azureai://` identity. |
 | Conversation simulation | Does not accept a sample cap. Bound the number of seed rows, `num_conversations`, and `max_turns` instead. Do not combine it with a `source` block. |
@@ -552,7 +559,7 @@ For ordinary dataset runs, an explicit CLI `--max-samples 0` overrides a positiv
 YAML cap. Negative values are invalid. No temporary subset dataset is published
 automatically, and a registered source does not silently become an inline copy.
 
-**Publish-first route for build 38:** curate the desired rows in the local file
+**Explicit publish-first route:** curate the desired rows in the local file
 before publishing, explicitly register that dataset, then run the registered
 version without a positive sample cap. For a new ordinary turn-dataset eval:
 
@@ -567,8 +574,36 @@ The registration is an explicit shared-service mutation, not an automatic
 temporary dataset. Use your own unique name and confirm the published version.
 If reusing an eval, remove its positive YAML `max_samples` or explicitly override
 it with `--max-samples 0`. The registered run uses the service-issued `file_id`;
-do not fabricate that identity. The observed unregistered-local failures made
-no mutation, and a future fix is not included in build 38.
+do not fabricate that identity. Build 38's unregistered-local failures and this
+publish-first workaround remain historical evidence; its immutable packages
+have not been replaced by the build 39 fix.
+
+### Dataset downloads
+
+Build 39's targeted checks passed `--output-file` with exact source bytes in
+both namespaces, including refusal to overwrite without `--force` and directory
+output:
+
+```bash
+azd ai dataset download <you>-curated --version <version> --output-file dataset.jsonl
+azd ai eval dataset download <you>-curated --version <version> --output-file eval-dataset.jsonl
+```
+
+A container-backed single-file download must have a complete one-file listing
+and `isSingleFile: true` metadata. A one-file folder is still a folder and
+requires `--output-dir`; multiple-file datasets retain their relative layout.
+Build 38 still has its documented single-file `--output-file` issue and
+`--output-dir` workaround. Do not apply build 39 results to those older binaries.
+
+### Observed conversation output
+
+When a waited run already reads all output rows for its summary, build 39 can
+report unique conversation output IDs and output-item lifecycle statuses.
+These are **not** generated/completed-conversation totals, evaluation verdict
+totals, or inferred actual turns. Duplicate IDs count once; missing IDs and
+unknown/conflicting statuses are separate. Filtered/paged listings and detail
+views without all rows do not establish complete counts. No extra service
+fetch or inference of missing values is promised.
 
 These authoring examples require a matching-candidate live pass before being
 marked verified. A missing deployment, unavailable evaluator, or service
@@ -628,5 +663,5 @@ To remove the extensions and the feed:
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension source remove foundry-candidate-38
+azd extension source remove foundry-candidate-39
 ```
