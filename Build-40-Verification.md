@@ -1,7 +1,7 @@
 # Candidate 40: source and acceptance checklist
 
-**Corrected source build approved and in progress. Not published or approved
-for publication.** The earlier `0f7caa5f` attempt was withheld for an
+**Corrected source packages built locally. Not published or approved for
+publication.** The earlier `0f7caa5f` attempt was withheld for an
 integration-only test signature mismatch; it was not a new product defect.
 Build 39 remains Latest with its [known issues](./Build-39-Verification.md#newly-reported-known-issues).
 Its registry, versions, packages, and historical evidence are unchanged.
@@ -13,9 +13,9 @@ this candidate's final packages.
 | Planned tag | `extensions-2026-09-23-40`, subject to immutable collision checks |
 | Evaluations | `1.0.40-beta` |
 | Dataset | `1.0.0-beta.28` |
-| Required azd | `>=1.33.0`, to be rechecked in the corrected packages |
+| Required azd | `>=1.33.0`, verified in both corrected package manifests and registry |
 | Source for both extensions | [`361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a`](https://github.com/m7md7sien/azure-dev/commit/361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a) |
-| Corrected registry SHA256 | Pending; earlier attempt's hashes do not identify this build |
+| Corrected registry SHA256 | `648c9632fcf5a4e1f993cb0cb4c5bc37691e5821df8ec8422c36a2b30f548d9f` (local, not published) |
 | Publication | Separate approval pending |
 
 No installation URL is offered before real published assets exist.
@@ -81,10 +81,10 @@ one platform-named entrypoint, ZIP for Windows/macOS and tar.gz for Linux.
 | --- | --- |
 | Exact source and BUILD approval | Approved for the SHA above |
 | Combined source tests/build/vet/lint and go-fix checks | Rerunning on corrected source; no pass inherited from earlier attempts |
-| Twelve archive layouts/manifests/entrypoints/hashes and extracted binary VCS/platform identity | Corrected build in progress |
-| Fresh isolated Windows installation, exact JSON versions and binary hashes | Pending corrected packages |
+| Twelve archive layouts/manifests/entrypoints/hashes and extracted binary VCS/platform identity | Passed for the corrected source; only four isolated packaging version files changed |
+| Fresh isolated Windows installation, exact JSON versions and binary hashes | Passed on azd 1.33.0; both corrected installed binaries match the extracted archives |
 | Final packaged init CLI matrix and two actual ConPTY correction/cancel paths | Pending |
-| Independent synthetic HTTP-caller proof at the final source | Pending; never a live Azure failure claim |
+| Independent synthetic HTTP-caller proof at the final source | Passed 15 source-test groups at the corrected SHA, including failed/errored responses, immutable IDs, URL redaction, and mixed/valid lifecycle cases. This is source-fixture evidence, not native CLI or live Azure failure execution. |
 | Separate PUBLISH approval | Pending |
 | Complete new draft, individual asset uploads, literal registry last | Not started |
 | Non-Latest publication, anonymous downloads and fresh published-source install | Not started |
@@ -101,6 +101,11 @@ installation checks in 2.30 minutes, but its combined tests did not compile.
 Those earlier artifacts and receipts remain intact as **prior-attempt evidence
 only**. The corrected source uses fresh staging and requires new version,
 digest, and acceptance receipts. No earlier binary is overwritten or relabeled.
+
+The corrected source completed production build, packaging, and fresh local
+installation checks in 2.12 minutes. Its exact versioned bundles and new hashes
+were delivered for the separate 31-case CLI and two-path ConPTY acceptance.
+Those package results and parent combined-source gates remain pending.
 
 ## Evidence boundaries and remaining issues
 
