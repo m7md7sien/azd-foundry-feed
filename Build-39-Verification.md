@@ -1,6 +1,6 @@
 # Candidate 39: source and acceptance checklist
 
-**Build approved and in progress. Not published or approved for publication.**
+**Built locally. Not published or approved for publication.**
 Both extensions use the exact source SHA below. Build 38 remains the published
 Latest release, and its registry, packages, and historical findings are unchanged.
 
@@ -16,7 +16,7 @@ provisional, not reserved, and must be checked again before build/publication.
 | Dataset | `1.0.0-beta.27` |
 | Required azd | `>=1.33.0`, subject to checking the approved manifests |
 | Source commit for both extensions | [`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898) |
-| Registry/archive hashes | Not generated |
+| Registry SHA256 | `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44` (local, not published) |
 | Publication and Latest promotion | Separate pending gates |
 
 No install URL is offered until real assets exist. Do not use this document as
@@ -57,9 +57,9 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | --- | --- |
 | Exact source SHA and BUILD approval | Approved for `9a549449c2d5c2b4c6661f0ee8f8da7e3036c898` |
 | Combined source checks and hosted race suites at that SHA | Pending |
-| Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Build in progress in fresh `b39-9a549449c2d5` staging |
-| Fresh isolated Windows bundle installation and exact runtime versions | Not started |
-| Candidate-specific regression/live acceptance | Not started |
+| Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Passed from fresh `b39-9a549449c2d5` staging; only four packaging version files changed |
+| Fresh isolated Windows bundle installation and exact runtime versions | Passed with azd 1.33.0, exact JSON versions, and installed bytes matching the archives |
+| Candidate-specific regression/live acceptance | Bundles and exact hashes handed to the verifier; results pending |
 | Separate PUBLISH approval | Pending |
 | Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Not started |
 | Non-Latest publication and anonymous pinned registry/all-asset verification | Not started |
@@ -70,6 +70,10 @@ The release should contain 12 platform archives, `source-provenance.json`,
 `SHA256SUMS`, and the literal `registry.json`. Preserve every older release and
 asset. Synchronize the repository registry/docs only with real published assets.
 Report publication separately from Latest promotion.
+
+Local build, packaging, and installation checks completed in 2.20 minutes.
+That measured result is not a guarantee for later builds or a live-service
+readiness claim.
 
 ## Candidate-specific acceptance targets
 
