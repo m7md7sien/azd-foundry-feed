@@ -1,26 +1,55 @@
-# Candidate 38: source and acceptance checklist
+# Build 38: source and acceptance checklist
 
-**Not published. Final packages, hosted race checks, and scoped package acceptance passed.** The
+**Published 2026-09-23, not Latest yet.** Final packages, hosted race checks, and
+scoped package acceptance passed. Anonymous asset downloads and fresh Windows
+installation from the published registry passed. Installed-candidate CI is
+pending, so the rolling feed still selects build 37.
+
+The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
 The corrected `e6f86f96` packages passed scoped functional checks. The final
 source below differs only in test isolation and has its own package identity
-and smoke evidence. Publication still requires an explicit release decision.
-The rolling feed still points to build 37. Do not describe this candidate as
+and smoke evidence. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
 | Item | Candidate |
 | --- | --- |
-| Planned release tag | `extensions-2026-09-23-38` |
+| Release | [extensions-2026-09-23-38](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-38) |
 | Evaluations | `1.0.38-beta` |
 | Dataset | `1.0.0-beta.26` |
 | Required azd | `>=1.33.0` |
 | Source commit for both extensions | [`c5be500196d66bb4326bb62700a1dde83c1f92a5`](https://github.com/m7md7sien/azure-dev/commit/c5be500196d66bb4326bb62700a1dde83c1f92a5) |
-| Publication decision | Not yet approved; earlier attempt's results are not this source's acceptance |
+| Publication decision | Published non-Latest after explicit approval; promotion awaits final installed-candidate CI |
 
 Package-only version overrides are applied in an isolated checkout.
 Source dependency manifests and changelogs are unchanged. Each extension is
 built for Windows, Linux, and macOS, on amd64 and arm64. A built archive is not
 proof that it has been executed on that platform.
+
+## Install this build
+
+Use a fresh `AZD_CONFIG_DIR` for verification so an existing development registry
+or binary cannot mask what was installed. This pinned source works independently
+of the rolling Latest designation:
+
+```bash
+azd extension source add -n foundry-candidate-38 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/registry.json
+azd extension install azure.ai.evaluations --source foundry-candidate-38 --version 1.0.38-beta
+azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1.0.0-beta.26
+azd ai eval version -o json
+azd ai dataset version -o json
+```
+
+If this source name already exists, check its URL rather than silently switching
+sources. Existing installed extensions are not automatically replaced by changing
+the registry URL; use the isolated configuration or explicitly upgrade.
+
+The pinned `registry.json` SHA256 is
+`cd4849035f32551b59c36a2699d71a81454a0bfa51c8c74cd9b75e4433b94cdc`.
+[SHA256SUMS](https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/SHA256SUMS)
+and [source-provenance.json](https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/source-provenance.json)
+are immutable release assets. Provenance verification fields describe the
+build-time snapshot; the acceptance record below includes later checks.
 
 ## Included changes, not upstream merge claims
 
@@ -110,7 +139,8 @@ No temporary subset dataset is automatically published.
 | Functional preflight acceptance | Passed 17/17 measured negative cases on `e6f86f96` packages, without dataset-version/private-state changes and with independent evaluator/eval absence checks; bounded one-seed simulation passed |
 | Final package identity and smoke acceptance | Passed: exact bundle/installed binary hashes, JSON versions, Go VCS/platform metadata, CLI guards, one fresh manual-seed simulation, and byte-matching directory download |
 | Actual Linux CI run and installed versions | Pending |
-| Anonymous pinned registry and all archive downloads | Pending publication |
+| Anonymous pinned registry and all archive downloads | Passed: all 15 assets match local approved bytes and SHA256, including the literal registry |
+| Fresh Windows install from the published pinned source | Passed with azd 1.33.0; exact versions and installed bytes match final archives |
 | Anonymous rolling Latest registry | Still build 37 |
 
 The earlier `9a27cd20` source could publish dependency assets for some invalid
@@ -175,3 +205,8 @@ is unknown. The final GA simulation discriminator is unconfirmed. Privacy
 signoff remains pending. None of those gates is satisfied by publishing this
 unofficial feed. Do not include tokens, private prompts, customer rows, or full
 raw service responses in public evidence.
+
+Richer observed generated/completed-conversation and actual-turn counters remain
+follow-up work. An all-scenarios fresh-user pass is pending. Hosted source race
+and offline installed-CLI checks are not authenticated live-cloud CI proof;
+bounded live service checks were performed separately.

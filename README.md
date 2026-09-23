@@ -13,20 +13,34 @@ compiling one. The original proposals above are not sufficient source provenance
 for a later build. Each release identifies its bundled changes; a PR bundled into
 this feed is **not necessarily merged upstream**.
 
-The currently published build is
-[37](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-22-37):
-evaluations `1.0.37-beta` and dataset `1.0.0-beta.25`. It bundles
+The newest published candidate is
+[38](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-38):
+evaluations `1.0.38-beta` and dataset `1.0.0-beta.26`, both built from
+[`c5be500196d66bb4326bb62700a1dde83c1f92a5`](https://github.com/m7md7sien/azure-dev/commit/c5be500196d66bb4326bb62700a1dde83c1f92a5).
+It bundles
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116),
 [Azure/azure-dev#10113](https://github.com/Azure/azure-dev/pull/10113), and
 [Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102).
-No newer candidate is published or verified by this document.
+plus the follow-up fixes described in the
+[build 38 acceptance record](./Build-38-Verification.md).
+
+**Build 38 is published but not Latest yet.** Anonymous downloads and a fresh
+Windows install have passed; final installed-candidate CI is pending. Use the
+[pinned build 38 instructions](./Build-38-Verification.md#install-this-build)
+to test it now. The rolling Latest URL below still selects build 37.
 
 ## Bug bash
 
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
-Closing out specific bugs from the last round?
+For current candidate evidence and known limitations, use
+**[Build 38 verification](./Build-38-Verification.md)**. The standalone dataset
+`--output-file` issue has a verified `--output-dir` workaround. Richer observed
+simulation counters and an all-scenarios fresh-user pass remain follow-up work.
+Hosted source/offline CLI checks are not live-cloud CI approval.
+
+Closing out specific bugs in the older build?
 **[Build 37 verification checklist](./Build-37-Verification.md)** distinguishes
 expected behavior from historical evidence and remaining verification gates.
 Installability and source tests do not establish live feature readiness.
