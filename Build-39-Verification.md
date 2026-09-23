@@ -1,6 +1,7 @@
 # Candidate 39: source and acceptance checklist
 
-**Built locally. Not published or approved for publication.**
+**Built locally; scoped exact-package acceptance passed. Not published or
+approved for publication.**
 Both extensions use the exact source SHA below. Build 38 remains the published
 Latest release, and its registry, packages, and historical findings are unchanged.
 
@@ -14,7 +15,7 @@ provisional, not reserved, and must be checked again before build/publication.
 | Planned tag | `extensions-2026-09-23-39` |
 | Evaluations | `1.0.39-beta` |
 | Dataset | `1.0.0-beta.27` |
-| Required azd | `>=1.33.0`, subject to checking the approved manifests |
+| Required azd | `>=1.33.0`, confirmed in both packaged manifests and the registry |
 | Source commit for both extensions | [`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898) |
 | Registry SHA256 | `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44` (local, not published) |
 | Publication and Latest promotion | Separate pending gates |
@@ -59,7 +60,8 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | Combined source checks and hosted race suites at that SHA | Pending |
 | Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Passed from fresh `b39-9a549449c2d5` staging; only four packaging version files changed |
 | Fresh isolated Windows bundle installation and exact runtime versions | Passed with azd 1.33.0, exact JSON versions, and installed bytes matching the archives |
-| Candidate-specific regression/live acceptance | Bundles and exact hashes handed to the verifier; results pending |
+| Candidate-specific regression/live acceptance | Scoped pass on the exact packages: both download surfaces, local/registered static runs, rubric properties/sample/export, and lookup IDs; details below |
+| Owned verification-fixture cleanup | Passed: owned eval, both runs, dataset version, and evaluator version returned 404; the local-only dataset remained unpublished |
 | Separate PUBLISH approval | Pending |
 | Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Not started |
 | Non-Latest publication and anonymous pinned registry/all-asset verification | Not started |
@@ -77,8 +79,9 @@ readiness claim.
 
 ## Candidate-specific acceptance targets
 
-These are pending targets, not pass claims. Record exact source, versions,
-package hashes, commands, and sanitized outcomes for each result.
+The matrix defines the acceptance scope. The recorded results below cover only
+the measured cases, not every target or possible service response. Record exact
+source, versions, package hashes, commands, and sanitized outcomes for each result.
 
 | Area | Required evidence |
 | --- | --- |
@@ -96,9 +99,35 @@ The approved README specifies that rubric detail uses returned
 weights, and reasons. Applicability is not a pass/fail verdict and missing values
 must not become zero or false. JSON retains nested `properties` and `sample`
 fields; these may contain sensitive prompts and answers, so prefer a private
-output file rather than shared terminal or CI logs. This contract still needs
-candidate-specific package acceptance; it is not proof for the deleted build 38
+output file rather than shared terminal or CI logs. The two-dimension case below
+has candidate-specific evidence; it is not proof for the deleted build 38
 fresh-user run.
+
+### Recorded scoped package result
+
+The verifier independently matched the bundle and installed binary hashes,
+versions, embedded `9a549449c2d5c2b4c6661f0ee8f8da7e3036c898` VCS revision,
+and registry hash `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44`
+in a fresh configuration, leaving build 38 untouched.
+
+Both dataset command namespaces passed exact-file/source-byte checks, refusal
+to overwrite without force, forced replacement, and directory output. Separate
+recorded tests passed seven cases per module covering folder/multiple-file
+guards; those are not live tests of every dataset shape.
+
+Two bounded static runs scored three rows with zero errors: a genuinely local
+inline dataset capped at one row and an uncapped registered dataset with two
+rows. The registered positive-cap refusal and absence of implicit local-dataset
+publication passed. No data generation or agent invocation was performed.
+
+For a returned two-dimension rubric result, the typed JSON and export retained
+the actual service properties and sample fields exactly. The human numeric
+lookup ID and both dimensions' numeric values, applicability, and full reasons
+matched the retained service evidence. The sensitive result content is not
+included here. This result verifies that measured shape, not unseen rubric or
+GA service cases. Cleanup was confirmed by 404 responses for the owned eval,
+both runs, registered dataset version, and evaluator version. The local-only
+dataset remained unpublished; no agent or conversation resources were created.
 
 Use small owned fixtures and bounded model calls; do not regenerate large
 datasets merely to replace provenance. Delete only resources proved to belong
