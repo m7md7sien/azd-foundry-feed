@@ -1,9 +1,10 @@
 # Build 41: source and acceptance checklist
 
-**Published non-Latest on 2026-09-23.** Combined source gates, packaging,
-independent targeted package acceptance, all 15 anonymous downloads and a
-fresh public Windows installation passed. Final hosted CI and Latest
-promotion remain pending; build 40 remains Latest.
+**Published and promoted to Latest on 2026-09-23.** Combined source gates,
+packaging, independent targeted package acceptance, final hosted CLI/full-race
+CI, all 15 anonymous downloads and fresh pinned/Latest Windows installations
+passed. Publication was non-Latest first; promotion followed matching final
+hosted proof, not the earlier build 40 results.
 
 This release corrects the observed responses-backed evaluation contract,
 catalog evaluator-pin reconciliation, and init dataset binding/custom paths.
@@ -17,7 +18,7 @@ Earlier build 40 evidence is inherited history, not a build 41 rerun.
 | Required azd | `>=1.33.0`, confirmed in both manifests and the registry |
 | Source for both extensions | [`8ef8b6df77336950c60506ab2966037f579d92cd`](https://github.com/m7md7sien/azure-dev/commit/8ef8b6df77336950c60506ab2966037f579d92cd) |
 | Registry SHA256 | `aff0d6f456e3fb08773b1c888136eed12ec8a06bd2eba0addda0383142ae7d79` |
-| Publication | Non-Latest at `2026-09-23T10:41:09Z`; final hosted proof required before promotion |
+| Publication | Non-Latest at `2026-09-23T10:41:09Z`, then Latest at `2026-09-23T10:57:51Z` after final gates |
 
 ## Install this build
 
@@ -111,13 +112,46 @@ Build, packaging and fresh local installation took 2.13 minutes with warm toolin
 | Independent cleanup | Passed: ten owned service identities returned HTTP 404; zero owned processes/children; temporary fixtures/configuration/virtual environment removed |
 | Non-Latest publication | Passed: all 15 assets uploaded individually and server sizes/digests verified, with literal `registry.json` last |
 | Anonymous downloads and fresh public installation | Passed all 15 SHA256s and registry metadata/URLs; exact public Windows JSON versions and executable bytes match |
-| Final hosted CLI and full source-race proof | Pending: planned 160 actual CLI checks per Linux/Windows OS plus both full source-race suites |
-| Latest promotion and stable-URL/fresh-install verification | Not started; build 40 remains Latest |
+| Final hosted CLI and full source-race proof | Passed: [run 35851410814](https://github.com/m7md7sien/azure-dev/actions/runs/35851410814), 160 actual CLI checks per Linux/Windows OS and both full source-race suites; both downloaded CLI artifacts verified |
+| Latest promotion and stable-URL/fresh-install verification | Passed: promoted at `2026-09-23T10:57:51Z`; anonymous stable registry/all 15 assets and fresh unversioned Latest-source Windows install match approved versions/bytes |
 
 The public Windows amd64 executable SHA256s match independent acceptance:
 evaluations `ce8b8906a52f9879470ace66daab4edf71795d0566bd45243271eed9c54d0255`;
 dataset `43b6223ecb3d2702f3d00c0731e1ad8f758800b940971a5fe9050b18d419cbf5`.
 Builds 38, 39 and 40 retain their original assets and versions.
+
+### Final hosted proof
+
+[Run 35851410814](https://github.com/m7md7sien/azure-dev/actions/runs/35851410814)
+passed all four jobs using the
+[frozen manifest at `91a5ab2e4dcd25a07d54eba0f67f711cfed16948`](https://github.com/m7md7sien/azure-dev/blob/91a5ab2e4dcd25a07d54eba0f67f711cfed16948/eng/scripts/eval-candidate-proof/candidate.json).
+Both source fields match the approved SHA, and the registry, four
+Linux/Windows amd64 archive hashes, versions and azd 1.33.0 match the public
+packages. Each downloaded artifact records **160 unique actual CLI commands
+and their expected outcomes**: 124 retained checks plus 36 dataset-binding checks.
+
+The binding matrix spans four layouts (default, custom `nightly.yaml`,
+custom `nightly.yml` with nested references, and a custom configuration with
+a conflicting default sidecar), three modes (simulation, static and turn),
+and three behaviors per combination (collision refusal, same-file reuse and
+distinct-file addition). Its 12 collisions preserved authored/private state;
+the 24 valid controls retained original authored content, private/reference
+files and the selected configuration without unintended default-sidecar writes.
+
+The 50 retained seed refusals also passed. Four cold-entry seed cases and all
+12 cold-entry binding refusals created only the normal zero-byte
+`.azure/.env.lock`; the other 46 seed refusals were completely unchanged.
+Expected/after digests match in all refusal cases, with before/after digests
+also matching those 46 unchanged cases. All other authored/private state and
+isolated global configuration remain unchanged. This precise core read-lock
+allowance is not permission to ignore paths or authored writes.
+
+Both complete internal race suites passed at the exact approved source with
+Go 1.26.4 and `go test -race -count=1 -timeout 15m ./internal/...`.
+The hosted reports explicitly mark live-cloud evaluation, cloud quality gates,
+interactive correction and failed-cloud-run verification as **NOT RUN**.
+The separate local ConPTY, source HTTP fixtures and bounded live response/pin
+controls above retain their own scopes. Build 40's frozen CI is unchanged.
 
 ## Cleanup and evidence boundaries
 

@@ -24,11 +24,14 @@ It bundles
 plus the follow-up fixes described in the
 [build 41 acceptance record](./Build-41-Verification.md).
 
-**Build 41 is published non-Latest; build 40 remains Latest.** Use the
+**Build 41 is now Latest.** Use the
 [pinned build 41 instructions](./Build-41-Verification.md#install-this-build)
-for the new fixes. All 15 anonymous downloads and a fresh public Windows
-installation matched the approved bytes. Final build 41 hosted proof is
-pending: 160 actual CLI checks per OS plus both full source-race suites.
+for reproducible installation. [Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35851410814)
+passed 160 actual CLI checks on each of Linux and Windows plus both full
+source-race suites. The stable Latest registry, all 15 anonymous downloads and
+a fresh Latest-source Windows install matched the approved bytes. The
+[acceptance record](./Build-41-Verification.md#final-hosted-proof) preserves
+the precise cold-read lock and offline/live coverage distinctions.
 
 **Build 40 retains its responses-backed issue:** an evaluation using
 `source.responses` failed with zero output rows and a `response_id` mapping

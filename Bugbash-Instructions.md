@@ -23,8 +23,10 @@ privacy signoff remain separate gates.
 
 These instructions target **build 41**, evaluations `1.0.41-beta` and dataset
 `1.0.0-beta.29`. The source below pins that release for reproducible results.
-Build 41 is published non-Latest pending final hosted CI; the README's rolling
-Latest source still selects build 40.
+Build 41 is now Latest. Both pinned and rolling Latest installation paths were
+verified. [Final hosted CI](./Build-41-Verification.md#final-hosted-proof)
+passed 160 actual CLI checks per Linux/Windows OS and both full source-race
+suites; these are offline checks, not hosted live-cloud evaluation.
 
 Build 41's [targeted acceptance](./Build-41-Verification.md#changes-and-measured-acceptance)
 passed six CLI and two ConPTY init cases, one canonical stored-response row
