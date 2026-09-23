@@ -27,7 +27,7 @@ Build 40 is now Latest; the README separately documents the rolling Latest
 source. Both the pinned and Latest installation paths were verified.
 
 Build 40 corrects the reported simulation-init local-write defect and adds
-actionable failed/errored-run guidance. Its new proof is local/offline:
+actionable failed/errored-run guidance. Its original acceptance was local/offline:
 31 exact-package CLI cases, two actual Windows ConPTY correction/cancel paths,
 and 15 combined-source synthetic HTTP groups. The HTTP fixtures are not a real
 operationally failed Azure run. A separate published-package local follow-up
@@ -39,6 +39,14 @@ and content remains unchanged. Read the
 [build 40 scope and remaining issues](./Build-40-Verification.md#evidence-boundaries-and-remaining-issues)
 before testing; the service generation-count/cost and terminal-delete issues,
 GA alignment, privacy and live-cloud CI gates remain open.
+
+A subsequent [bounded build 40 live regression](./Build-40-Verification.md#bounded-published-package-live-regression)
+completed two graded rows and no data-generation jobs: one two-turn simulation
+conversation and one static row with two returned rubric dimensions. The
+simulation completed with a failed quality verdict, not an execution error;
+the static row passed. Exact identities, measured output fields, printed
+inspection/export commands and cleanup were checked. This is separate from
+the earlier local checks, not live operational-failure or all-scenario proof.
 
 Build 39 has
 [completed targeted package and independent focused fresh-user follow-up](./Build-39-Verification.md#independent-focused-fresh-user-follow-up)
@@ -586,8 +594,10 @@ the run acceptance status.
 
 ### Sample caps and registered dataset identity
 
-Build 40 retains the following **build 39 contract**, with live evidence still
-tied to build 39. Build 37 allowed bounded inline subsets
+Build 40 retains the following **build 39 contract**. The bounded build 40 live
+regression confirmed service-issued `file_id`/version-1 identities for its
+registered simulation and static datasets; broader cap behavior remains tied
+to build 39's scoped evidence. Build 37 allowed bounded inline subsets
 of registered data and did not treat an explicit CLI zero as an override; that
 historical behavior is not the current contract.
 
@@ -634,6 +644,10 @@ azd ai dataset download <you>-curated --version <version> --output-file dataset.
 azd ai eval dataset download <you>-curated --version <version> --output-file eval-dataset.jsonl
 ```
 
+The bounded build 40 live regression separately confirmed exact source bytes
+through both download namespaces. It does not replace build 39's broader
+overwrite, forced-replacement and directory-output evidence.
+
 A container-backed single-file download must have a complete one-file listing
 and `isSingleFile: true` metadata. A one-file folder is still a folder and
 requires `--output-dir`; multiple-file datasets retain their relative layout.
@@ -655,11 +669,16 @@ available output and JSON export in terminal summaries/details, using immutable
 eval/run IDs. Failed and explicit `--status errored` listings are additional
 views, not substitutes for all available output. A whole-run failure can have
 no rows or grading counts; inspect available output and run diagnostics rather
-than assuming grading succeeded. New failure-guidance proof uses synthetic HTTP
-fixtures, not a real failed Azure run.
+than assuming grading succeeded. Failed-service guidance retains synthetic
+HTTP proof, not a real operationally failed Azure run. The subsequent bounded
+build 40 live regression executed the printed immutable-ID unfiltered
+list/export commands on completed runs and checked preservation of the measured
+raw `properties`/`sample` fields. A failed simulation quality verdict does not
+establish operational failure or errored-row coverage.
 
-These authoring examples require a matching-candidate live pass before being
-marked verified. A missing deployment, unavailable evaluator, or service
+Only the bounded cases recorded in the build 40 checklist have matching live
+evidence; the remaining authoring examples are not thereby verified.
+A missing deployment, unavailable evaluator, or service
 rejection is a recorded blocker, not a successful test. The current simulation
 run uses `azure_ai_user_conversation_simulation_preview`. The
 [public GA proposal and current target differ](./Build-39-Verification.md#public-ga-proposal-versus-current-deployment):

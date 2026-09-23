@@ -4,6 +4,9 @@
 scoped local acceptance, final Linux/Windows installed-CLI and full source-race
 CI, all 15 anonymous asset checks, and fresh pinned/Latest Windows installations
 passed. Promotion followed the final cold-entry filesystem checks below.
+A subsequent [bounded live regression](#bounded-published-package-live-regression)
+also completed with cleanup on the same published bytes; it did not change
+the release or replace the original acceptance evidence.
 The earlier `0f7caa5f` attempt was withheld for an
 integration-only test signature mismatch; it was not a new product defect.
 Build 39 retains its [known issues](./Build-39-Verification.md#newly-reported-known-issues).
@@ -43,7 +46,8 @@ replace the installed extensions.
 and [source-provenance.json](https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/source-provenance.json)
 describe the immutable artifacts. Provenance verification fields are a
 build-time snapshot, not the current acceptance status; later evidence is below.
-The live-scenario field does not promise a new build 40 Azure run.
+Its live-scenario field is not updated in place; the later bounded live
+regression and cleanup are recorded separately below.
 
 ## Approved source scope
 
@@ -117,6 +121,7 @@ one platform-named entrypoint, ZIP for Windows/macOS and tar.gz for Linux.
 | Non-Latest publication, anonymous downloads and fresh published-source install | Passed: published at `2026-09-23T06:06:42Z`; all 15 anonymous SHA256s, registry metadata/URLs, exact Windows JSON versions and installed binary digests match |
 | Final published Linux/Windows CLI and full source-race CI | Passed: [final run 35826828347](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347), 124 actual CLI checks per OS plus both unchanged full race suites; both downloaded evidence artifacts verified |
 | Latest promotion and stable-URL/fresh-install verification | Passed: promoted at `2026-09-23T06:30:30Z`; anonymous stable registry matches the approved SHA256, all 15 assets rechecked, and fresh Latest-source Windows install matches versions and executable bytes |
+| Subsequent bounded published-package live regression | Passed with cleanup: two graded rows, zero data-generation jobs, exact registered identities, measured output/download bytes and printed immutable-ID inspection/export commands; scope below, not an operationally failed-service replay |
 
 The release contains 12 platform archives plus `source-provenance.json`,
 `SHA256SUMS`, and literal `registry.json`. Tag/version collisions were checked
@@ -187,8 +192,9 @@ paths, not every possible terminal, keyboard input, or invalid dataset.
 The separate 15-group combined-source HTTP fixture result remains source-test
 evidence for failed/errored responses, immutable identities, URL redaction, and
 lifecycle guards. It does not establish native CLI replay of a real
-operationally failed service payload. No Azure operations, paid jobs, shared
-resource changes, or retries of historical HTTP 409 job deletion were performed.
+operationally failed service payload. Those local acceptance checks performed
+no Azure operations, paid jobs, shared resource changes, or retries of
+historical HTTP 409 job deletion.
 
 Cleanup completed with zero owned processes. The current gate's private fixtures,
 isolated build 40 configuration, virtual environment, and test archives were
@@ -211,12 +217,49 @@ these counts are not combined into a claim of unique or exhaustive coverage.
 All owned fixtures, isolated configuration and downloads were removed, with
 zero owned processes remaining.
 
+### Bounded published-package live regression
+
+After the original acceptance and publication, a separately authorized live
+regression completed on the **same public build 40 packages**. A fresh pinned
+installation matched registry SHA256 `648c9632fcf5a4e1f993cb0cb4c5bc37691e5821df8ec8422c36a2b30f548d9f`,
+evaluations `1.0.40-beta`, dataset `1.0.0-beta.28`, source
+`361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a` and the accepted executable hashes above.
+This lane used **two graded rows and zero data-generation jobs**.
+
+One manually authored seed produced one completed two-turn simulation
+conversation, with two user and two assistant messages. Its evaluation
+reported **one failed quality verdict and zero execution errors**. A separate
+static row passed and returned two actual rubric dimensions. The regression
+checks passed; this does not mean the simulation's quality verdict passed.
+
+Both cases retained the strict registered service-issued `file_id` and
+version-1 identities. The CLI's printed immutable-ID commands for listing all
+available output and exporting JSON were actually executed. The measured raw
+`properties`/`sample` fields were preserved, and both dataset download
+namespaces reproduced exact source bytes. Rubric weight/version-2 catalog
+metadata and idempotence checks passed. Two bounded invalid-input checks at
+`init`/`create` made no authored-file, asset or state writes.
+
+Cleanup completed: all nine newly created owned service identities returned
+HTTP 404 on absence checks. The lane's local fixtures, isolated configuration
+and virtual environment were removed, and the original build 39 environment
+remained unchanged. Private service responses, prompts and detailed receipts
+are not published here.
+
+This is not a native replay of an operationally failed service run, an
+errored-row test, GA-contract confirmation, authenticated live-cloud CI, or
+an all-scenarios rerun. It does not establish a service data-generation
+count/cost fix or clear historical terminal-job deletion failures. The earlier
+31-case/two-ConPTY, 15-group synthetic HTTP, 26-case local fresh-user and
+124-check-per-OS hosted evidence retain their separate scopes.
+
 ## Evidence boundaries and remaining issues
 
-Build 40 acceptance is **local/offline**: versioned init CLI/ConPTY checks,
-synthetic source HTTP fixtures, and package-download/install verification.
-Build 39 live-service evidence stays explicitly
-tied to build 39; no new build 40 Azure failure execution is claimed.
+Build 40's original acceptance was **local/offline**: versioned init CLI/ConPTY
+checks, synthetic source HTTP fixtures, and package-download/install
+verification. The subsequent two-row live regression above adds only its
+explicitly measured scope. Build 39 live-service evidence stays tied to
+build 39; no build 40 operationally failed-service execution is claimed.
 Earlier broader scenario, field-preservation, simulation, and cleanup evidence
 must not be silently relabeled as a build 40 rerun.
 

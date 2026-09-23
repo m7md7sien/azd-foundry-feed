@@ -48,8 +48,13 @@ Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
 For current candidate evidence and known limitations, use
-**[Build 40 verification](./Build-40-Verification.md)**. Its new acceptance is
-local/offline; no build 40 Azure execution or all-scenarios rerun is claimed.
+**[Build 40 verification](./Build-40-Verification.md)**. In addition to its
+local/offline acceptance, a subsequent
+[bounded live regression](./Build-40-Verification.md#bounded-published-package-live-regression)
+completed two graded rows with no data-generation jobs and confirmed cleanup.
+The simulation completed with a failed quality verdict and zero execution
+errors; the static row passed with two returned rubric dimensions. This is
+not an operationally failed-service replay or an all-scenarios rerun.
 GA contract/deployment alignment, privacy/AA, upstream review and authenticated
 live-cloud CI remain external gates. There is no unconditional readiness claim.
 
