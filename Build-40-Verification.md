@@ -1,6 +1,7 @@
 # Candidate 40: source and acceptance checklist
 
-**Build approved and in progress. Not published or approved for publication.**
+**Production packages built locally; the independent combined-source test gate
+failed to compile. Not published or approved for publication.**
 Build 39 remains Latest with its [known issues](./Build-39-Verification.md#newly-reported-known-issues).
 Its registry, versions, packages, and historical evidence are unchanged.
 Source changes and development-artifact passes do not establish acceptance of
@@ -11,9 +12,9 @@ this candidate's final packages.
 | Planned tag | `extensions-2026-09-23-40`, subject to immutable collision checks |
 | Evaluations | `1.0.40-beta` |
 | Dataset | `1.0.0-beta.28` |
-| Required azd | `>=1.33.0`, subject to packaged manifest verification |
+| Required azd | `>=1.33.0`, confirmed in both packaged manifests and the local registry |
 | Source for both extensions | [`0f7caa5fb6a6b048bdd864428a76260d03935ae5`](https://github.com/m7md7sien/azure-dev/commit/0f7caa5fb6a6b048bdd864428a76260d03935ae5) |
-| Registry and archive hashes | Not generated yet |
+| Local attempt registry SHA256 | `4cc508f7b95964f47ade8776ae97bca8a2bc759e5d9d5eefc319c654c61222c2` (not published) |
 | Publication | Separate approval pending |
 
 No installation URL is offered before real published assets exist.
@@ -77,9 +78,9 @@ one platform-named entrypoint, ZIP for Windows/macOS and tar.gz for Linux.
 | Gate | Status |
 | --- | --- |
 | Exact source and BUILD approval | Approved for the SHA above |
-| Parent combined tests/build/vet/lint and go-fix checks | Running; result pending |
-| Twelve archive layouts/manifests/entrypoints/hashes and extracted binary VCS/platform identity | Build in progress |
-| Fresh isolated Windows installation, exact JSON versions and binary hashes | Pending |
+| Combined source tests/build/vet/lint and go-fix checks | Blocked: independent tests at the exact SHA do not compile because two simulation-row tests still expect two return values from the now-three-value run-source helper. Production compilation alone is not a passing source gate. |
+| Twelve archive layouts/manifests/entrypoints/hashes and extracted binary VCS/platform identity | Passed for this source attempt; only four isolated package version files changed |
+| Fresh isolated Windows installation, exact JSON versions and binary hashes | Passed on azd 1.33.0 for this attempt; both installed binaries match the extracted archives |
 | Final packaged init CLI matrix and two actual ConPTY correction/cancel paths | Pending |
 | Independent synthetic HTTP-caller proof at the final source | Pending; never a live Azure failure claim |
 | Separate PUBLISH approval | Pending |
@@ -92,6 +93,12 @@ The release should contain 12 platform archives plus `source-provenance.json`,
 `SHA256SUMS`, and literal `registry.json`. Recheck tag/version availability before
 publication, never overwrite older assets, and keep final digests tied to the
 exact source and runtime versions. Publication and Latest promotion are separate.
+
+This source attempt completed production build, packaging, and local installation
+checks in 2.30 minutes. The exact bundles and hashes were handed to the verifier
+as **attempt evidence only**. They do not resolve the combined-source compile
+failure. Any replacement source SHA needs explicit approval and a fresh staging
+directory; these artifacts must not be overwritten or relabeled.
 
 ## Evidence boundaries and remaining issues
 
