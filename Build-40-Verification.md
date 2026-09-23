@@ -1,7 +1,7 @@
 # Candidate 40: source and acceptance checklist
 
-**Corrected source packages built locally. Not published or approved for
-publication.** The earlier `0f7caa5f` attempt was withheld for an
+**Corrected source packages and scoped local acceptance passed. Not published
+or approved for publication.** The earlier `0f7caa5f` attempt was withheld for an
 integration-only test signature mismatch; it was not a new product defect.
 Build 39 remains Latest with its [known issues](./Build-39-Verification.md#newly-reported-known-issues).
 Its registry, versions, packages, and historical evidence are unchanged.
@@ -83,7 +83,8 @@ one platform-named entrypoint, ZIP for Windows/macOS and tar.gz for Linux.
 | Combined source tests/build/vet/lint and go-fix checks | Rerunning on corrected source; no pass inherited from earlier attempts |
 | Twelve archive layouts/manifests/entrypoints/hashes and extracted binary VCS/platform identity | Passed for the corrected source; only four isolated packaging version files changed |
 | Fresh isolated Windows installation, exact JSON versions and binary hashes | Passed on azd 1.33.0; both corrected installed binaries match the extracted archives |
-| Final packaged init CLI matrix and two actual ConPTY correction/cancel paths | Pending |
+| Final packaged init CLI matrix and two actual ConPTY correction/cancel paths | Passed on the exact corrected Windows amd64 packages: 31 CLI cases (24 invalid refused, 7 valid) and two actual ConPTY paths; details below |
+| Independent verification cleanup and preservation | Passed: zero owned processes; current gate fixtures, isolated config, virtual environment, and test archives removed. The verifier's original build 39 files remained byte-identical. |
 | Independent synthetic HTTP-caller proof at the final source | Passed 15 source-test groups at the corrected SHA, including failed/errored responses, immutable IDs, URL redaction, and mixed/valid lifecycle cases. This is source-fixture evidence, not native CLI or live Azure failure execution. |
 | Separate PUBLISH approval | Pending |
 | Complete new draft, individual asset uploads, literal registry last | Not started |
@@ -105,7 +106,35 @@ digest, and acceptance receipts. No earlier binary is overwritten or relabeled.
 The corrected source completed production build, packaging, and fresh local
 installation checks in 2.12 minutes. Its exact versioned bundles and new hashes
 were delivered for the separate 31-case CLI and two-path ConPTY acceptance.
-Those package results and parent combined-source gates remain pending.
+Those scoped package checks have passed; parent combined-source gate results
+and publication approval remain pending.
+
+### Recorded exact-package local acceptance
+
+The independent verifier matched both final bundle hashes, the registry
+SHA256, installed executable hashes, JSON versions, embedded corrected VCS
+revision, and command help on a fresh azd 1.33.0 Windows amd64 installation.
+The withheld `0f7caa5f` attempt was not installed in this verification lane.
+
+All **31 actual CLI cases passed**: 24 invalid-input cases were refused and
+seven valid controls succeeded. Both actual Windows ConPTY paths passed:
+correcting the dataset twice before a valid confirmation retained independent
+models and the requested `5/20` limits; Ctrl+C at correction left authored
+files unchanged. This is the measured init matrix and those two interactive
+paths, not every possible terminal, keyboard input, or invalid dataset.
+
+The separate 15-group combined-source HTTP fixture result remains source-test
+evidence for failed/errored responses, immutable identities, URL redaction, and
+lifecycle guards. It does not establish native CLI replay of a real
+operationally failed service payload. No Azure operations, paid jobs, shared
+resource changes, or retries of historical HTTP 409 job deletion were performed.
+
+Cleanup completed with zero owned processes. The current gate's private fixtures,
+isolated build 40 configuration, virtual environment, and test archives were
+removed; all nine files in the verifier's original build 39 configuration
+remained byte-identical. Packaging staging and immutable bundles are retained
+separately for the publication gate. Only this public-safe summary is recorded,
+not the private ledger or terminal captures.
 
 ## Evidence boundaries and remaining issues
 
