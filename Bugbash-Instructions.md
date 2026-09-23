@@ -21,6 +21,10 @@ has passed. Baseline simulation and rubric evidence does not verify a newer
 candidate. Service deployment, the final GA simulation discriminator, and
 privacy signoff remain separate gates.
 
+These instructions target **build 38**, evaluations `1.0.38-beta` and dataset
+`1.0.0-beta.26`. The source below pins that release for reproducible results.
+The README separately documents the rolling Latest source.
+
 ---
 
 ## Quick start
@@ -46,19 +50,16 @@ Everywhere below, replace `<you>` with your alias. **Names must be unique** --
 the project is shared and evals persist, so prefix your datasets, evaluators
 and evals to avoid collisions with other testers.
 
-**Returning testers:** if `foundry-bugbash` points at a dated release, run
-`azd extension source remove foundry-bugbash` once, then add the source below.
-This removes only the saved source configuration, not your Foundry resources.
-
-The source URL follows GitHub's **Latest** release, so it does not change with
-each build. New bug-bash releases must include `registry.json` and be marked
-Latest; GitHub releases marked only as prereleases are not selected.
+**Returning testers:** use a fresh azd configuration or explicitly reinstall
+the two extensions from `foundry-candidate-38` below. Adding a source does not
+replace installed binaries. If this source name already exists, check that its
+URL matches rather than silently using an older registry.
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-bugbash -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/latest/download/registry.json
-azd extension install azure.ai.evaluations --source foundry-bugbash
-azd extension install azure.ai.dataset --source foundry-bugbash
+azd extension source add -n foundry-candidate-38 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/registry.json
+azd extension install azure.ai.evaluations --source foundry-candidate-38 --version 1.0.38-beta
+azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1.0.0-beta.26
 
 # 2. make a project to work in
 mkdir azd-eval-bugbash
@@ -99,10 +100,10 @@ The endpoint is saved in this azd environment. `--project-endpoint` overrides it
 otherwise the environment value takes precedence over a machine-wide
 `azd ai project` selection and over variables exported in your shell.
 
-**Check what you installed:** both extensions should use `foundry-bugbash` and
-match the versions in the [current registry][registry].
+**Check what you installed:** both extensions should use `foundry-candidate-38`
+and match the versions in the [pinned registry][registry].
 
-[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/latest/download/registry.json
+[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-38/registry.json
 
 ```bash
 azd extension list --installed
@@ -110,16 +111,16 @@ azd ai eval version
 azd ai dataset version
 ```
 
-The rolling source does not replace installed binaries automatically. For a
-newer version, use `azd extension upgrade <id>` and select `foundry-bugbash` if
-asked. Releases and versions must not be overwritten. To avoid a source
-selection prompt when moving to a new candidate, reinstall explicitly:
+Sources do not replace installed binaries automatically. Releases and versions
+must not be overwritten. To select this build explicitly in an existing
+configuration, uninstall the installed extensions and reinstall from the pinned
+source (skip an uninstall if that extension is absent):
 
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension install azure.ai.evaluations --source foundry-bugbash
-azd extension install azure.ai.dataset --source foundry-bugbash
+azd extension install azure.ai.evaluations --source foundry-candidate-38 --version 1.0.38-beta
+azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1.0.0-beta.26
 ```
 
 ## Command surface
@@ -226,7 +227,9 @@ anyway would overwrite an edit nobody in the repo can see.
 ### 5. Automation and CI/CD
 
 Add a second eval named `<you>-gate` to `evals/azure.eval.yaml`. **Give it
-something of its own** -- a different dataset, evaluator or sample cap. An eval
+something of its own** -- a different dataset or evaluator. Do not use a positive
+sample cap to distinguish evals over registered datasets: build 38 rejects that
+unsupported subset request. An eval
 copied from the first with only the name changed is refused, on the grounds
 that two identical evals are almost always a copy-paste slip. Then:
 
@@ -298,6 +301,9 @@ built-in evaluator catalogue check is not an assurance that the project, agent,
 models, or every evaluator will work at run time. `generate` produces artifacts;
 it must not silently attach them to an existing eval or replace its configuration.
 Read its next steps, then explicitly declare or initialize the eval you want.
+Build 38 also exposes `--conversation-mode static|simulation` and explicit
+simulator limits; the [build 38 checklist](./Build-38-Verification.md#candidate-authoring)
+shows those command-line forms. Full YAML remains useful beyond the scaffold.
 
 Author the full configuration when the scaffold does not expose the desired
 mode. Add a service to `azure.yaml` without replacing existing services:
@@ -382,24 +388,22 @@ the run acceptance status.
 
 ### Sample caps and registered dataset identity
 
-**Historical build 37 behavior:** the following describes build 37.
-Published build 38 changes registered-dataset caps and explicit-zero
-overrides; see [the build 38 checklist](./Build-38-Verification.md).
-Do not apply candidate instructions to an installed build 37.
+The following describes **build 38**. Build 37 allowed bounded inline subsets
+of registered data and did not treat an explicit CLI zero as an override; that
+historical behavior is not the current contract.
 
 | Mode | Supported bound and expected behavior |
 | --- | --- |
-| Ordinary local dataset run | Positive `--max-samples` or eval `max_samples` bounds the rows sent. A positive command-line value takes precedence over the YAML value. |
-| Ordinary registered dataset run | A positive cap is supported by reading bounded rows and sending them inline. `Inline data` in the portal is expected for this mode; verify the count and selected version. |
-| Uncapped registered dataset run | Uses the service-issued dataset identity when available. Do not construct or guess an `azureai://` identity. |
+| Genuinely unregistered local dataset run | Positive `--max-samples` or eval `max_samples` bounds inline rows after the service confirms absence. |
+| Registered dataset, including an already published `file:` declaration | Uses the service-issued version identity. Positive sample caps are rejected because this source has no supported subset option. Publish/select a smaller dataset deliberately instead. |
+| Identity lookup, authorization, or missing-ID failure | Stop rather than silently send inline rows. Do not construct or guess an `azureai://` identity. |
 | Conversation simulation | Does not accept a sample cap. Bound the number of seed rows, `num_conversations`, and `max_turns` instead. Do not combine it with a `source` block. |
-| Traces | Use the trace source's `max_traces` and time window. A dataset sample cap is not a substitute. |
+| Traces, other source-backed runs, and reruns selected by eval ID | Reject explicit sample-cap flags that cannot affect this source. Use trace-source limits or select response IDs. |
 | Data generation | `generate --max-samples` requests a service generation count, not a dataset-run cap. Record the resulting count; merged service code does not prove deployment. |
 
-For ordinary dataset runs, zero or an omitted cap means no cap at that level;
-negative values are invalid. An explicit CLI zero does not clear a positive
-YAML cap. A capped registered run deliberately trades direct file reference for
-a bounded inline subset. Do not report that distinction alone as a bug.
+For ordinary dataset runs, an explicit CLI `--max-samples 0` overrides a positive
+YAML cap. Negative values are invalid. No temporary subset dataset is published
+automatically, and a registered source does not silently become an inline copy.
 
 These authoring examples require a matching-candidate live pass before being
 marked verified. A missing deployment, unavailable evaluator, or service
@@ -459,5 +463,5 @@ To remove the extensions and the feed:
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension source remove foundry-bugbash
+azd extension source remove foundry-candidate-38
 ```
