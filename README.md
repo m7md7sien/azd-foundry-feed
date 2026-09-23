@@ -24,11 +24,12 @@ It bundles
 plus the follow-up fixes described in the
 [build 39 acceptance record](./Build-39-Verification.md).
 
-**Build 39 is published but not Latest yet.** Its anonymous asset checks and
-fresh published-source Windows installation passed. Final installed-CLI and
-hosted race CI are pending. Use the
+**Build 39 is Latest.** [Final CI](https://github.com/m7md7sien/azure-dev/actions/runs/35810319528)
+passed 68/68 installed-CLI checks on each of Linux and Windows, plus both full
+source-race suites. Anonymous asset checks and fresh pinned/Latest Windows
+installs matched approved bytes. Use the
 [pinned build 39 instructions](./Build-39-Verification.md#install-this-build)
-to test it now; the stable Latest URL below still selects build 38.
+or the stable Latest URL below.
 
 ## Bug bash
 

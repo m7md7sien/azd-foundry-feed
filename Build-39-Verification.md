@@ -1,10 +1,10 @@
 # Build 39: source and acceptance checklist
 
-**Published non-Latest on 2026-09-23.** Local packaging, parent source checks,
-scoped exact-package acceptance, anonymous asset verification, and a fresh
-published-source Windows install passed. Final installed-CLI and hosted race CI
-gate promotion. Both extensions use the exact source SHA below. Build 38
-remains Latest, and its release assets and historical findings are unchanged.
+**Published and promoted to Latest on 2026-09-23.** Local packaging, parent
+source checks, scoped exact-package acceptance, final installed-CLI/full-race
+CI, anonymous asset verification, and fresh pinned/Latest Windows installations
+passed. Both extensions use the exact source SHA below. Build 38's release
+assets and historical findings are unchanged.
 
 | Item | Published value |
 | --- | --- |
@@ -14,7 +14,7 @@ remains Latest, and its release assets and historical findings are unchanged.
 | Required azd | `>=1.33.0`, confirmed in both packaged manifests and the registry |
 | Source commit for both extensions | [`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898) |
 | Registry SHA256 | `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44` |
-| Latest promotion | Pending final installed-CLI and hosted race CI |
+| Latest promotion | Completed after final hosted CI and anonymous/install gates; stable URL and fresh install verified |
 
 ## Install this build
 
@@ -73,7 +73,7 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | --- | --- |
 | Exact source SHA and BUILD approval | Approved for `9a549449c2d5c2b4c6661f0ee8f8da7e3036c898` |
 | Parent combined source checks | Both modules passed full short suites with `NO_COLOR=1` and no skips, build, vet (including evaluation tags), zero lint issues, and clean `go fix` diff |
-| Full hosted source-race suites | Run with the final published package pins; required before Latest, not before non-Latest publication |
+| Full hosted source-race suites | [Passed for both modules](https://github.com/m7md7sien/azure-dev/actions/runs/35810319528) at the exact source with unchanged Go 1.26.4 commands |
 | Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Passed from fresh `b39-9a549449c2d5` staging; only four packaging version files changed |
 | Fresh isolated Windows bundle installation and exact runtime versions | Passed with azd 1.33.0, exact JSON versions, and installed bytes matching the archives |
 | Candidate-specific regression/live acceptance | Scoped pass on the exact packages: both download surfaces, local/registered static runs, rubric properties/sample/export, and lookup IDs; details below |
@@ -82,8 +82,15 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Passed: all 15 remote sizes, SHA256 digests, and upload states matched |
 | Non-Latest publication and anonymous pinned registry/all-asset verification | Passed: all 15 assets anonymously downloaded and SHA256 matched |
 | Fresh published-source Windows install | Passed on azd 1.33.0; exact JSON versions and installed binary bytes match final archives |
-| Final Linux/Windows CLI/source CI with exact published pins | Pending: 68 CLI checks per OS and both full race suites requested |
-| Latest promotion, anonymous stable URL, and fresh stable-source install | Not started |
+| Final Linux/Windows CLI/source CI with exact published pins | [All four jobs passed](https://github.com/m7md7sien/azure-dev/actions/runs/35810319528): 68/68 unique actual installed-CLI checks per OS, both full race suites, exact registry/archive/installed bytes and versions; no skips |
+| Latest promotion, anonymous stable URL, and fresh stable-source install | Passed: Latest registry matches approved SHA256; all 15 assets re-downloaded/hash-checked and a fresh Windows install matches versions and final bytes |
+
+The [frozen CI manifest](https://github.com/m7md7sien/azure-dev/blob/0ce78ee5c10208e0f739b7aaa5b3496736c359c3/eng/scripts/eval-candidate-proof/candidate.json)
+pins the source, registry, four Linux/Windows amd64 extension archives, and azd
+1.33.0. Workflow commit `0ce78ee5c10208e0f739b7aaa5b3496736c359c3` is not the
+extension source commit. Downloaded CI evidence was checked for unique commands,
+exit codes, source/run identities, and sanitized fixtures. Live-cloud evaluation
+and cloud quality-gate execution were **not run**.
 
 The release should contain 12 platform archives, `source-provenance.json`,
 `SHA256SUMS`, and the literal `registry.json`. Preserve every older release and
