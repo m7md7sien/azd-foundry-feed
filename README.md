@@ -14,31 +14,33 @@ for a later build. Each release identifies its bundled changes; a PR bundled int
 this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
-[40](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-40):
-evaluations `1.0.40-beta` and dataset `1.0.0-beta.28`, both built from
-[`361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a`](https://github.com/m7md7sien/azure-dev/commit/361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a).
+[41](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-41):
+evaluations `1.0.41-beta` and dataset `1.0.0-beta.29`, both built from
+[`8ef8b6df77336950c60506ab2966037f579d92cd`](https://github.com/m7md7sien/azure-dev/commit/8ef8b6df77336950c60506ab2966037f579d92cd).
 It bundles
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116),
 [Azure/azure-dev#10113](https://github.com/Azure/azure-dev/pull/10113), and
 [Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102)
 plus the follow-up fixes described in the
-[build 40 acceptance record](./Build-40-Verification.md).
+[build 41 acceptance record](./Build-41-Verification.md).
 
-**Build 40 is now Latest.** Use the
-[pinned build 40 instructions](./Build-40-Verification.md#install-this-build)
-for reproducible installation. [Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347)
-passed 124 installed CLI checks on each of Linux and Windows plus both full
-source-race suites. The stable Latest registry, all 15 anonymous downloads, and
-a fresh Latest-source Windows install matched the approved bytes. The
-[acceptance record](./Build-40-Verification.md#final-hosted-proof) includes the
-precise first-read zero-byte `.env.lock` allowance and scoped evidence limits.
+**Build 41 is published non-Latest; build 40 remains Latest.** Use the
+[pinned build 41 instructions](./Build-41-Verification.md#install-this-build)
+for the new fixes. All 15 anonymous downloads and a fresh public Windows
+installation matched the approved bytes. Final build 41 hosted proof is
+pending: 160 actual CLI checks per OS plus both full source-race suites.
 
-**New confirmed build 40 issue:** a responses-backed evaluation
-(`source.responses`) failed with zero output rows and a `response_id` mapping
-error. This path is not working in the observed case; a correction is being
-prepared, but no fixed replacement package has been verified or published.
+**Build 40 retains its responses-backed issue:** an evaluation using
+`source.responses` failed with zero output rows and a `response_id` mapping
+error. Build 41 ships the corrected contract combination, with one exact-package
+live row producing two passing evaluator results and zero execution errors.
 Read the [runtime failure and diagnostic scope](./Build-40-Verification.md#confirmed-responses-backed-runtime-failure).
 The earlier scoped passes do not establish that all build 40 scenarios passed.
+
+Build 41 also passed a zero-run manual catalog-pin control (`1` to `2` to
+unset), six actual init CLI cases and two ConPTY correction/cancel paths.
+Legacy migration/history checks remain source-fixture evidence, not live
+coverage of every migration path or broad root-cause isolation.
 
 Build 40 corrects build 39's high-priority simulation-init validation/local-write
 defect, including interactive correction and mixed seed fields. Its exact Windows
@@ -57,8 +59,12 @@ Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
 For current candidate evidence and known limitations, use
-**[Build 40 verification](./Build-40-Verification.md)**. In addition to its
-local/offline acceptance, a subsequent
+**[Build 41 verification](./Build-41-Verification.md)**. Its targeted corrective
+acceptance does not relabel broader build 40 journeys as build 41 results.
+
+**[Build 40 verification](./Build-40-Verification.md)** retains its
+[124-check-per-OS and full-race CI](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347).
+In addition to its local/offline acceptance, a subsequent
 [bounded live regression](./Build-40-Verification.md#bounded-published-package-live-regression)
 completed two graded rows with no data-generation jobs and confirmed cleanup.
 The simulation completed with a failed quality verdict and zero execution

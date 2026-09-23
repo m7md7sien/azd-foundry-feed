@@ -7,7 +7,7 @@
       "description": "Define and run Foundry evaluations from your terminal. (Beta)",
       "versions": [
         {
-          "version": "1.0.40-beta",
+          "version": "1.0.41-beta",
           "requiredAzdVersion": ">=1.33.0",
           "capabilities": [
             "custom-commands",
@@ -38,50 +38,50 @@
             "darwin/amd64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "2907a52f1a4c455c926e2b47c3fc3295c761ef50e59ba02e41cbd598184eebad"
+                "value": "2ed0b84269700ea7aed9d4e40aa522823f57fe4afee312aeb048ddf93d12cef8"
               },
               "entryPoint": "azure-ai-evaluations-darwin-amd64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-evaluations-darwin-amd64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-evaluations-darwin-amd64.zip"
             },
             "darwin/arm64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "5fcfca632ab257fd9f39983128dd59b035e8c432a2c6c35c919e78479b636400"
+                "value": "e4f258a534c73e6c6c2ed5810420697994b731f7f944da3f26e206d258341c54"
               },
               "entryPoint": "azure-ai-evaluations-darwin-arm64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-evaluations-darwin-arm64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-evaluations-darwin-arm64.zip"
             },
             "linux/amd64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "f306012636d4316b431760fb1c4a12d3ff2e881824c81624bb58240faad80373"
+                "value": "d2c3cc5c90adb7b3ef86caa0e27abecb61fe102e2dcff4a86b909eefc954385c"
               },
               "entryPoint": "azure-ai-evaluations-linux-amd64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-evaluations-linux-amd64.tar.gz"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-evaluations-linux-amd64.tar.gz"
             },
             "linux/arm64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "a1062227fcabd10df1aa1233f86ec3d5cca2d38101c7d721ca3080b07635a5ef"
+                "value": "4c0247d9bb5086eba29e52f47a98826c3d964d6ce13d7c302121b910d05c3b34"
               },
               "entryPoint": "azure-ai-evaluations-linux-arm64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-evaluations-linux-arm64.tar.gz"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-evaluations-linux-arm64.tar.gz"
             },
             "windows/amd64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "946c49c3640c92f05fc3c6c71f4409d616bccd127db72553080151bb0e67a677"
+                "value": "4a262433ffb7558d19dd6138fb4c24e1ca93b6c647c452b23ef1b0d3605d7d75"
               },
               "entryPoint": "azure-ai-evaluations-windows-amd64.exe",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-evaluations-windows-amd64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-evaluations-windows-amd64.zip"
             },
             "windows/arm64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "e1af63fd83435306642f98fd6dee73daff963a7a8cc19c3f25fd11ce38ff551f"
+                "value": "cb959ce7da07302915561b8543d0329af261b18f13469f11b3fb18bc48f23c0d"
               },
               "entryPoint": "azure-ai-evaluations-windows-arm64.exe",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-evaluations-windows-arm64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-evaluations-windows-arm64.zip"
             }
           }
         }
@@ -94,7 +94,7 @@
       "description": "Register and version Foundry datasets from your terminal. (Beta)",
       "versions": [
         {
-          "version": "1.0.0-beta.28",
+          "version": "1.0.0-beta.29",
           "requiredAzdVersion": ">=1.33.0",
           "capabilities": [
             "custom-commands",
@@ -117,50 +117,50 @@
             "darwin/amd64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "89f5c78cefb5406f9fd6aa8670156162b4a3cb6e48e2e2e047d7279dc8602d8f"
+                "value": "3bb42f79cd32da546033ee13c73f49a66a97bdce77251366240168c63d277066"
               },
               "entryPoint": "azure-ai-dataset-darwin-amd64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-dataset-darwin-amd64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-dataset-darwin-amd64.zip"
             },
             "darwin/arm64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "01a8cb3e62e816c062eb88794059ce41fc9cc7d296a0ad9309676eabc41f1c07"
+                "value": "3bcd62ed6986a57a34efae55a9622476a8805143f1974c5fbfb2cd7cdd16184c"
               },
               "entryPoint": "azure-ai-dataset-darwin-arm64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-dataset-darwin-arm64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-dataset-darwin-arm64.zip"
             },
             "linux/amd64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "c49b2ba38bdf70f8874b7acbb14e587f7a7cb7d389ff257b62b0aacd6c6ccb18"
+                "value": "4429b2b36c99392cde2a167fff27a5bbdde76bdecb5165121eb820bc86b32f5e"
               },
               "entryPoint": "azure-ai-dataset-linux-amd64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-dataset-linux-amd64.tar.gz"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-dataset-linux-amd64.tar.gz"
             },
             "linux/arm64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "4ef0c601099278942a04f83386c6b5cecbfb39998aa72510e93c0f2712a15304"
+                "value": "68ce16f1effa7d83718ae6470efc532a9b9c9fe6fb5e7fa12a055d9f7b07aa0c"
               },
               "entryPoint": "azure-ai-dataset-linux-arm64",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-dataset-linux-arm64.tar.gz"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-dataset-linux-arm64.tar.gz"
             },
             "windows/amd64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "69974f1ef8608d9405c9b4913601a980ac93f57286a5d97d7a14da41e75eac12"
+                "value": "66f39a27db5203da73d3c82b7d736cafa2593c9ae41940b9817bceb205f3d8c8"
               },
               "entryPoint": "azure-ai-dataset-windows-amd64.exe",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-dataset-windows-amd64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-dataset-windows-amd64.zip"
             },
             "windows/arm64": {
               "checksum": {
                 "algorithm": "sha256",
-                "value": "fb1cf717efa6ae7a39b6e6611a6a85546886f46e839ed828129b68aed124a3cf"
+                "value": "271c6fff9a1f9a0ac5c50116da784dec71a061b0e8317d242af52dc8cb7b552e"
               },
               "entryPoint": "azure-ai-dataset-windows-arm64.exe",
-              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/azure-ai-dataset-windows-arm64.zip"
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-41/azure-ai-dataset-windows-arm64.zip"
             }
           }
         }

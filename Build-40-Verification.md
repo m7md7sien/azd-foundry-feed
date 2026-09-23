@@ -35,8 +35,11 @@ A subsequent live round on public build 40 found a runtime defect in
 responses-backed evaluation (`source.responses`): the run failed with zero
 output rows and a `response_id` mapping error. This is an actual operational
 failure, distinct from the earlier completed simulation's failed quality
-verdict. A correction is being prepared for a later candidate; no fixed
-replacement package has been verified or published.
+verdict. The separately published
+[build 41 packages](./Build-41-Verification.md#responses-backed-evaluation)
+contain a corrected contract combination that passed one exact-package live
+row with two passing evaluator results. This does not change build 40's
+immutable packages or establish broad root-cause isolation.
 
 Diagnostic follow-up commands worked for this observed failed run. That
 extends the earlier synthetic terminal-guidance evidence to this specific
