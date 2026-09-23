@@ -1,8 +1,8 @@
-# Candidate 39: draft source and acceptance checklist
+# Candidate 39: source and acceptance checklist
 
-**Preparation only. Not built, published, or approved for publication.** The
-exact source SHA is awaiting approval. Build 38 remains the published Latest
-release, and its registry, packages, and historical findings are unchanged.
+**Build approved and in progress. Not published or approved for publication.**
+Both extensions use the exact source SHA below. Build 38 remains the published
+Latest release, and its registry, packages, and historical findings are unchanged.
 
 The live release/tag inventory and Latest registry were checked on 2026-09-23.
 Build 38 currently carries evaluations `1.0.38-beta` and dataset
@@ -15,20 +15,21 @@ provisional, not reserved, and must be checked again before build/publication.
 | Evaluations | `1.0.39-beta` |
 | Dataset | `1.0.0-beta.27` |
 | Required azd | `>=1.33.0`, subject to checking the approved manifests |
-| Source commit for both extensions | Pending exact integration SHA and BUILD approval |
+| Source commit for both extensions | [`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898) |
 | Registry/archive hashes | Not generated |
 | Publication and Latest promotion | Separate pending gates |
 
 No install URL is offered until real assets exist. Do not use this document as
 evidence that a build 38 issue has been fixed in a published package.
 
-## Planned scope, not shipped fixes
+## Approved source scope, not shipped fixes
 
-The coordinator is integrating follow-up work for:
+The [six integrated follow-up commits](https://github.com/m7md7sien/azure-dev/compare/c5be500196d66bb4326bb62700a1dde83c1f92a5...9a549449c2d5c2b4c6661f0ee8f8da7e3036c898)
+address:
 
 - Single-file downloads in both `azd ai dataset` and `azd ai eval dataset`.
-- Observed conversation-output counts, kept distinct from requested simulation
-  settings and other service evaluation counts.
+- Observed conversation-output identities and lifecycle statuses from a complete
+  output listing, distinct from requested settings and evaluation verdicts.
 - Human-readable handoff guidance for unattended runs.
 - Truly unregistered local files whose remote version listing is empty.
 - Actual returned rubric dimension data and preservation of nested result/sample
@@ -54,9 +55,9 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 
 | Gate | Status |
 | --- | --- |
-| Exact source SHA and BUILD approval | Pending |
+| Exact source SHA and BUILD approval | Approved for `9a549449c2d5c2b4c6661f0ee8f8da7e3036c898` |
 | Combined source checks and hosted race suites at that SHA | Pending |
-| Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Not started |
+| Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Build in progress in fresh `b39-9a549449c2d5` staging |
 | Fresh isolated Windows bundle installation and exact runtime versions | Not started |
 | Candidate-specific regression/live acceptance | Not started |
 | Separate PUBLISH approval | Pending |
@@ -77,14 +78,23 @@ package hashes, commands, and sanitized outcomes for each result.
 
 | Area | Required evidence |
 | --- | --- |
-| Standalone and embedded dataset download | The affected single-file `--output-file` path writes the exact expected bytes in both namespaces; existing directory downloads and invalid-input safeguards remain intact. |
-| Truly unregistered local files | Exercise a direct declaration and a dataset override with confirmed remote absence and bounded rows. Verify no implicit dataset publication. Keep authorization/transport failures distinct from absence. |
+| Standalone and embedded dataset download | The affected single-file `--output-file` path writes the exact expected bytes in both namespaces. Container-backed single files require a complete one-file listing and `isSingleFile: true`; one-file folders still require directory output. Existing destination/force safeguards remain intact. |
+| Truly unregistered local files | Exercise a direct declaration and a dataset override with confirmed remote absence and bounded rows. A valid complete empty listing requires confirming not-found lookups; malformed/incomplete listings and authorization/service failures must not enable inline fallback. Verify no implicit dataset publication. |
 | Registered dataset identity and caps | Retain service-issued version identity and explicit positive-cap rejection. Do not replace registered data with an inline copy or automatically publish a temporary subset. |
-| Observed conversation outputs | Distinguish observed output/conversation/turn counts from requested seeds, repetitions, turn ceilings, and evaluation verdict totals. Do not treat missing counters as zero or synthesize unsupported counts. |
+| Observed conversation outputs | A waited run that already fetched all rows reports unique conversation IDs and output-item lifecycle statuses. Duplicates count once; unknown/conflicting statuses and rows without IDs stay separate. Paged/filtered or unfetched detail views must not imply complete coverage. No new fetch, generated/completed-conversation total, or transcript-based actual-turn inference is promised. |
 | Rubric detail and raw fields | Display dimension values only when actually returned. Verify applicable scores, weights and reasons against sanitized retained service evidence; preserve nested JSON fields rather than silently dropping them. |
 | Detail lookup identifiers | A human-displayed lookup ID works with the detail command; JSON retains the service identity. |
 | Unattended handoff | Confirm the human next-step hint and runnable reattachment command without contaminating JSON output or resubmitting work. |
 | Existing behavior | Retain the prior semantic preflight/no-mutation, static-versus-simulation, pinning, cap-zero, and JSON-output guarantees using evidence tied to the candidate or an explicitly justified source boundary. |
+
+The approved README specifies that rubric detail uses returned
+`properties.dimension_scores`, including available scores, applicability,
+weights, and reasons. Applicability is not a pass/fail verdict and missing values
+must not become zero or false. JSON retains nested `properties` and `sample`
+fields; these may contain sensitive prompts and answers, so prefer a private
+output file rather than shared terminal or CI logs. This contract still needs
+candidate-specific package acceptance; it is not proof for the deleted build 38
+fresh-user run.
 
 Use small owned fixtures and bounded model calls; do not regenerate large
 datasets merely to replace provenance. Delete only resources proved to belong
