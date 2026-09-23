@@ -26,6 +26,13 @@ These instructions target **build 40**, evaluations `1.0.40-beta` and dataset
 Build 40 is now Latest; the README separately documents the rolling Latest
 source. Both the pinned and Latest installation paths were verified.
 
+**Known build 40 runtime defect:** the observed `source.responses` evaluation
+failed with zero output rows and a `response_id` mapping error. Do not treat
+run creation or acceptance as evidence that this path scored successfully.
+A fixed replacement package is not yet available. See the
+[confirmed failure and diagnostic scope](./Build-40-Verification.md#confirmed-responses-backed-runtime-failure);
+the earlier passes below remain scoped, not an all-scenarios claim.
+
 Build 40 corrects the reported simulation-init local-write defect and adds
 actionable failed/errored-run guidance. Its original acceptance was local/offline:
 31 exact-package CLI cases, two actual Windows ConPTY correction/cancel paths,
@@ -669,12 +676,17 @@ available output and JSON export in terminal summaries/details, using immutable
 eval/run IDs. Failed and explicit `--status errored` listings are additional
 views, not substitutes for all available output. A whole-run failure can have
 no rows or grading counts; inspect available output and run diagnostics rather
-than assuming grading succeeded. Failed-service guidance retains synthetic
-HTTP proof, not a real operationally failed Azure run. The subsequent bounded
+than assuming grading succeeded. Failed-service guidance originally had
+synthetic HTTP proof, not live-service failure coverage. The subsequent bounded
 build 40 live regression executed the printed immutable-ID unfiltered
 list/export commands on completed runs and checked preservation of the measured
 raw `properties`/`sample` fields. A failed simulation quality verdict does not
 establish operational failure or errored-row coverage.
+
+The later responses-backed runtime failure did exercise diagnostic follow-up
+commands successfully on an actual failed run with zero output rows. That is
+evidence for inspecting this failure, not a fix for responses-backed execution
+or coverage of every operational-failure and errored-row case.
 
 Only the bounded cases recorded in the build 40 checklist have matching live
 evidence; the remaining authoring examples are not thereby verified.

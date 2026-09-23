@@ -14,6 +14,11 @@ Its registry, versions, packages, and historical evidence are unchanged.
 Earlier source changes and development-artifact passes were not substituted
 for this candidate's exact-package acceptance.
 
+**New confirmed runtime defect:** the later
+[responses-backed evaluation case](#confirmed-responses-backed-runtime-failure)
+failed with zero output rows. The earlier scoped acceptance remains valid,
+but is not an all-scenarios pass or a claim that this path works.
+
 | Item | Candidate value |
 | --- | --- |
 | Release | [extensions-2026-09-23-40](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-40) |
@@ -23,6 +28,24 @@ for this candidate's exact-package acceptance.
 | Source for both extensions | [`361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a`](https://github.com/m7md7sien/azure-dev/commit/361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a) |
 | Registry SHA256 | `648c9632fcf5a4e1f993cb0cb4c5bc37691e5821df8ec8422c36a2b30f548d9f` |
 | Publication | Complete; non-Latest first, then Latest after final hosted and anonymous gates |
+
+## Confirmed responses-backed runtime failure
+
+A subsequent live round on public build 40 found a runtime defect in
+responses-backed evaluation (`source.responses`): the run failed with zero
+output rows and a `response_id` mapping error. This is an actual operational
+failure, distinct from the earlier completed simulation's failed quality
+verdict. A correction is being prepared for a later candidate; no fixed
+replacement package has been verified or published.
+
+Diagnostic follow-up commands worked for this observed failed run. That
+extends the earlier synthetic terminal-guidance evidence to this specific
+operational failure; it does not establish that responses-backed evaluation
+works, that every failure shape is covered, or that errored output rows were
+tested. Do not infer scoring success from run creation or acceptance.
+
+Build 40's source, versions, registry and all 15 assets remain unchanged.
+Earlier local, hosted, and bounded live passes retain their original scopes.
 
 ## Install this build
 
@@ -92,10 +115,12 @@ implying successful grading. Returned run-level failure messages should redact
 URL credentials, query strings, and fragments in human output. JSON should keep
 its existing document and exit behavior without appended prose.
 
-Independent synthetic HTTP-caller fixtures are the proof path for those failed
-service-response shapes. They are **not** a real operationally failed Azure run.
-No paid failure reproduction or TLS-validation bypass is part of this
-candidate's acceptance.
+Independent synthetic HTTP-caller fixtures were the original proof for those
+failed service-response shapes, not a real operationally failed Azure run.
+The later responses-backed failure above separately exercised diagnostic
+follow-up commands on one actual failed run. It does not turn the original
+fixture checks into live proof or establish every failure shape.
+No TLS-validation bypass is part of this candidate's acceptance.
 
 ## Packaging and gates
 
@@ -258,8 +283,10 @@ count/cost fix or clear historical terminal-job deletion failures. The earlier
 Build 40's original acceptance was **local/offline**: versioned init CLI/ConPTY
 checks, synthetic source HTTP fixtures, and package-download/install
 verification. The subsequent two-row live regression above adds only its
-explicitly measured scope. Build 39 live-service evidence stays tied to
-build 39; no build 40 operationally failed-service execution is claimed.
+explicitly measured scope. The later responses-backed round found the
+confirmed operational failure recorded above, with diagnostic follow-up
+commands working for that case. Build 39 live-service evidence stays tied to
+build 39.
 Earlier broader scenario, field-preservation, simulation, and cleanup evidence
 must not be silently relabeled as a build 40 rerun.
 

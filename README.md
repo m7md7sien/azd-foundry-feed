@@ -33,11 +33,20 @@ a fresh Latest-source Windows install matched the approved bytes. The
 [acceptance record](./Build-40-Verification.md#final-hosted-proof) includes the
 precise first-read zero-byte `.env.lock` allowance and scoped evidence limits.
 
+**New confirmed build 40 issue:** a responses-backed evaluation
+(`source.responses`) failed with zero output rows and a `response_id` mapping
+error. This path is not working in the observed case; a correction is being
+prepared, but no fixed replacement package has been verified or published.
+Read the [runtime failure and diagnostic scope](./Build-40-Verification.md#confirmed-responses-backed-runtime-failure).
+The earlier scoped passes do not establish that all build 40 scenarios passed.
+
 Build 40 corrects build 39's high-priority simulation-init validation/local-write
 defect, including interactive correction and mixed seed fields. Its exact Windows
 packages passed 31 CLI cases and two actual ConPTY paths. Terminal failed/errored
-run guidance has 15-group synthetic HTTP/source evidence, **not a real failed
-Azure-run replay**. These fixes do not alter
+run guidance originally had 15-group synthetic HTTP/source evidence; those
+fixtures were not live-service proof. Diagnostic follow-up commands also
+worked for the later observed responses-backed failure, without establishing
+coverage of every operational-failure or errored-row shape. These fixes do not alter
 [build 39's immutable packages or known issues](./Build-39-Verification.md#newly-reported-known-issues).
 The reported Q&A generation count/cost blocker and terminal-job deletion remain
 backend-open; deprecated agent-hint work remains deferred.
