@@ -1,9 +1,9 @@
 # Build 38: source and acceptance checklist
 
-**Published 2026-09-23, not Latest yet.** Final packages, hosted race checks, and
-scoped package acceptance passed. Anonymous asset downloads and fresh Windows
-installation from the published registry passed. Installed-candidate CI is
-pending, so the rolling feed still selects build 37.
+**Published and promoted to Latest on 2026-09-23.** Final packages, hosted race
+checks, scoped package acceptance, and installed-candidate CI passed. Anonymous
+asset downloads and fresh Windows installations from both pinned and Latest
+registries matched the approved bytes.
 
 The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
@@ -19,7 +19,7 @@ verified from baseline evidence or from the presence of these instructions.
 | Dataset | `1.0.0-beta.26` |
 | Required azd | `>=1.33.0` |
 | Source commit for both extensions | [`c5be500196d66bb4326bb62700a1dde83c1f92a5`](https://github.com/m7md7sien/azure-dev/commit/c5be500196d66bb4326bb62700a1dde83c1f92a5) |
-| Publication decision | Published non-Latest after explicit approval; promotion awaits final installed-candidate CI |
+| Publication decision | Published non-Latest first, then promoted after installed-candidate/source CI and anonymous verification passed |
 
 Package-only version overrides are applied in an isolated checkout.
 Source dependency manifests and changelogs are unchanged. Each extension is
@@ -138,10 +138,17 @@ No temporary subset dataset is automatically published.
 | Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
 | Functional preflight acceptance | Passed 17/17 measured negative cases on `e6f86f96` packages, without dataset-version/private-state changes and with independent evaluator/eval absence checks; bounded one-seed simulation passed |
 | Final package identity and smoke acceptance | Passed: exact bundle/installed binary hashes, JSON versions, Go VCS/platform metadata, CLI guards, one fresh manual-seed simulation, and byte-matching directory download |
-| Actual Linux CI run and installed versions | Pending |
+| Final published-candidate CI | [Passed all four jobs](https://github.com/m7md7sien/azure-dev/actions/runs/35802906993): Linux and Windows each 64/64 actual azd-hosted CLI checks, exact archive/installed bytes and versions, plus both full source-race suites at `c5be5001`; no skips |
 | Anonymous pinned registry and all archive downloads | Passed: all 15 assets match local approved bytes and SHA256, including the literal registry |
 | Fresh Windows install from the published pinned source | Passed with azd 1.33.0; exact versions and installed bytes match final archives |
-| Anonymous rolling Latest registry | Still build 37 |
+| Anonymous rolling Latest registry | Verified at promotion: exact approved registry SHA256 and all 15 assets |
+| Fresh Windows install through rolling Latest | Passed with azd 1.33.0; exact versions and final archive bytes |
+
+The final CI workflow commit is
+[`b872df44381dbbdc786ab07f548e65722c02b053`](https://github.com/m7md7sien/azure-dev/blob/b872df44381dbbdc786ab07f548e65722c02b053/eng/scripts/eval-candidate-proof/candidate.json).
+Its immutable manifest pins the extension source, registry hash, all four
+Linux/Windows amd64 extension archives, and azd 1.33.0. The workflow commit is
+not the extension source commit. Live-cloud CI was **not run**.
 
 The earlier `9a27cd20` source could publish dependency assets for some invalid
 seed/query inputs and was not approved for publication. The new source checks

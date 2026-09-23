@@ -24,10 +24,11 @@ It bundles
 plus the follow-up fixes described in the
 [build 38 acceptance record](./Build-38-Verification.md).
 
-**Build 38 is published but not Latest yet.** Anonymous downloads and a fresh
-Windows install have passed; final installed-candidate CI is pending. Use the
-[pinned build 38 instructions](./Build-38-Verification.md#install-this-build)
-to test it now. The rolling Latest URL below still selects build 37.
+**Build 38 is Latest.** Anonymous downloads and fresh pinned/Latest Windows
+installs passed. [Final CI](https://github.com/m7md7sien/azure-dev/actions/runs/35802906993)
+passed 64/64 installed-CLI checks on each of Linux and Windows, plus both full
+source-race suites. Use the stable Latest URL below or the
+[pinned build 38 instructions](./Build-38-Verification.md#install-this-build).
 
 ## Bug bash
 
