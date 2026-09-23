@@ -18,7 +18,7 @@ customer data, or full raw live-service responses.
 [README](./README.md). Bundled means included in a feed build, not merged
 upstream. These scenarios are test instructions, not a claim that every scenario
 has passed. Baseline simulation and rubric evidence does not verify a newer
-candidate. Service deployment, the final GA simulation discriminator, and
+candidate. Service deployment, GA simulation contract/deployment alignment, and
 privacy signoff remain separate gates.
 
 These instructions target **build 39**, evaluations `1.0.39-beta` and dataset
@@ -536,7 +536,9 @@ resulting transcript. A seed row is not an agent `query`; do not bind it to
 `num_conversations` accepts 1 through 5 per seed and defaults to 1 when omitted.
 `max_turns` accepts 1 through 20; omission preserves the service default.
 Explicit zero is invalid. `desired_num_turns` cannot exceed an explicit
-`max_turns`. Start with one seed and a small turn budget because every
+`max_turns`. Desired turns are a target, not an exact-length guarantee; the
+maximum is a hard ceiling. Early termination alone is not evidence of a CLI
+bug. Start with one seed and a small turn budget because every
 conversation invokes models. Inspect run output and transcript shape, not just
 the run acceptance status.
 
@@ -608,7 +610,10 @@ fetch or inference of missing values is promised.
 These authoring examples require a matching-candidate live pass before being
 marked verified. A missing deployment, unavailable evaluator, or service
 rejection is a recorded blocker, not a successful test. The current simulation
-run contract is preview-only; the final GA discriminator is unconfirmed.
+run uses `azure_ai_user_conversation_simulation_preview`. The
+[public GA proposal and current target differ](./Build-39-Verification.md#public-ga-proposal-versus-current-deployment):
+the target's non-executing schema check rejected the proposed GA name. Keep the
+shipped preview wire; GA contract/deployment alignment remains external.
 
 ### More to try
 

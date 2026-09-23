@@ -160,6 +160,29 @@ historical evidence, not new build 39 executions.
 
 ## Remaining qualifications
 
+### Public GA proposal versus current deployment
+
+The public proposal [Azure/azure-rest-api-specs#45904](https://github.com/Azure/azure-rest-api-specs/pull/45904),
+reviewed at
+[`8363fd2a7898143ac8a06ea573faf74035c10a62`](https://github.com/Azure/azure-rest-api-specs/blob/8363fd2a7898143ac8a06ea573faf74035c10a62/specification/ai-foundry/data-plane/Foundry/src/openai/evaluations/user_conversation_simulation.tsp),
+names the run discriminator `azure_ai_user_conversation_simulation`.
+A separate, non-executing schema probe against the current bug-bash target
+rejected that GA name as unknown and listed
+`azure_ai_user_conversation_simulation_preview` among accepted types. The probe
+did not supply resource/model inputs or create an evaluation run.
+
+Build 39 therefore retains the preview run wire used by the previously scored
+bug-bash simulations. A public proposal is not evidence that this target has
+deployed the GA contract. Contract/deployment alignment remains an external
+gate; do not unconditionally replace the wire discriminator or claim GA
+readiness. This distinction concerns the run contract, not seed generation's
+separate `simulation_seed` discriminator.
+
+The reviewed proposal describes `desired_num_turns` as a **target** and the
+maximum turn setting as a **hard limit**, not a promise of an exact observed
+length. Earlier termination is allowed and does not by itself establish a CLI
+bug. Record actual transcript observations separately from requested settings.
+
 Do not infer an all-scenarios fresh-user pass, authenticated live-cloud CI pass,
 final GA simulation contract, privacy signoff, or service-fix deployment from
 packaging or source checks. Each needs its own evidence. Keep unsupported or
@@ -169,8 +192,8 @@ Broader fresh-user scenario work belongs to build 38, including its failures
 and gaps; build 39 currently has the targeted exact-package regressions above,
 not a full fresh-user rerun. Two historical terminal data-generation job records
 returned HTTP 409 when deletion was attempted. These records were neither
-created nor retried by this candidate's tests, and no service-history cleanup
-fix is claimed.
+created nor retried by this candidate's tests. Their removal remains backend
+cleanup work; no service-history cleanup fix or verified retention TTL is claimed.
 
 Public files must contain no credentials, private prompts or handoff material,
 customer data, or full raw service responses. Publish sanitized field/shape
