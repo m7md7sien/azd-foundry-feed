@@ -576,7 +576,7 @@ historical behavior is not the current contract.
 | Identity lookup, authorization, or missing-ID failure | Stop rather than silently send inline rows. Do not construct or guess an `azureai://` identity. |
 | Conversation simulation | Does not accept a sample cap. Bound the number of seed rows, `num_conversations`, and `max_turns` instead. Do not combine it with a `source` block. |
 | Traces, other source-backed runs, and reruns selected by eval ID | Reject explicit sample-cap flags that cannot affect this source. Use trace-source limits or select response IDs. |
-| Data generation | `generate --max-samples` requests a service generation count, not a dataset-run cap. A reported `simple_qna` request for 15 produced 16 results/file rows, while the separate seed case produced 15. This remains a known service cost blocker: a fix is not established for the reported path, not merely awaiting proof of rollout. |
+| Data generation | `generate --max-samples` requests a service generation count, not a dataset-run cap. A reported `simple_qna` request for 15 produced 16 results/file rows, while the separate seed case produced 15. This remains an open service cost blocker: updated triage confirms that the merged patch does not cover the reported path. Do not treat rollout or client-side truncation as the fix. |
 
 For ordinary dataset runs, an explicit CLI `--max-samples 0` overrides a positive
 YAML cap. Negative values are invalid. No temporary subset dataset is published
