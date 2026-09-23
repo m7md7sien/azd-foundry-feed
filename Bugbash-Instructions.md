@@ -23,14 +23,19 @@ privacy signoff remain separate gates.
 
 These instructions target **build 40**, evaluations `1.0.40-beta` and dataset
 `1.0.0-beta.28`. The source below pins that release for reproducible results.
-Build 40 is published non-Latest pending final hosted CI; the README separately
-documents the rolling Latest source, which still selects build 39.
+Build 40 is now Latest; the README separately documents the rolling Latest
+source. Both the pinned and Latest installation paths were verified.
 
 Build 40 corrects the reported simulation-init local-write defect and adds
 actionable failed/errored-run guidance. Its new proof is local/offline:
 31 exact-package CLI cases, two actual Windows ConPTY correction/cancel paths,
 and 15 combined-source synthetic HTTP groups. The HTTP fixtures are not a real
-operationally failed Azure run. Read the
+operationally failed Azure run. A separate published-package local follow-up
+passed 26 init cases. [Final hosted CI](./Build-40-Verification.md#final-hosted-proof)
+passed 124 actual CLI checks on each of Linux and Windows plus both full source
+race suites. The first core environment read may retain a normal zero-byte
+`.azure/.env.lock`; the refusal checks verify every other authored/private path
+and content remains unchanged. Read the
 [build 40 scope and remaining issues](./Build-40-Verification.md#evidence-boundaries-and-remaining-issues)
 before testing; the service generation-count/cost and terminal-delete issues,
 GA alignment, privacy and live-cloud CI gates remain open.

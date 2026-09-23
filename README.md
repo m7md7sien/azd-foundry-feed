@@ -24,12 +24,14 @@ It bundles
 plus the follow-up fixes described in the
 [build 40 acceptance record](./Build-40-Verification.md).
 
-**Build 40 is published non-Latest; build 39 remains Latest.** Use the
+**Build 40 is now Latest.** Use the
 [pinned build 40 instructions](./Build-40-Verification.md#install-this-build)
-for the new fixes. All 15 anonymous downloads and a fresh public Windows install
-matched the approved bytes. Final build 40 hosted proof is pending: 124 installed
-CLI checks per OS plus both full source-race suites. The stable Latest URL below
-still installs build 39 until those gates pass.
+for reproducible installation. [Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347)
+passed 124 installed CLI checks on each of Linux and Windows plus both full
+source-race suites. The stable Latest registry, all 15 anonymous downloads, and
+a fresh Latest-source Windows install matched the approved bytes. The
+[acceptance record](./Build-40-Verification.md#final-hosted-proof) includes the
+precise first-read zero-byte `.env.lock` allowance and scoped evidence limits.
 
 Build 40 corrects build 39's high-priority simulation-init validation/local-write
 defect, including interactive correction and mixed seed fields. Its exact Windows

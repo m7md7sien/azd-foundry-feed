@@ -1,11 +1,12 @@
 # Build 40: source and acceptance checklist
 
-**Published non-Latest on 2026-09-23.** Corrected source gates, scoped local
-acceptance, all 15 anonymous asset checks, and fresh public Windows installation
-passed. Final hosted CI and Latest promotion remain pending.
+**Published and promoted to Latest on 2026-09-23.** Corrected source gates,
+scoped local acceptance, final Linux/Windows installed-CLI and full source-race
+CI, all 15 anonymous asset checks, and fresh pinned/Latest Windows installations
+passed. Promotion followed the final cold-entry filesystem checks below.
 The earlier `0f7caa5f` attempt was withheld for an
 integration-only test signature mismatch; it was not a new product defect.
-Build 39 remains Latest with its [known issues](./Build-39-Verification.md#newly-reported-known-issues).
+Build 39 retains its [known issues](./Build-39-Verification.md#newly-reported-known-issues).
 Its registry, versions, packages, and historical evidence are unchanged.
 Earlier source changes and development-artifact passes were not substituted
 for this candidate's exact-package acceptance.
@@ -18,7 +19,7 @@ for this candidate's exact-package acceptance.
 | Required azd | `>=1.33.0`, verified in both corrected package manifests and registry |
 | Source for both extensions | [`361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a`](https://github.com/m7md7sien/azure-dev/commit/361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a) |
 | Registry SHA256 | `648c9632fcf5a4e1f993cb0cb4c5bc37691e5821df8ec8422c36a2b30f548d9f` |
-| Publication | Complete, non-Latest; final hosted CI required before promotion |
+| Publication | Complete; non-Latest first, then Latest after final hosted and anonymous gates |
 
 ## Install this build
 
@@ -114,8 +115,8 @@ one platform-named entrypoint, ZIP for Windows/macOS and tar.gz for Linux.
 | Separate PUBLISH approval | Approved for the exact source, versions and registry digest above |
 | Complete new draft, individual asset uploads, literal registry last | Passed: all 15 asset names/sizes/server SHA256s verified before publication; no old assets overwritten |
 | Non-Latest publication, anonymous downloads and fresh published-source install | Passed: published at `2026-09-23T06:06:42Z`; all 15 anonymous SHA256s, registry metadata/URLs, exact Windows JSON versions and installed binary digests match |
-| Final published Linux/Windows CLI and full source-race CI | Pending: planned 124 checks per OS plus both unchanged full race suites |
-| Latest promotion and stable-URL/fresh-install verification | Not started |
+| Final published Linux/Windows CLI and full source-race CI | Passed: [final run 35826828347](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347), 124 actual CLI checks per OS plus both unchanged full race suites; both downloaded evidence artifacts verified |
+| Latest promotion and stable-URL/fresh-install verification | Passed: promoted at `2026-09-23T06:30:30Z`; anonymous stable registry matches the approved SHA256, all 15 assets rechecked, and fresh Latest-source Windows install matches versions and executable bytes |
 
 The release contains 12 platform archives plus `source-provenance.json`,
 `SHA256SUMS`, and literal `registry.json`. Tag/version collisions were checked
@@ -125,18 +126,49 @@ versions. Publication and Latest promotion are separate.
 The withheld `0f7caa5f` source completed production build, packaging, and local
 installation checks in 2.30 minutes, but its combined tests did not compile.
 Those earlier artifacts and receipts remain intact as **prior-attempt evidence
-only**. The corrected source uses fresh staging and requires new version,
+only**. The corrected source used fresh staging with its own version,
 digest, and acceptance receipts. No earlier binary was overwritten or relabeled.
 
 The corrected source completed production build, packaging, and fresh local
 installation checks in 2.12 minutes. Its exact versioned bundles and new hashes
 were delivered for the separate 31-case CLI and two-path ConPTY acceptance.
-Those scoped package checks, parent combined-source gates, and non-Latest
-publication have passed. Final hosted proof remains pending.
+Those scoped package checks, parent combined-source gates, publication and
+final hosted proof have passed.
 
 The fresh public Windows amd64 installation matched these accepted executable
 SHA256s: evaluations `fc94f9a171d5e598fb4479d413e5d7a33957b2634d2fb229d43795561a5c0dc8`;
 dataset `5e551a44090d384dd66285cb13cdaf2d63e6aff6410cf3b9e387ed3c12fcd828`.
+
+### Final hosted proof
+
+[Run 35826828347](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347)
+passed all four jobs using the
+[frozen manifest at `c117d9c82891c4c5f6d849a5708f541b71f13f8c`](https://github.com/m7md7sien/azure-dev/blob/c117d9c82891c4c5f6d849a5708f541b71f13f8c/eng/scripts/eval-candidate-proof/candidate.json).
+Both source fields match the approved build SHA, and the registry, four
+Linux/Windows amd64 archive hashes, extension versions and azd 1.33.0 match the
+published packages. Both downloaded CLI artifacts contain **124 unique actual
+commands with their expected outcomes** per OS: 68 retained checks, 50 seed-JSON
+refusal/state-preservation checks and six valid controls.
+
+Each OS records four cold-entry cases that create exactly the normal
+**zero-byte `.azure/.env.lock`**, plus 46 repeated refusals with the entire
+project unchanged. All 50 cases preserve every other authored/private path and
+content, including the isolated global configuration. Expected/after digests
+match in all 50 cases; before/after digests also match in the 46 unchanged
+cases. No directories or paths are ignored. The allowed core read-lock residue
+is not authored configuration mutation.
+
+Both full internal source-race suites passed at the exact approved source with
+Go 1.26.4 and `go test -race -count=1 -timeout 15m ./internal/...`. The earlier
+[passing run 35826281452](https://github.com/m7md7sien/azure-dev/actions/runs/35826281452)
+used precreated read locks; the final run strengthens cold-entry evidence
+without changing source or package pins.
+
+These are hosted **offline** checks. CI did not run interactive correction,
+authenticated live-cloud evaluation, a cloud quality gate, or a real failed-run
+replay. The separate local ConPTY and synthetic HTTP evidence below retains
+its own scope. Final publication and Latest checks did not modify any of the
+15 assets or the historical build 38/39 releases.
 
 ### Recorded exact-package local acceptance
 

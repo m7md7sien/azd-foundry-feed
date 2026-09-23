@@ -11,7 +11,7 @@ high-priority simulation-init validation blocker and a reopened failed-run
 reporting issue. The historical passes below remain scoped evidence, not a
 blanket "bug-bash ready" or "all blockers fixed" declaration. Published packages
 and versions have not changed. The corrected
-[build 40 packages](./Build-40-Verification.md) are published separately;
+[build 40 packages](./Build-40-Verification.md) are published separately and now Latest;
 their fixes and local/offline acceptance do not revise build 39's results.
 
 | Item | Published value |
