@@ -14,29 +14,31 @@ for a later build. Each release identifies its bundled changes; a PR bundled int
 this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
-[39](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-39):
-evaluations `1.0.39-beta` and dataset `1.0.0-beta.27`, both built from
-[`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898).
+[40](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-40):
+evaluations `1.0.40-beta` and dataset `1.0.0-beta.28`, both built from
+[`361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a`](https://github.com/m7md7sien/azure-dev/commit/361ca3c338069452a0bc1da6aa5a7b7c4e8bcf6a).
 It bundles
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116),
 [Azure/azure-dev#10113](https://github.com/Azure/azure-dev/pull/10113), and
 [Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102)
 plus the follow-up fixes described in the
-[build 39 acceptance record](./Build-39-Verification.md).
+[build 40 acceptance record](./Build-40-Verification.md).
 
-**Build 39 is Latest.** [Final CI](https://github.com/m7md7sien/azure-dev/actions/runs/35810319528)
-passed 68/68 installed-CLI checks on each of Linux and Windows, plus both full
-source-race suites. Anonymous asset checks and fresh pinned/Latest Windows
-installs matched approved bytes. Use the
-[pinned build 39 instructions](./Build-39-Verification.md#install-this-build)
-or the stable Latest URL below.
+**Build 40 is published non-Latest; build 39 remains Latest.** Use the
+[pinned build 40 instructions](./Build-40-Verification.md#install-this-build)
+for the new fixes. All 15 anonymous downloads and a fresh public Windows install
+matched the approved bytes. Final build 40 hosted proof is pending: 124 installed
+CLI checks per OS plus both full source-race suites. The stable Latest URL below
+still installs build 39 until those gates pass.
 
-**New build 39 reports include a high-priority release blocker:** simulation
-`init` can write configuration for invalid seed rows, although `create` rejects
-them before publication. Failed-run summary/detail actionability is also
-reopened. See [the current known issues](./Build-39-Verification.md#newly-reported-known-issues).
-Earlier CI and scoped passes are not an assertion that all blockers are fixed
-or that build 39 is unconditionally bug-bash ready.
+Build 40 corrects build 39's high-priority simulation-init validation/local-write
+defect, including interactive correction and mixed seed fields. Its exact Windows
+packages passed 31 CLI cases and two actual ConPTY paths. Terminal failed/errored
+run guidance has 15-group synthetic HTTP/source evidence, **not a real failed
+Azure-run replay**. These fixes do not alter
+[build 39's immutable packages or known issues](./Build-39-Verification.md#newly-reported-known-issues).
+The reported Q&A generation count/cost blocker and terminal-job deletion remain
+backend-open; deprecated agent-hint work remains deferred.
 
 ## Bug bash
 
@@ -44,7 +46,14 @@ Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
 For current candidate evidence and known limitations, use
-**[Build 39 verification](./Build-39-Verification.md)**. Targeted exact-package
+**[Build 40 verification](./Build-40-Verification.md)**. Its new acceptance is
+local/offline; no build 40 Azure execution or all-scenarios rerun is claimed.
+GA contract/deployment alignment, privacy/AA, upstream review and authenticated
+live-cloud CI remain external gates. There is no unconditional readiness claim.
+
+**[Build 39 verification](./Build-39-Verification.md)** retains its
+[final 68-check-per-OS and full-race CI](https://github.com/m7md7sien/azure-dev/actions/runs/35810319528).
+Its targeted exact-package
 checks cover both single-file download surfaces, local-file caps, registered
 identity guards, and preservation/rendering of returned rubric details.
 Observed conversation-output identities/statuses are not generation totals or

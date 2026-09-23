@@ -21,22 +21,34 @@ has passed. Baseline simulation and rubric evidence does not verify a newer
 candidate. Service deployment, GA simulation contract/deployment alignment, and
 privacy signoff remain separate gates.
 
-These instructions target **build 39**, evaluations `1.0.39-beta` and dataset
-`1.0.0-beta.27`. The source below pins that release for reproducible results.
-The README separately documents the rolling Latest source. Build 39 has
+These instructions target **build 40**, evaluations `1.0.40-beta` and dataset
+`1.0.0-beta.28`. The source below pins that release for reproducible results.
+Build 40 is published non-Latest pending final hosted CI; the README separately
+documents the rolling Latest source, which still selects build 39.
+
+Build 40 corrects the reported simulation-init local-write defect and adds
+actionable failed/errored-run guidance. Its new proof is local/offline:
+31 exact-package CLI cases, two actual Windows ConPTY correction/cancel paths,
+and 15 combined-source synthetic HTTP groups. The HTTP fixtures are not a real
+operationally failed Azure run. Read the
+[build 40 scope and remaining issues](./Build-40-Verification.md#evidence-boundaries-and-remaining-issues)
+before testing; the service generation-count/cost and terminal-delete issues,
+GA alignment, privacy and live-cloud CI gates remain open.
+
+Build 39 has
 [completed targeted package and independent focused fresh-user follow-up](./Build-39-Verification.md#independent-focused-fresh-user-follow-up)
 with no new functional defect observed in that earlier scope. Broader scenario evidence
 remains build 38 history; not all journeys were rerun on build 39. Keep those
 evidence sets separate.
 
-**Subsequent build 39 reports remain open:** simulation `init` can write
+**Build 39's immutable packages still have their reported defects:** simulation `init` can write
 configuration despite blank seed descriptions or `desired_num_turns: 0`;
 `create` protects publication, not those local writes. Failed-run output
 actionability is also reopened. Read the
 [current known issues](./Build-39-Verification.md#newly-reported-known-issues)
 before testing. Existing scoped passes are not an all-blockers-fixed claim.
 
-The [actual Windows ConPTY checkpoint](./Build-39-Verification.md#actual-windows-conpty-checkpoint)
+The [actual build 39 Windows ConPTY checkpoint](./Build-39-Verification.md#actual-windows-conpty-checkpoint)
 also completed for 13 scoped cases, including Ctrl+C, explicit Cancel,
 add-only file preservation, and JSON-only console stdout, with local cleanup
 confirmed. Bounds were supplied as flags and some inputs were prefilled.
@@ -69,15 +81,15 @@ the project is shared and evals persist, so prefix your datasets, evaluators
 and evals to avoid collisions with other testers.
 
 **Returning testers:** use a fresh azd configuration or explicitly reinstall
-the two extensions from `foundry-candidate-39` below. Adding a source does not
+the two extensions from `foundry-candidate-40` below. Adding a source does not
 replace installed binaries. If this source name already exists, check that its
 URL matches rather than silently using an older registry.
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-candidate-39 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/registry.json
-azd extension install azure.ai.evaluations --source foundry-candidate-39 --version 1.0.39-beta
-azd extension install azure.ai.dataset --source foundry-candidate-39 --version 1.0.0-beta.27
+azd extension source add -n foundry-candidate-40 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/registry.json
+azd extension install azure.ai.evaluations --source foundry-candidate-40 --version 1.0.40-beta
+azd extension install azure.ai.dataset --source foundry-candidate-40 --version 1.0.0-beta.28
 
 # 2. make a project to work in
 mkdir azd-eval-bugbash
@@ -123,10 +135,10 @@ The endpoint is saved in this azd environment. `--project-endpoint` overrides it
 otherwise the environment value takes precedence over a machine-wide
 `azd ai project` selection and over variables exported in your shell.
 
-**Check what you installed:** both extensions should use `foundry-candidate-39`
+**Check what you installed:** both extensions should use `foundry-candidate-40`
 and match the versions in the [pinned registry][registry].
 
-[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-39/registry.json
+[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-23-40/registry.json
 
 ```bash
 azd extension list --installed
@@ -142,8 +154,8 @@ source (skip an uninstall if that extension is absent):
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension install azure.ai.evaluations --source foundry-candidate-39 --version 1.0.39-beta
-azd extension install azure.ai.dataset --source foundry-candidate-39 --version 1.0.0-beta.27
+azd extension install azure.ai.evaluations --source foundry-candidate-40 --version 1.0.40-beta
+azd extension install azure.ai.dataset --source foundry-candidate-40 --version 1.0.0-beta.28
 ```
 
 ## Optional: owned-agent and own-trace setup
@@ -151,7 +163,7 @@ azd extension install azure.ai.dataset --source foundry-candidate-39 --version 1
 The bug-bash feed installs only evaluations and datasets. Seeing only `eval`
 and `dataset` under `azd ai --help` is expected. Agent management is a separate,
 independently versioned [official extension][agents-install]. Install it from
-`azd`, **not** `foundry-candidate-39`, in the same isolated configuration:
+`azd`, **not** `foundry-candidate-40`, in the same isolated configuration:
 
 ```bash
 azd extension install azure.ai.agents --source azd --version 1.0.0-beta.16
@@ -472,7 +484,7 @@ Read its next steps, then explicitly declare or initialize the eval you want.
 The `--conversation-mode static|simulation` flags and explicit simulator limits
 introduced in build 38 remain supported. Its
 [authoring examples](./Build-38-Verification.md#candidate-authoring) show those
-unchanged command forms; install build 39 using this guide's pinned source.
+unchanged command forms; install build 40 using this guide's pinned source.
 Full YAML remains useful beyond the scaffold.
 
 Author the full configuration when the scaffold does not expose the desired
@@ -553,10 +565,14 @@ resulting transcript. A seed row is not an agent `query`; do not bind it to
 `max_turns` accepts 1 through 20; omission preserves the service default.
 Explicit zero is invalid for the numeric simulation settings. Seed rows also
 require a nonblank description and positive whole-number `desired_num_turns`
-when supplied, but **build 39 `init` can accept a blank description or zero
-desired turns and write configuration**. Check those rows yourself before
-scaffolding; `create` rejects them before dependency publication, which does
-not resolve the init-local-write bug. `desired_num_turns` cannot exceed an explicit
+when supplied. Build 40 checks locally available seed files before authored
+writes, including declared files and local nested references. It rejects mixed
+`messages`, `query`, or `response` fields even when empty/null. Interactive init
+allows correction or replacement before confirmation; JSON/`--no-prompt`
+reject invalid local input without configuration writes. A remote dataset with
+no local file is not fetched by init. Build 39 lacks the corrected init guard;
+successful scaffolding there is not proof of valid seed semantics.
+`desired_num_turns` cannot exceed an explicit
 `max_turns`. Desired turns are a target, not an exact-length guarantee; the
 maximum is a hard ceiling. Early termination alone is not evidence of a CLI
 bug. Start with one seed and a small turn budget because every
@@ -565,7 +581,8 @@ the run acceptance status.
 
 ### Sample caps and registered dataset identity
 
-The following describes **build 39**. Build 37 allowed bounded inline subsets
+Build 40 retains the following **build 39 contract**, with live evidence still
+tied to build 39. Build 37 allowed bounded inline subsets
 of registered data and did not treat an explicit CLI zero as an override; that
 historical behavior is not the current contract.
 
@@ -628,6 +645,14 @@ unknown/conflicting statuses are separate. Filtered/paged listings and detail
 views without all rows do not establish complete counts. No extra service
 fetch or inference of missing values is promised.
 
+Build 40 retains that reporting behavior and adds commands for unfiltered
+available output and JSON export in terminal summaries/details, using immutable
+eval/run IDs. Failed and explicit `--status errored` listings are additional
+views, not substitutes for all available output. A whole-run failure can have
+no rows or grading counts; inspect available output and run diagnostics rather
+than assuming grading succeeded. New failure-guidance proof uses synthetic HTTP
+fixtures, not a real failed Azure run.
+
 These authoring examples require a matching-candidate live pass before being
 marked verified. A missing deployment, unavailable evaluator, or service
 rejection is a recorded blocker, not a successful test. The current simulation
@@ -689,5 +714,5 @@ To remove the extensions and the feed:
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension source remove foundry-candidate-39
+azd extension source remove foundry-candidate-40
 ```

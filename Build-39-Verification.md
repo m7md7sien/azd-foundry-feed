@@ -1,6 +1,6 @@
 # Build 39: source and acceptance checklist
 
-**Published and promoted to Latest on 2026-09-23.** Local packaging, parent
+**Published and promoted to Latest on 2026-09-23 after its gates passed.** Local packaging, parent
 source checks, scoped exact-package acceptance, final installed-CLI/full-race
 CI, anonymous asset verification, and fresh pinned/Latest Windows installations
 passed. Both extensions use the exact source SHA below. Build 38's release
@@ -10,7 +10,9 @@ assets and historical findings are unchanged.
 high-priority simulation-init validation blocker and a reopened failed-run
 reporting issue. The historical passes below remain scoped evidence, not a
 blanket "bug-bash ready" or "all blockers fixed" declaration. Published packages
-and versions have not changed.
+and versions have not changed. The corrected
+[build 40 packages](./Build-40-Verification.md) are published separately;
+their fixes and local/offline acceptance do not revise build 39's results.
 
 | Item | Published value |
 | --- | --- |
@@ -25,13 +27,13 @@ and versions have not changed.
 ## Newly reported known issues
 
 These reports were received after the earlier scoped build 39 verification.
-Fixes being prepared for a later candidate are not present in these immutable
+Fixes published in build 40 are not present in these immutable
 packages. Tracking numbers below are issue identifiers, not GitHub issue links.
 
 | Tracking | Status | Build 39 observation and boundary |
 | --- | --- | --- |
 | `5640927` | **High / P1, release blocker** | Simulation `init` accepts a blank or whitespace-only seed description or `desired_num_turns: 0` and writes configuration. `create` still rejects these inputs before publishing dependencies, but that protection does not fix the premature local writes by `init`. |
-| `5595070` | **Reopened CLI reporting issue** | Failed-run summary/detail output is still reported to lack actionable follow-up commands. Follow-up synthetic HTTP-caller tests cover whole-run failure with absent or zero result counts, but are not execution of a real operationally failed service payload or a shipped build 40 fix. |
+| `5595070` | **Reopened CLI reporting issue in build 39** | Failed-run summary/detail output is still reported to lack actionable follow-up commands. Build 40 ships corrected guidance with synthetic HTTP-caller proof for whole-run failure with absent/zero result counts, not execution of a real operationally failed service payload. These build 39 packages are unchanged. |
 | `5631330` | **Known service cost blocker, open/unassigned** | A `simple_qna` generation request for 15 produced a reported result/file count of 16; the separate seed case returned 15. Updated service triage confirms that the merged patch does not cover the reported Q&A generation path. This is not merely an unconfirmed rollout. No client-side truncation remedy is claimed; generation counts are distinct from dataset-run caps. |
 | `5595119` | **Deferred, not included** | The deprecated agent-hint change remains outside these packages. No fix or changed behavior is claimed here. |
 | `5571322` | **Scoped published-39 retest passed** | An independent retest on the exact published build 39 passed Ctrl+C cancellation in the `run start` and `create` eval pickers without an ambiguity error. A nonzero exit is not required for intentional user cancellation. The earlier external pass omitted this case; that omission was a coverage gap, not a confirmed regression. This does not establish Escape cancellation. |
@@ -54,8 +56,9 @@ azd ai eval run output export <run-id> --eval <eval-name-or-id> --output-file re
 
 Use IDs from the actual run/list output and retain sensitive result content
 privately. These documented commands do not claim that the affected summaries
-already print the required guidance. Build 40 is preparation-only until an exact
-source SHA, build, and separate publication approval are provided.
+already print the required guidance. Use the separately published
+[build 40 packages](./Build-40-Verification.md#install-this-build) for corrected
+init validation and terminal guidance; preserve the version-specific evidence.
 
 ## Install this build
 
