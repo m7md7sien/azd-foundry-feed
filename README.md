@@ -37,7 +37,11 @@ hero scenarios, full YAML authoring, and where to file findings.
 
 For current candidate evidence and known limitations, use
 **[Build 38 verification](./Build-38-Verification.md)**. The standalone dataset
-`--output-file` issue has a verified `--output-dir` workaround. Richer observed
+`--output-file` issue has a verified `--output-dir` workaround. Truly unregistered
+local-file runs can fail with `has no versions to read`; curate rows, explicitly
+publish the dataset, and run its registered version without a positive cap.
+Per-dimension rubric details can be lost by build 38's typed CLI projection;
+the original fresh-user scenario's coverage remains unverified. Richer observed
 simulation counters and an all-scenarios fresh-user pass remain follow-up work.
 Hosted source/offline CLI checks are not live-cloud CI approval.
 

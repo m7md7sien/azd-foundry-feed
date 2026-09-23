@@ -297,13 +297,26 @@ the dataset and evaluator as already **unchanged** and only creates the eval --
 that is correct, not a missed publish. A second `create` with no edits skips
 everything, the eval included.
 
-Then open one sample. This is the only place a rubric's per-dimension scores and
-the judge's full reasons are visible; the listing truncates them to a cell.
+Then open one sample to inspect the scores and reasons available in that
+result. Do not assume a rubric definition guarantees per-dimension output:
+the build 38 fresh-user check found no dimension fields in the tested CLI JSON.
+The original run has no retained raw response establishing its service shape.
+Separate sanitized evidence from another generated-rubric run contained
+`properties.dimension_scores` and `evaluator_version`, which the build 38
+typed projection drops. That confirms a CLI reporting gap, not a general claim
+that the service lacks dimension scores.
 
 ```bash
 azd ai eval run output list --eval <you>-regression-eval
 azd ai eval run output show <item-id> --eval <you>-regression-eval
+azd ai eval run output show <item-id> --eval <you>-regression-eval -o json
 ```
+
+Record which metrics and explanations are actually present. The detail view
+can show dimensions when the returned evaluator results contain dimension
+metrics; it does not derive them from the rubric definition. Per-dimension
+coverage for the original scenario remains unverified. Do not invent scores
+or reasons that are absent from the result.
 
 ### 3. Inner loop
 
@@ -528,7 +541,7 @@ historical behavior is not the current contract.
 
 | Mode | Supported bound and expected behavior |
 | --- | --- |
-| Genuinely unregistered local dataset run | Positive `--max-samples` or eval `max_samples` bounds inline rows after the service confirms absence. |
+| Genuinely unregistered local dataset run | **Known build 38 failure:** fresh-user checks returned `has no versions to read` for both a dataset override and a direct local declaration, despite confirmed remote absence. Intended inline/cap support is not a working-path guarantee in this build. |
 | Registered dataset, including an already published `file:` declaration | Uses the service-issued version identity. Positive sample caps are rejected because this source has no supported subset option. Publish/select a smaller dataset deliberately instead. |
 | Identity lookup, authorization, or missing-ID failure | Stop rather than silently send inline rows. Do not construct or guess an `azureai://` identity. |
 | Conversation simulation | Does not accept a sample cap. Bound the number of seed rows, `num_conversations`, and `max_turns` instead. Do not combine it with a `source` block. |
@@ -538,6 +551,24 @@ historical behavior is not the current contract.
 For ordinary dataset runs, an explicit CLI `--max-samples 0` overrides a positive
 YAML cap. Negative values are invalid. No temporary subset dataset is published
 automatically, and a registered source does not silently become an inline copy.
+
+**Publish-first route for build 38:** curate the desired rows in the local file
+before publishing, explicitly register that dataset, then run the registered
+version without a positive sample cap. For a new ordinary turn-dataset eval:
+
+```bash
+azd ai dataset create <you>-curated --from-file ./evals/datasets/<you>-curated.jsonl --no-prompt
+azd ai eval init --source dataset --dataset <you>-curated --target support-agent --judge-model gpt-4.1-nano --evaluator builtin.relevance --name <you>-curated-eval --no-prompt
+azd ai eval create <you>-curated-eval
+azd ai eval run start --eval <you>-curated-eval --no-prompt
+```
+
+The registration is an explicit shared-service mutation, not an automatic
+temporary dataset. Use your own unique name and confirm the published version.
+If reusing an eval, remove its positive YAML `max_samples` or explicitly override
+it with `--max-samples 0`. The registered run uses the service-issued `file_id`;
+do not fabricate that identity. The observed unregistered-local failures made
+no mutation, and a future fix is not included in build 38.
 
 These authoring examples require a matching-candidate live pass before being
 marked verified. A missing deployment, unavailable evaluator, or service

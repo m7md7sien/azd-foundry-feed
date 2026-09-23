@@ -118,13 +118,31 @@ follow its printed init/recovery commands rather than rerunning successful jobs.
 | Registered dataset, including a published `file:` declaration | Send the service-issued version identity. Never silently fall back to inline rows after lookup, authorization, or missing-identity errors. |
 | Positive cap on a registered dataset | Reject explicitly because the current `file_id` source has no supported subset option. Remove the cap or deliberately publish a smaller dataset. |
 | `--max-samples 0` | Explicitly overrides a configured positive cap. This differs from build 37. |
-| Genuinely unregistered local file | Inline rows and positive caps remain available after the service confirms the dataset is absent. |
+| Genuinely unregistered local file | **Known build 38 failure:** returns `has no versions to read` in fresh-user checks of both a dataset override and a direct local declaration despite confirmed remote absence. Inline/cap support is intended, not demonstrated working in this build. |
 | Source-backed run or rerun selected by eval ID | Reject an explicit sample-cap flag that cannot change that source. Use trace-source bounds or select response IDs instead. |
 | Simulation | Reject sample caps; use a small seed dataset, conversations per seed, and maximum turns. |
 
 Do not use a different sample cap to distinguish two registered-dataset evals
 in the CI scenario. Give the second eval a different dataset or evaluator.
 No temporary subset dataset is automatically published.
+
+**Local-file workaround:** choose the desired subset of rows before publication,
+explicitly publish the dataset, then run it through the registered `file_id`
+path without a positive cap. The
+[publish-first example](./Bugbash-Instructions.md#sample-caps-and-registered-dataset-identity)
+uses a unique owned dataset name and makes the service mutation explicit. The
+unregistered-local failures observed on build 38 did not mutate the service.
+Do not treat a follow-up fix as present in these immutable packages.
+
+**Rubric result detail is not guaranteed:** fresh-user checks found no
+per-dimension fields in the tested build 38 CLI JSON. That JSON is a typed CLI
+projection, not a raw service response. Separate sanitized service evidence from
+another generated-rubric run contains `properties.dimension_scores` and
+`evaluator_version`, which build 38's typed projection drops. This confirms a
+CLI projection gap; it does not prove the service shape of the original run,
+whose raw response was not retained. Inspect the metrics and reasons actually
+returned. Per-dimension coverage for the original scenario remains unverified,
+and neither complete dimension scores nor full judge explanations are promised.
 
 ## Acceptance record
 
