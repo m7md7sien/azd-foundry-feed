@@ -108,6 +108,7 @@ one platform-named entrypoint, ZIP for Windows/macOS and tar.gz for Linux.
 | Twelve archive layouts/manifests/entrypoints/hashes and extracted binary VCS/platform identity | Passed for the corrected source; only four isolated packaging version files changed |
 | Fresh isolated Windows installation, exact JSON versions and binary hashes | Passed on azd 1.33.0; both corrected installed binaries match the extracted archives |
 | Final packaged init CLI matrix and two actual ConPTY correction/cancel paths | Passed on the exact corrected Windows amd64 packages: 31 CLI cases (24 invalid refused, 7 valid) and two actual ConPTY paths; details below |
+| Independent public-docs-driven local follow-up | Passed on published build 40: 26 actual init invocations, with 18 invalid cases preserving authored YAML/JSONL and eight valid controls; exact public package/registry/installed bytes matched. No Azure or PTY coverage in this lane. |
 | Independent verification cleanup and preservation | Passed: zero owned processes; current gate fixtures, isolated config, virtual environment, and test archives removed. The verifier's original build 39 files remained byte-identical. |
 | Independent synthetic HTTP-caller proof at the final source | Passed 15 source-test groups at the corrected SHA, including failed/errored responses, immutable IDs, URL redaction, and mixed/valid lifecycle cases. This is source-fixture evidence, not native CLI or live Azure failure execution. |
 | Separate PUBLISH approval | Approved for the exact source, versions and registry digest above |
@@ -163,6 +164,20 @@ removed; all nine files in the verifier's original build 39 configuration
 remained byte-identical. Packaging staging and immutable bundles are retained
 separately for the publication gate. Only this public-safe summary is recorded,
 not the private ledger or terminal captures.
+
+### Independent published-package fresh-user follow-up
+
+A separate public-docs/help-driven local follow-up passed **26 actual init
+invocations** against published build 40. Eighteen invalid cases made no
+authored YAML/JSONL changes, and eight valid controls passed. The public ZIPs,
+registry and installed executable bytes matched the candidate identity above.
+
+This was local validation, not Azure execution, authentication, billing, or
+an operationally failed-run replay. It did not rerun nested-reference chains
+or use a PTY. The earlier 31-case and two-ConPTY acceptance remains separate;
+these counts are not combined into a claim of unique or exhaustive coverage.
+All owned fixtures, isolated configuration and downloads were removed, with
+zero owned processes remaining.
 
 ## Evidence boundaries and remaining issues
 
