@@ -1,10 +1,10 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Final packages and hosted race checks passed; final package acceptance pending.** The
+**Not published. Final packages, hosted race checks, and scoped package acceptance passed.** The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
 The corrected `e6f86f96` packages passed scoped functional checks. The final
-source below differs only in test isolation and needs its own package identity
-and smoke checks. Publication still requires an explicit release decision.
+source below differs only in test isolation and has its own package identity
+and smoke evidence. Publication still requires an explicit release decision.
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -108,7 +108,7 @@ No temporary subset dataset is automatically published.
 | Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary build-byte and Go VCS/platform checks |
 | Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
 | Functional preflight acceptance | Passed 17/17 measured negative cases on `e6f86f96` packages, without dataset-version/private-state changes and with independent evaluator/eval absence checks; bounded one-seed simulation passed |
-| Final package identity and smoke acceptance | Pending; no production changes from `e6f86f96`, but final bytes and source metadata must match |
+| Final package identity and smoke acceptance | Passed: exact bundle/installed binary hashes, JSON versions, Go VCS/platform metadata, CLI guards, one fresh manual-seed simulation, and byte-matching directory download |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
@@ -130,6 +130,16 @@ That package's one-seed run
 and zero errors in 20 seconds. No new 15-row generation was needed. The final
 `c5be5001` source changes two test files only, retaining all assertions; it does
 not change production code, modules, or extension source versions.
+
+**Final `c5be5001` package evidence:** both bundle and installed binary hashes
+matched, including the embedded `c5be500196d66bb4326bb62700a1dde83c1f92a5`
+VCS revision and Windows amd64 platform. One fresh manually authored seed
+produced run `evalrun_4d06671e8c1041dc85522b5ad85213cb`, which completed with one
+passed evaluation and zero errors; the verifier observed two turns against
+`support-agent:1`. No data generation was repeated. Dataset show, byte-matching
+directory download, and CLI JSON guards passed. The new owned resources were
+removed and absence confirmed. This is scoped package evidence, not an
+all-scenarios claim or a relabeling of the earlier 17-case matrix.
 
 **Dataset download issue confirmed on the earlier `9a27cd20` package of
 `1.0.0-beta.26`:** for a CLI-uploaded
