@@ -1,6 +1,6 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Final packages built; hosted race and final acceptance pending.** The
+**Not published. Final packages and hosted race checks passed; final package acceptance pending.** The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
 The corrected `e6f86f96` packages passed scoped functional checks. The final
 source below differs only in test isolation and needs its own package identity
@@ -102,7 +102,7 @@ No temporary subset dataset is automatically published.
 | Gate | Status |
 | --- | --- |
 | Parent standard source checks | Passed on `e6f86f96`: build, full short suite with `NO_COLOR=1` and no skips, tagged vet, zero lint issues, clean `go fix` diff |
-| Hosted race run at the final pinned SHA | Pending; final change removes parallel test setup using shared SDK globals |
+| Hosted race run at the final pinned SHA | [Passed full evaluation and dataset race jobs, with no command weakening or skips](https://github.com/m7md7sien/azure-dev/actions/runs/35801322469) |
 | Earlier source race-test run | [`e6f86f96` evaluation command tests failed with a data race; dataset race tests passed](https://github.com/m7md7sien/azure-dev/actions/runs/35798951876). This is not passing package CI evidence. |
 | Both extensions built from the final pinned SHA | Passed in fresh staging; only four packaging version files changed |
 | Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary build-byte and Go VCS/platform checks |
