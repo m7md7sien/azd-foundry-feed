@@ -31,6 +31,13 @@ installs matched approved bytes. Use the
 [pinned build 39 instructions](./Build-39-Verification.md#install-this-build)
 or the stable Latest URL below.
 
+**New build 39 reports include a high-priority release blocker:** simulation
+`init` can write configuration for invalid seed rows, although `create` rejects
+them before publication. Failed-run summary/detail actionability is also
+reopened. See [the current known issues](./Build-39-Verification.md#newly-reported-known-issues).
+Earlier CI and scoped passes are not an assertion that all blockers are fixed
+or that build 39 is unconditionally bug-bash ready.
+
 ## Bug bash
 
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
@@ -42,8 +49,10 @@ checks cover both single-file download surfaces, local-file caps, registered
 identity guards, and preservation/rendering of returned rubric details.
 Observed conversation-output identities/statuses are not generation totals or
 inferred actual turns. An independent public-docs/help-only **focused build 39
-fresh-user follow-up completed with no new functional defect observed**.
-Its scoped results and not-rerun limits are in the acceptance record. Broader
+fresh-user follow-up completed with no new functional defect observed in that
+earlier measured scope**. Subsequent external reports are recorded separately
+in the known issues above. Its scoped results and not-rerun limits remain in
+the acceptance record. Broader
 journeys remain build 38 evidence, not a complete build 39 rerun. A separate
 actual Windows ConPTY checkpoint passed 13 scoped interactive cases and finished
 process/fixture cleanup; Escape cancellation was not established. Hosted

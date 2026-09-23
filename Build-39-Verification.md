@@ -6,6 +6,12 @@ CI, anonymous asset verification, and fresh pinned/Latest Windows installations
 passed. Both extensions use the exact source SHA below. Build 38's release
 assets and historical findings are unchanged.
 
+**Current readiness qualification:** subsequent external reports identify a
+high-priority simulation-init validation blocker and a reopened failed-run
+reporting issue. The historical passes below remain scoped evidence, not a
+blanket "bug-bash ready" or "all blockers fixed" declaration. Published packages
+and versions have not changed.
+
 | Item | Published value |
 | --- | --- |
 | Release | [extensions-2026-09-23-39](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-39) |
@@ -15,6 +21,41 @@ assets and historical findings are unchanged.
 | Source commit for both extensions | [`9a549449c2d5c2b4c6661f0ee8f8da7e3036c898`](https://github.com/m7md7sien/azure-dev/commit/9a549449c2d5c2b4c6661f0ee8f8da7e3036c898) |
 | Registry SHA256 | `5fc9456319ad0f6408e36cb693e0a8007d750c5721011aea0badf88d68fb0c44` |
 | Latest promotion | Completed after final hosted CI and anonymous/install gates; stable URL and fresh install verified |
+
+## Newly reported known issues
+
+These reports were received after the earlier scoped build 39 verification.
+Fixes being prepared for a later candidate are not present in these immutable
+packages. Tracking numbers below are issue identifiers, not GitHub issue links.
+
+| Tracking | Status | Build 39 observation and boundary |
+| --- | --- | --- |
+| `5640927` | **High / P1, release blocker** | Simulation `init` accepts a blank or whitespace-only seed description or `desired_num_turns: 0` and writes configuration. `create` still rejects these inputs before publishing dependencies, but that protection does not fix the premature local writes by `init`. |
+| `5595070` | **Reopened CLI reporting issue** | Failed-run summary/detail output is still reported to lack actionable follow-up commands. Do not treat the presence of result details or a previous summary test as proof that this failure path is resolved. |
+| `5631330` | **External service issue remains open** | A `simple_qna` generation request for 15 produced a reported result/file count of 16; the separate seed case returned 15. The successful seed count does not establish that Q&A overshoot is fixed or that a service fix is deployed. Generation counts are distinct from dataset-run caps. |
+| `5595119` | **Deferred, not included** | The deprecated agent-hint change remains outside these packages. No fix or changed behavior is claimed here. |
+| `5571322` | **External retest coverage gap** | The external pass did not retest this cancellation case. That is neither a confirmed regression nor an external pass. Earlier scoped Ctrl+C/Cancel evidence and the unsupported/unproven Escape case remain separately recorded below. |
+| `5572139` | **Backend cleanup issue remains open** | Terminal data-generation job deletion remains service-blocked. Historical HTTP 409 records were not cleared, and no retention TTL has been verified. |
+
+Before simulation `init`, inspect each seed row: `test_case_description` must
+contain non-whitespace text, and a supplied `desired_num_turns` must be a
+positive whole number within an explicit maximum. Do not interpret successful
+build 39 scaffolding as confirmation of those semantics. The existing
+pre-publication `create` guard remains necessary, and no invalid input should
+be treated as ready to run.
+
+For failed-run investigation, the installed help supports manual inspection:
+
+```bash
+azd ai eval run output list --eval <eval-name-or-id> --run <run-id> --status failed,errored --all
+azd ai eval run output show <output-item-id> --eval <eval-name-or-id> --run <run-id>
+azd ai eval run output export <run-id> --eval <eval-name-or-id> --output-file results.json
+```
+
+Use IDs from the actual run/list output and retain sensitive result content
+privately. These documented commands do not claim that the affected summaries
+already print the required guidance. Build 40 is preparation-only until an exact
+source SHA, build, and separate publication approval are provided.
 
 ## Install this build
 
@@ -77,7 +118,7 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Passed from fresh `b39-9a549449c2d5` staging; only four packaging version files changed |
 | Fresh isolated Windows bundle installation and exact runtime versions | Passed with azd 1.33.0, exact JSON versions, and installed bytes matching the archives |
 | Candidate-specific regression/live acceptance | Scoped pass on the exact packages: both download surfaces, local/registered static runs, rubric properties/sample/export, and lookup IDs; details below |
-| Independent focused fresh-user follow-up | Completed on the published Windows amd64 packages using only public docs/help; no new functional defect observed. Scope and not-rerun limits below. |
+| Independent focused fresh-user follow-up | Completed on the published Windows amd64 packages using only public docs/help; no new functional defect was observed in that earlier scope. Subsequent external issues are listed above. |
 | Actual Windows ConPTY checkpoint | Completed: 13 scoped cases on the published evaluation package, with final local process/fixture cleanup confirmed. Escape was not a cancellation pass. |
 | Owned verification-fixture cleanup | Passed: owned eval, both runs, dataset version, and evaluator version returned 404; the local-only dataset remained unpublished |
 | Separate PUBLISH approval | Approved for exact source and registry hash above, non-Latest first |
@@ -168,7 +209,9 @@ installation with azd 1.33.0, evaluations `1.0.39-beta`, and dataset
 this release and were rechecked. Usage documentation was pinned to
 [public revision `9c6381e`](https://github.com/m7md7sien/azd-foundry-feed/blob/9c6381e22943ae2bf5f0736647e08d35bb3b3237/Bugbash-Instructions.md).
 The tester used public provenance for the source identity, not source inspection
-in this lane. **No new functional defect was observed in this focused scope.**
+in this lane. **No new functional defect was observed in that earlier focused
+scope.** The later external reports above are additional findings, not erased
+by this historical result.
 
 | Area rerun on build 39 | Observed result |
 | --- | --- |
@@ -198,6 +241,11 @@ evaluator selection and Add confirmation; explicit minimum `1/1` and maximum
 `0`, `6`, and `21` before prompting; Ctrl+C at the mode and simulator prompts;
 explicit Cancel; and JSON-only stdout on a real console. Add-only YAML behavior
 preserved existing entries and comments.
+
+Those numeric-bound cases exercised flags and authored configuration paths;
+they did not establish rejection of every invalid seed-row value during
+simulation `init`. In particular, they do not close the newly reported
+`desired_num_turns: 0` seed-row/local-write blocker.
 
 This was a partially specified CLI workflow: source, name, dataset, target,
 and some levels/bounds were supplied as flags. Numeric limits were **flags, not

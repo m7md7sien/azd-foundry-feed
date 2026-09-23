@@ -25,9 +25,16 @@ These instructions target **build 39**, evaluations `1.0.39-beta` and dataset
 `1.0.0-beta.27`. The source below pins that release for reproducible results.
 The README separately documents the rolling Latest source. Build 39 has
 [completed targeted package and independent focused fresh-user follow-up](./Build-39-Verification.md#independent-focused-fresh-user-follow-up)
-with no new functional defect observed in that scope. Broader scenario evidence
+with no new functional defect observed in that earlier scope. Broader scenario evidence
 remains build 38 history; not all journeys were rerun on build 39. Keep those
 evidence sets separate.
+
+**Subsequent build 39 reports remain open:** simulation `init` can write
+configuration despite blank seed descriptions or `desired_num_turns: 0`;
+`create` protects publication, not those local writes. Failed-run output
+actionability is also reopened. Read the
+[current known issues](./Build-39-Verification.md#newly-reported-known-issues)
+before testing. Existing scoped passes are not an all-blockers-fixed claim.
 
 The [actual Windows ConPTY checkpoint](./Build-39-Verification.md#actual-windows-conpty-checkpoint)
 also completed for 13 scoped cases, including Ctrl+C, explicit Cancel,
@@ -544,7 +551,12 @@ resulting transcript. A seed row is not an agent `query`; do not bind it to
 
 `num_conversations` accepts 1 through 5 per seed and defaults to 1 when omitted.
 `max_turns` accepts 1 through 20; omission preserves the service default.
-Explicit zero is invalid. `desired_num_turns` cannot exceed an explicit
+Explicit zero is invalid for the numeric simulation settings. Seed rows also
+require a nonblank description and positive whole-number `desired_num_turns`
+when supplied, but **build 39 `init` can accept a blank description or zero
+desired turns and write configuration**. Check those rows yourself before
+scaffolding; `create` rejects them before dependency publication, which does
+not resolve the init-local-write bug. `desired_num_turns` cannot exceed an explicit
 `max_turns`. Desired turns are a target, not an exact-length guarantee; the
 maximum is a hard ceiling. Early termination alone is not evidence of a CLI
 bug. Start with one seed and a small turn budget because every
@@ -564,7 +576,7 @@ historical behavior is not the current contract.
 | Identity lookup, authorization, or missing-ID failure | Stop rather than silently send inline rows. Do not construct or guess an `azureai://` identity. |
 | Conversation simulation | Does not accept a sample cap. Bound the number of seed rows, `num_conversations`, and `max_turns` instead. Do not combine it with a `source` block. |
 | Traces, other source-backed runs, and reruns selected by eval ID | Reject explicit sample-cap flags that cannot affect this source. Use trace-source limits or select response IDs. |
-| Data generation | `generate --max-samples` requests a service generation count, not a dataset-run cap. Record the resulting count; merged service code does not prove deployment. |
+| Data generation | `generate --max-samples` requests a service generation count, not a dataset-run cap. A reported `simple_qna` request for 15 produced 16 results/file rows, while the separate seed case produced 15. Overshoot is not established as fixed or deployed. |
 
 For ordinary dataset runs, an explicit CLI `--max-samples 0` overrides a positive
 YAML cap. Negative values are invalid. No temporary subset dataset is published
