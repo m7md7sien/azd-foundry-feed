@@ -75,16 +75,21 @@ azd ai eval create
 azd ai eval run start
 ```
 
-That evaluates the traces `support-agent` has already produced. Runtime depends
-on sample count, model latency and service load. Then read the per-sample results:
+That evaluates traces the shared `support-agent` has already produced, not
+necessarily your own requests. It is a shared-data example, **not an
+own-trace-isolation test**. For owned-agent/version and isolated trace scenarios,
+use [the setup below](#optional-owned-agent-and-own-trace-setup) instead of
+changing the shared agent. Runtime depends on sample count, model latency and
+service load. Then read the per-sample results:
 
 ```bash
 azd ai eval run output list --eval <you>-trace-eval
 ```
 
-**If that run fails with `No trace data found`**, the shared agent has not run
-recently, so there is nothing to evaluate. That is the state of the project, not
-a bug in the tool. A dataset needs nothing but the file you write:
+**If that run fails with `No trace data found`**, check the selected agent,
+version/window, tracing configuration, query permissions, and ingestion delay.
+Do not assume this proves the agent has not run, and do not broaden an
+own-trace test to other testers' traffic. Record the blocker or use a dataset:
 
 ```bash
 mkdir -p evals/datasets
@@ -122,6 +127,129 @@ azd extension uninstall azure.ai.dataset
 azd extension install azure.ai.evaluations --source foundry-candidate-38 --version 1.0.38-beta
 azd extension install azure.ai.dataset --source foundry-candidate-38 --version 1.0.0-beta.26
 ```
+
+## Optional: owned-agent and own-trace setup
+
+The bug-bash feed installs only evaluations and datasets. Seeing only `eval`
+and `dataset` under `azd ai --help` is expected. Agent management is a separate,
+independently versioned [official extension][agents-install]. Install it from
+`azd`, **not** `foundry-candidate-38`, in the same isolated configuration:
+
+```bash
+azd extension install azure.ai.agents --source azd --version 1.0.0-beta.16
+azd extension list --installed
+azd ai agent version
+azd ai agent init --help
+azd ai agent invoke --help
+```
+
+These agent commands were checked against installed `azure.ai.agents`
+`1.0.0-beta.16` with azd 1.33.0. Its dependencies install separately; it is not
+part of build 38. Help verification is not an end-to-end agent deployment pass.
+
+### Existing project and uniquely owned agent
+
+For CLI initialization, `--project-id` means the Azure Resource Manager **resource
+ID**, not `FOUNDRY_PROJECT_ENDPOINT`. In [Foundry](https://ai.azure.com), open the
+authorized existing project, then **Manage > Project details > Resource ID**, as
+documented in [connecting an existing project][existing-project]. Copy that
+value; do not derive a subscription or resource group from the endpoint. If you
+cannot obtain it or lack access, record that setup blocker. Do not create a
+replacement project, deployment, or role assignment in the shared subscription.
+
+Use a new directory, a unique owned agent name, and an **existing** model
+deployment. The installed prompt-agent initializer documents this syntax:
+
+```bash
+azd ai agent init --kind prompt --agent-name <you>-bugbash-agent --project-id "<existing-project-resource-id>" --model-deployment gpt-4.1-nano --instructions "Answer the test user's support questions clearly." --no-prompt
+```
+
+Review the generated `azure.yaml`: confirm the existing project, existing model,
+and your unique agent identity before deployment. `init` creates configuration;
+it does not prove an agent exists. The [official prompt-agent quickstart][prompt-agent]
+also documents creation using the existing project endpoint and model. Its
+resource-creation prerequisite links are not permission to provision new shared
+infrastructure for this bug bash.
+
+When deploying through azd, the help-checked form `azd deploy <owned-service-key>`
+selects one service from your own `azure.yaml`; an unqualified `azd deploy` or
+`azd up` can act on more resources. Never target the shared `support-agent`.
+Inspect the actual deployed identity/version with
+`azd ai agent show <owned-service-key> -o json`.
+
+### Owned-agent version 2 is a separate test
+
+For prompt agents, the official [versioning guidance][agent-versions] says to
+save subsequent changes as new immutable versions. Make such changes **only to
+the uniquely named agent you created**. Record the service-assigned name and
+version before and after; do not assume the next version is `2`, and do not
+change or deploy version 2 of `support-agent`.
+
+This guide's publication does **not** establish a live-tested CLI recipe for
+owned-agent version-2 creation. Use the official versioning workflow and report
+the observed versions, or mark the scenario blocked. Dataset v1/v2 evidence is
+not agent-versioning evidence. The installed agent `invoke --version` flag
+selects an existing version; it does not create one.
+
+### Generate and evaluate only your own traces
+
+Follow [the official tracing setup][agent-tracing]: an Application Insights
+connection and telemetry query permissions are required, including Log Analytics
+Reader and any protected-table permissions. Ask the project owner to confirm
+the existing shared configuration; do not change its connections or permissions.
+
+After your owned agent is deployed, copy its endpoint from
+`azd ai agent show <owned-service-key>` and record your request's UTC time window.
+The installed help and [official invoke guidance][agent-invoke] support:
+
+```bash
+azd ai agent invoke --agent-endpoint "<owned-endpoint-from-agent-show>" --new-session "What are your support hours?"
+```
+
+Use only the endpoint of your owned agent. `--new-session` separates conversation
+history, **not** traces across agents or users. Allow ingestion and confirm that
+your requests appear in the project's traces before evaluating them:
+
+```bash
+azd ai eval init --name <you>-own-traces --source traces --target <you>-bugbash-agent --judge-model gpt-4.1-nano --trace-days 1 --max-traces 1 --no-prompt
+```
+
+In this eval's generated `source` block, replace the broad lookback with your
+actual version and request window. The following fields are verified against
+the build 38 schema; replace every placeholder with an observed value:
+
+```yaml
+source:
+  type: traces
+  agent_name: <you>-bugbash-agent
+  agent_version: "<actual-agent-version>"
+  start_time: "<request-start-UTC-RFC3339>"
+  end_time: "<request-end-UTC-RFC3339>"
+  max_traces: 1
+```
+
+Remove the generated `lookback_hours` when supplying `start_time`; they cannot
+be combined. End must follow start. Then:
+
+```bash
+azd ai eval create <you>-own-traces
+azd ai eval run start --eval <you>-own-traces --no-prompt
+azd ai eval run output list --eval <you>-own-traces
+```
+
+Check the returned agent/version and trace or conversation identity against your
+own request. A unique eval name alone does not isolate traces, and a time window
+is not a user/session authorization boundary. If the intended trace is missing,
+record the setup/service blocker instead of widening to shared-agent traffic.
+Scoped replay has separate live evidence; this owned-agent setup still needs
+its own fresh-user pass.
+
+[agents-install]: https://learn.microsoft.com/azure/foundry/agents/how-to/install-cli-foundry-extensions
+[existing-project]: https://learn.microsoft.com/azure/foundry/agents/how-to/init-agent-project#connect-to-an-existing-foundry-project
+[prompt-agent]: https://learn.microsoft.com/azure/foundry/agents/quickstarts/prompt-agent
+[agent-versions]: https://learn.microsoft.com/azure/foundry/agents/concepts/development-lifecycle#save-changes-as-versions
+[agent-tracing]: https://learn.microsoft.com/azure/foundry/observability/how-to/trace-agent-setup
+[agent-invoke]: https://learn.microsoft.com/azure/foundry/agents/how-to/invoke-hosted-agent
 
 ## Command surface
 
@@ -191,8 +319,9 @@ scenario 4 -- and run it again. That is the loop this scenario exists for, and
 it is what makes the comparison below mean something. Edit the agent's
 instructions in the Foundry portal **only for a separate agent you own**.
 Never edit or redeploy the shared `support-agent`, its versions, or shared model
-deployments. Point your eval at your owned agent before this step, or skip the
-mutation and record the coverage gap. Then:
+deployments. Complete the [owned-agent setup and versioning boundary](#optional-owned-agent-and-own-trace-setup)
+first. Point your eval at your owned agent before this step, or skip the mutation
+and record the coverage gap. Then:
 
 ```bash
 azd ai eval create
@@ -251,8 +380,13 @@ export:
 azd ai eval run start --eval <you>-gate --no-prompt --no-wait -o json
 # the run_id field of that JSON is what the next two commands take
 azd ai eval run show <run-id> --eval <you>-gate --no-prompt --wait --fail-on pass-rate=0.8
-azd ai eval run output export <run-id> --eval <you>-gate --output-file results.csv
+azd ai eval run output export <run-id> --eval <you>-gate --output-file results.json
 ```
+
+Export supports **JSON only** (`--format json`, the default). It writes one
+document containing the run and its evaluated items; naming the file `.csv`
+does not convert it. Convert the exported JSON separately if another format
+is needed.
 
 **Expect:** `--no-wait -o json` returns as soon as the run is accepted, carrying
 `run_id`, `eval_id`, `eval_name`, `dataset`, `dataset_version`, `status` and
