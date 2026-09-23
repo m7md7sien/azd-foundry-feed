@@ -1,7 +1,8 @@
 # Candidate 39: source and acceptance checklist
 
-**Built locally; scoped exact-package acceptance passed. Not published or
-approved for publication.**
+**Publication approved, not yet published.** Local packaging, parent source
+checks, and scoped exact-package acceptance passed. The release will be
+published non-Latest first; final hosted CI and anonymous checks gate promotion.
 Both extensions use the exact source SHA below. Build 38 remains the published
 Latest release, and its registry, packages, and historical findings are unchanged.
 
@@ -57,12 +58,13 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | Gate | Status |
 | --- | --- |
 | Exact source SHA and BUILD approval | Approved for `9a549449c2d5c2b4c6661f0ee8f8da7e3036c898` |
-| Combined source checks and hosted race suites at that SHA | Pending |
+| Parent combined source checks | Both modules passed full short suites with `NO_COLOR=1` and no skips, build, vet (including evaluation tags), zero lint issues, and clean `go fix` diff |
+| Full hosted source-race suites | Run with the final published package pins; required before Latest, not before non-Latest publication |
 | Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Passed from fresh `b39-9a549449c2d5` staging; only four packaging version files changed |
 | Fresh isolated Windows bundle installation and exact runtime versions | Passed with azd 1.33.0, exact JSON versions, and installed bytes matching the archives |
 | Candidate-specific regression/live acceptance | Scoped pass on the exact packages: both download surfaces, local/registered static runs, rubric properties/sample/export, and lookup IDs; details below |
 | Owned verification-fixture cleanup | Passed: owned eval, both runs, dataset version, and evaluator version returned 404; the local-only dataset remained unpublished |
-| Separate PUBLISH approval | Pending |
+| Separate PUBLISH approval | Approved for exact source and registry hash above, non-Latest first |
 | Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Not started |
 | Non-Latest publication and anonymous pinned registry/all-asset verification | Not started |
 | Fresh published-source installs and final Linux/Windows CLI/source CI with exact pins | Not started |
@@ -140,6 +142,13 @@ Do not infer an all-scenarios fresh-user pass, authenticated live-cloud CI pass,
 final GA simulation contract, privacy signoff, or service-fix deployment from
 packaging or source checks. Each needs its own evidence. Keep unsupported or
 unverified behavior explicit.
+
+Broader fresh-user scenario work belongs to build 38, including its failures
+and gaps; build 39 currently has the targeted exact-package regressions above,
+not a full fresh-user rerun. Two historical terminal data-generation job records
+returned HTTP 409 when deletion was attempted. These records were neither
+created nor retried by this candidate's tests, and no service-history cleanup
+fix is claimed.
 
 Public files must contain no credentials, private prompts or handoff material,
 customer data, or full raw service responses. Publish sanitized field/shape
