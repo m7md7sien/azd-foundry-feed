@@ -1,9 +1,10 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Corrected source and scoped package acceptance passed; publication pending.** The
+**Not published. Final source build and hosted race checks in progress.** The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
-The new source below includes the semantic preflight fix and has fresh
-package verification. Publication still requires an explicit release decision.
+The corrected `e6f86f96` packages passed scoped functional checks. The final
+source below differs only in test isolation and needs its own package identity
+and smoke checks. Publication still requires an explicit release decision.
 The rolling feed still points to build 37. Do not describe this candidate as
 verified from baseline evidence or from the presence of these instructions.
 
@@ -13,7 +14,7 @@ verified from baseline evidence or from the presence of these instructions.
 | Evaluations | `1.0.38-beta` |
 | Dataset | `1.0.0-beta.26` |
 | Required azd | `>=1.33.0` |
-| Source commit for both extensions | [`e6f86f9605511c8448bff8114275ac1a160cf479`](https://github.com/m7md7sien/azure-dev/commit/e6f86f9605511c8448bff8114275ac1a160cf479) |
+| Source commit for both extensions | [`c5be500196d66bb4326bb62700a1dde83c1f92a5`](https://github.com/m7md7sien/azure-dev/commit/c5be500196d66bb4326bb62700a1dde83c1f92a5) |
 | Publication decision | Not yet approved; earlier attempt's results are not this source's acceptance |
 
 Package-only version overrides are applied in an isolated checkout.
@@ -28,7 +29,7 @@ The source combines the original
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116), and
 [Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102)
 with the following
-[incremental source changes](https://github.com/m7md7sien/azure-dev/compare/0361f347eb28c5f2e756225115318393b1dad28a...e6f86f9605511c8448bff8114275ac1a160cf479):
+[incremental source changes](https://github.com/m7md7sien/azure-dev/compare/0361f347eb28c5f2e756225115318393b1dad28a...c5be500196d66bb4326bb62700a1dde83c1f92a5):
 
 - Validate dependencies before publication; retain successful versions and print
   recovery information after a partial failure.
@@ -100,12 +101,14 @@ No temporary subset dataset is automatically published.
 
 | Gate | Status |
 | --- | --- |
-| Combined source checks at the pinned SHA | Parent-reported pass: build, full short suite with `NO_COLOR=1` and no skips, tagged vet, zero lint issues, and clean `go fix` diff |
-| Source race-test run | [Evaluation command tests failed with a data race; dataset race tests passed](https://github.com/m7md7sien/azure-dev/actions/runs/35798951876). This is not passing package CI evidence. |
-| Both extensions built from the pinned SHA | Passed in fresh source-specific staging; dependency manifests unchanged |
-| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary VCS revision/platform and matching build bytes |
-| Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
-| Matching-candidate live scenarios | Passed 17/17 measured negative cases without dataset-version/private-state changes; independent evaluator/eval absence checks; bounded one-seed simulation passed |
+| Parent standard source checks | Passed on `e6f86f96`: build, full short suite with `NO_COLOR=1` and no skips, tagged vet, zero lint issues, clean `go fix` diff |
+| Hosted race run at the final pinned SHA | Pending; final change removes parallel test setup using shared SDK globals |
+| Earlier source race-test run | [`e6f86f96` evaluation command tests failed with a data race; dataset race tests passed](https://github.com/m7md7sien/azure-dev/actions/runs/35798951876). This is not passing package CI evidence. |
+| Both extensions built from the final pinned SHA | In progress in fresh source-specific staging |
+| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Pending for final packages |
+| Fresh isolated Windows installation and versions | Pending for final packages |
+| Functional preflight acceptance | Passed 17/17 measured negative cases on `e6f86f96` packages, without dataset-version/private-state changes and with independent evaluator/eval absence checks; bounded one-seed simulation passed |
+| Final package identity and smoke acceptance | Pending; no production changes from `e6f86f96`, but final bytes and source metadata must match |
 | Actual Linux CI run and installed versions | Pending |
 | Anonymous pinned registry and all archive downloads | Pending publication |
 | Anonymous rolling Latest registry | Still build 37 |
@@ -115,16 +118,18 @@ seed/query inputs and was not approved for publication. The new source checks
 non-whitespace seed descriptions, positive whole-number `desired_num_turns`,
 turn ceilings, seed/message mode mixing, target query fields, whole-number rubric
 weights from 1 to 10, and numeric pass thresholds from 0 to 1. The verifier's
-expanded 17-case matrix exercised the exact new packages and confirmed rejection
+expanded 17-case matrix exercised the exact `e6f86f96` packages and confirmed rejection
 without dataset-version or private-state changes. Independent checks found no
 created custom rubric/eval resources for those cases. This closes the measured
 preflight blocker; it is not a claim that every possible invalid input was tested.
 
-Both new bundle hashes and installed Windows binary hashes matched the packaging
+Both `e6f86f96` bundle hashes and installed Windows binary hashes matched the packaging
 manifest, with exact JSON versions `1.0.38-beta` and `1.0.0-beta.26`.
-The new package's one-seed run
+That package's one-seed run
 `evalrun_b8d8f6d62a624d9f97e9f2ba2e658f66` completed with one passed evaluation
-and zero errors in 20 seconds. No new 15-row generation was needed.
+and zero errors in 20 seconds. No new 15-row generation was needed. The final
+`c5be5001` source changes two test files only, retaining all assertions; it does
+not change production code, modules, or extension source versions.
 
 **Dataset download issue confirmed on the earlier `9a27cd20` package of
 `1.0.0-beta.26`:** for a CLI-uploaded
