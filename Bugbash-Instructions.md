@@ -23,10 +23,18 @@ privacy signoff remain separate gates.
 
 These instructions target **build 39**, evaluations `1.0.39-beta` and dataset
 `1.0.0-beta.27`. The source below pins that release for reproducible results.
-The README separately documents the rolling Latest source. Broader fresh-user
-scenario evidence belongs to build 38; build 39 has
-[targeted exact-package acceptance](./Build-39-Verification.md), not a complete
-fresh-user rerun. Keep the two evidence sets separate.
+The README separately documents the rolling Latest source. Build 39 has
+[completed targeted package and independent focused fresh-user follow-up](./Build-39-Verification.md#independent-focused-fresh-user-follow-up)
+with no new functional defect observed in that scope. Broader scenario evidence
+remains build 38 history; not all journeys were rerun on build 39. Keep those
+evidence sets separate.
+
+The [actual Windows ConPTY checkpoint](./Build-39-Verification.md#actual-windows-conpty-checkpoint)
+also completed for 13 scoped cases, including Ctrl+C, explicit Cancel,
+add-only file preservation, and JSON-only console stdout, with local cleanup
+confirmed. Bounds were supplied as flags and some inputs were prefilled.
+Escape cancellation was not established; this is not a blanket interactive
+or all-platform pass.
 
 ---
 
@@ -244,8 +252,9 @@ Check the returned agent/version and trace or conversation identity against your
 own request. A unique eval name alone does not isolate traces, and a time window
 is not a user/session authorization boundary. If the intended trace is missing,
 record the setup/service blocker instead of widening to shared-agent traffic.
-Scoped replay has separate live evidence; this owned-agent setup still needs
-its own fresh-user pass.
+Scoped replay has separate live evidence. The focused build 39 follow-up did
+not repeat this complete owned-agent setup or versioning journey; broader
+build 38 evidence must not be relabeled as a new build 39 execution.
 
 [agents-install]: https://learn.microsoft.com/azure/foundry/agents/how-to/install-cli-foundry-extensions
 [existing-project]: https://learn.microsoft.com/azure/foundry/agents/how-to/init-agent-project#connect-to-an-existing-foundry-project

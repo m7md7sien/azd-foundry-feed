@@ -77,6 +77,8 @@ platform-named entrypoint. Windows/macOS use ZIP and Linux uses tar.gz.
 | Twelve archive layouts, manifests, entrypoints, SHA256 hashes, extracted binary bytes and VCS/platform metadata | Passed from fresh `b39-9a549449c2d5` staging; only four packaging version files changed |
 | Fresh isolated Windows bundle installation and exact runtime versions | Passed with azd 1.33.0, exact JSON versions, and installed bytes matching the archives |
 | Candidate-specific regression/live acceptance | Scoped pass on the exact packages: both download surfaces, local/registered static runs, rubric properties/sample/export, and lookup IDs; details below |
+| Independent focused fresh-user follow-up | Completed on the published Windows amd64 packages using only public docs/help; no new functional defect observed. Scope and not-rerun limits below. |
+| Actual Windows ConPTY checkpoint | Completed: 13 scoped cases on the published evaluation package, with final local process/fixture cleanup confirmed. Escape was not a cancellation pass. |
 | Owned verification-fixture cleanup | Passed: owned eval, both runs, dataset version, and evaluator version returned 404; the local-only dataset remained unpublished |
 | Separate PUBLISH approval | Approved for exact source and registry hash above, non-Latest first |
 | Complete new draft: individually uploaded assets, no overwrite, literal `registry.json` last | Passed: all 15 remote sizes, SHA256 digests, and upload states matched |
@@ -158,6 +160,62 @@ datasets merely to replace provenance. Delete only resources proved to belong
 to the test. Prior build 38 runs and its 64-check-per-platform CI remain
 historical evidence, not new build 39 executions.
 
+### Independent focused fresh-user follow-up
+
+The public-docs/help-only follow-up completed on a fresh isolated Windows amd64
+installation with azd 1.33.0, evaluations `1.0.39-beta`, and dataset
+`1.0.0-beta.27`. The pinned registry SHA256 and installed binary digests matched
+this release and were rechecked. Usage documentation was pinned to
+[public revision `9c6381e`](https://github.com/m7md7sien/azd-foundry-feed/blob/9c6381e22943ae2bf5f0736647e08d35bb3b3237/Bugbash-Instructions.md).
+The tester used public provenance for the source identity, not source inspection
+in this lane. **No new functional defect was observed in this focused scope.**
+
+| Area rerun on build 39 | Observed result |
+| --- | --- |
+| Both dataset namespaces | Exact-file and directory output matched source bytes; overwrite refusal and forced replacement passed. |
+| Unregistered local inputs | Direct-declaration and dataset-override runs each completed with a one-row cap. Remote absence was checked before and after; neither implicitly published a dataset. |
+| Registered identity and caps | Positive caps were refused. Explicit zero overrode a positive YAML cap while retaining service-issued `file_id` and version. Three static/manual-rubric rows total were scored across these cases. |
+| Rubric detail and JSON | Human detail displayed returned scores, applicability, weights and reasons; a null score was `not reported`. Detail/list/export result objects were semantically equal for the measured properties/sample fields. Lookup ID `1` worked while JSON retained the service URI. |
+| Bounded simulation | One seed, one repetition, maximum two turns: one passed evaluation, zero errors, and two user plus two assistant messages in the owned transcript. |
+| Observed-output summary | The waited run reported one identified conversation ID with completed output, separately from quality verdicts. Generated/completed-conversation totals and aggregate actual turns stayed `not reported`. Later `list --all` lacked that section, a recorded surface distinction rather than an established contract violation. |
+| Unattended model inputs | Public guidance/help and non-billable missing/explicit judge/simulator input validation passed. No new generation was submitted, so newly printed post-generation guidance was not executed. |
+| Owned-fixture cleanup | Both evals and their four runs, two dataset versions, and one rubric version were removed with absence checks. No build 39 cleanup failure was observed. Historical build 38 HTTP 409 job records were not retried or claimed cleared. |
+
+This was **not an all-scenarios build 39 rerun**. Broader agent-version, trace,
+deployment, CRUD/versioning, gating, and cancellation journeys remain build 38
+evidence. This follow-up was not authenticated live-cloud CI, an all-platform
+test, a direct raw-REST preservation audit, GA-contract confirmation, or privacy
+signoff. The original deleted build 38 run's raw shape remains unverified.
+
+### Actual Windows ConPTY checkpoint
+
+A separate interactive checkpoint completed on Windows amd64 with azd 1.33.0
+and the unchanged published evaluations `1.0.39-beta` package from the pinned
+source. **Thirteen scoped cases passed:** Simulation/Static and Turn pickers;
+independent simulator/judge text inputs and a local judge-deployment picker;
+evaluator selection and Add confirmation; explicit minimum `1/1` and maximum
+`5/20` bounds and preservation of an omitted maximum; rejection of out-of-range
+`0`, `6`, and `21` before prompting; Ctrl+C at the mode and simulator prompts;
+explicit Cancel; and JSON-only stdout on a real console. Add-only YAML behavior
+preserved existing entries and comments.
+
+This was a partially specified CLI workflow: source, name, dataset, target,
+and some levels/bounds were supplied as flags. Numeric limits were **flags, not
+interactive prompts**. JSON mode intentionally did not prompt even on a true
+console; stderr was captured separately. Cancellation preserved all preexisting
+authored files; a normal zero-byte environment lock file was the only new core
+lock artifact, not an authored configuration change. Escape did not cancel the
+tested picker during a bounded 12-second observation, so **Escape cancellation is unsupported/unproven here,
+not passed**. This is not an all-platform or every-keyboard-path result.
+
+The final cleanup receipt confirmed that all 14 owned PTY processes exited,
+with zero owned descendants or extension processes remaining. New private
+fixtures and the temporary virtual environment were removed; preexisting
+configuration/binary hashes and the source tree were unchanged. These checks
+created no Azure evaluation runs, generation jobs, or agent resources and used
+no shared prompt data. Only this public-safe scope summary is published, not
+the private reports or terminal captures.
+
 ## Remaining qualifications
 
 ### Public GA proposal versus current deployment
@@ -183,14 +241,16 @@ maximum turn setting as a **hard limit**, not a promise of an exact observed
 length. Earlier termination is allowed and does not by itself establish a CLI
 bug. Record actual transcript observations separately from requested settings.
 
-Do not infer an all-scenarios fresh-user pass, authenticated live-cloud CI pass,
-final GA simulation contract, privacy signoff, or service-fix deployment from
-packaging or source checks. Each needs its own evidence. Keep unsupported or
-unverified behavior explicit.
+The scoped build 39 follow-up is complete, but does not establish an
+all-scenarios rerun, authenticated live-cloud CI pass, final GA simulation
+contract, privacy signoff, or service-fix deployment. Required AA and upstream
+PR-review approvals also remain separate external gates; test results do not
+grant those approvals. Keep unsupported or unverified behavior explicit.
 
 Broader fresh-user scenario work belongs to build 38, including its failures
-and gaps; build 39 currently has the targeted exact-package regressions above,
-not a full fresh-user rerun. Two historical terminal data-generation job records
+and gaps; build 39 has the completed targeted package and independent focused
+follow-up evidence above, not a full rerun. Two historical terminal
+data-generation job records
 returned HTTP 409 when deletion was attempted. These records were neither
 created nor retried by this candidate's tests. Their removal remains backend
 cleanup work; no service-history cleanup fix or verified retention TTL is claimed.

@@ -41,8 +41,13 @@ For current candidate evidence and known limitations, use
 checks cover both single-file download surfaces, local-file caps, registered
 identity guards, and preservation/rendering of returned rubric details.
 Observed conversation-output identities/statuses are not generation totals or
-inferred actual turns. Broader fresh-user work remains build 38 evidence, not a
-complete build 39 rerun. Hosted source/offline checks are not live-cloud CI.
+inferred actual turns. An independent public-docs/help-only **focused build 39
+fresh-user follow-up completed with no new functional defect observed**.
+Its scoped results and not-rerun limits are in the acceptance record. Broader
+journeys remain build 38 evidence, not a complete build 39 rerun. A separate
+actual Windows ConPTY checkpoint passed 13 scoped interactive cases and finished
+process/fixture cleanup; Escape cancellation was not established. Hosted
+source/offline checks are not live-cloud CI.
 
 **[Build 38 verification](./Build-38-Verification.md)** retains that immutable
 release's evidence and known issues, including its download workaround,
