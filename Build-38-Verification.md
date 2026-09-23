@@ -1,6 +1,6 @@
 # Candidate 38: source and acceptance checklist
 
-**Not published. Final source build and hosted race checks in progress.** The
+**Not published. Final packages built; hosted race and final acceptance pending.** The
 earlier `9a27cd20` attempt was withheld for preventable preflight mutations.
 The corrected `e6f86f96` packages passed scoped functional checks. The final
 source below differs only in test isolation and needs its own package identity
@@ -104,9 +104,9 @@ No temporary subset dataset is automatically published.
 | Parent standard source checks | Passed on `e6f86f96`: build, full short suite with `NO_COLOR=1` and no skips, tagged vet, zero lint issues, clean `go fix` diff |
 | Hosted race run at the final pinned SHA | Pending; final change removes parallel test setup using shared SDK globals |
 | Earlier source race-test run | [`e6f86f96` evaluation command tests failed with a data race; dataset race tests passed](https://github.com/m7md7sien/azure-dev/actions/runs/35798951876). This is not passing package CI evidence. |
-| Both extensions built from the final pinned SHA | In progress in fresh source-specific staging |
-| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Pending for final packages |
-| Fresh isolated Windows installation and versions | Pending for final packages |
+| Both extensions built from the final pinned SHA | Passed in fresh staging; only four packaging version files changed |
+| Twelve archive layouts, manifests, entrypoints, SHA256 checks | Passed, including extracted binary build-byte and Go VCS/platform checks |
+| Fresh isolated Windows installation and versions | Passed with azd 1.33.0 and exact version JSON |
 | Functional preflight acceptance | Passed 17/17 measured negative cases on `e6f86f96` packages, without dataset-version/private-state changes and with independent evaluator/eval absence checks; bounded one-seed simulation passed |
 | Final package identity and smoke acceptance | Pending; no production changes from `e6f86f96`, but final bytes and source metadata must match |
 | Actual Linux CI run and installed versions | Pending |
