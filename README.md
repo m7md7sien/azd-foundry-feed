@@ -15,7 +15,7 @@ this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
 [42](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-42),
-a **non-Latest prerelease**: evaluations `1.0.42-beta` and dataset
+now **Latest**: evaluations `1.0.42-beta` and dataset
 `1.0.0-beta.30`, both built from
 [`d40a3b5a1e7c5944b1b43decd14c96096a99e5b6`](https://github.com/m7md7sien/azure-dev/commit/d40a3b5a1e7c5944b1b43decd14c96096a99e5b6).
 It preserves the published build 41 baseline, including earlier work from
@@ -29,20 +29,19 @@ implicitly included from the latest review branch. There is no new dataset
 functional fix.
 
 Use the [pinned build 42 instructions](./Build-42-Verification.md#install-this-build)
-to install that prerelease. All 15 anonymous downloads and a fresh pinned public
-Windows install matched the accepted bytes. Its local edge gate passed eight
+for reproducible installation. The stable Latest registry, all 15 anonymous
+downloads, and fresh pinned and unversioned Latest-source Windows installations
+matched the accepted bytes. Its local edge gate passed eight
 cases; practical acceptance passed six cases and 25 assertions, with the
-recorded harness correction qualified separately. Final exact-candidate hosted
-proof and Latest promotion remain pending.
+recorded harness correction qualified separately.
 
-**Build 41 remains Latest and the default feed.** Use the
-[pinned build 41 instructions](./Build-41-Verification.md#install-this-build)
-for reproducible installation. [Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35851410814)
-passed 160 actual CLI checks on each of Linux and Windows plus both full
-source-race suites. The stable Latest registry, all 15 anonymous downloads and
-a fresh Latest-source Windows install matched the approved bytes. The
-[acceptance record](./Build-41-Verification.md#final-hosted-proof) preserves
-the precise cold-read lock and offline/live coverage distinctions.
+**Build 42 is the default feed selection.**
+[Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35949654046)
+passed 160 unique actual CLI commands on each of Linux and Windows plus both
+full source-race suites; both downloaded artifact sets were verified.
+The [acceptance record](./Build-42-Verification.md#final-hosted-proof) preserves
+the precise cold-read lock and offline/live distinctions. This remains an
+unofficial beta bug-bash build, not GA.
 
 **Build 40 retains its responses-backed issue:** an evaluation using
 `source.responses` failed with zero output rows and a `response_id` mapping
@@ -72,13 +71,13 @@ backend-open; deprecated agent-hint work remains deferred.
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
-For the newest prerelease's evidence and limitations, use
+For the current candidate's evidence and limitations, use
 **[Build 42 verification](./Build-42-Verification.md)**. Its local/offline scope
 does not relabel older live tests as build 42 execution. New live qualification
 for excluded changes is deferred, not passed.
 
-**[Build 41 verification](./Build-41-Verification.md)** records the current
-Latest package. Its targeted corrective acceptance does not relabel broader
+**[Build 41 verification](./Build-41-Verification.md)** retains that historical
+package's results. Its targeted corrective acceptance does not relabel broader
 build 40 journeys as build 41 results.
 
 **[Build 40 verification](./Build-40-Verification.md)** retains its

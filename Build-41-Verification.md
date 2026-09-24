@@ -6,6 +6,9 @@ CI, all 15 anonymous downloads and fresh pinned/Latest Windows installations
 passed. Publication was non-Latest first; promotion followed matching final
 hosted proof, not the earlier build 40 results.
 
+This is a historical record. [Build 42](./Build-42-Verification.md) is now
+Latest; build 41's package assets and measured evidence remain unchanged.
+
 This release corrects the observed responses-backed evaluation contract,
 catalog evaluator-pin reconciliation, and init dataset binding/custom paths.
 Earlier build 40 evidence is inherited history, not a build 41 rerun.

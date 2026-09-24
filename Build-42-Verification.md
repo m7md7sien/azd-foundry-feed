@@ -1,19 +1,21 @@
 # Build 42: source and acceptance checklist
 
-**Published as a non-Latest prerelease on 2026-09-24.** Exact-source gates,
+**Published and promoted to Latest on 2026-09-24.** Exact-source gates,
 packaging, scoped installed-package acceptance, all 15 anonymous asset downloads
-and a fresh pinned public Windows installation passed. Testing independently
-crosschecked the local acceptance and installed identities.
+and fresh pinned and unversioned Latest-source Windows installations passed.
+Testing independently crosschecked the local acceptance and installed identities.
 
-**Build 41 remains Latest and the default feed.** Build 42's exact-candidate
-hosted CLI/full-race proof and separate Latest approval are still pending.
+Publication was non-Latest first. Promotion followed the exact-candidate hosted
+CLI/full-race proof, downloaded-artifact checks and separate approval. GitHub's
+Latest metadata does not change the beta package versions or make this
+unofficial bug-bash preview GA.
 
 This is a focused update to the published build 41 source. It separates an
 explicit picker **Cancel** choice from Ctrl+C or prompt failure and initializes
 the SDK Project client before concurrent generation workers use it. It does
 not include the broader new simulation-contract changes.
 
-| Item | Published prerelease value |
+| Item | Published value |
 | --- | --- |
 | Release | [extensions-2026-09-24-42](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-42) |
 | Evaluations | `1.0.42-beta` |
@@ -23,12 +25,12 @@ not include the broader new simulation-contract changes.
 | Integration branch | `m7md7sien-build-42-integration` |
 | Direct source parent | [`8ef8b6df77336950c60506ab2966037f579d92cd`](https://github.com/m7md7sien/azure-dev/commit/8ef8b6df77336950c60506ab2966037f579d92cd), published build 41 |
 | Registry SHA256 | `83026575746f7db5c5cc7a3035f9e75b776f709875d2f0768bd9c215aaaca635` |
-| Publication / Latest | Prerelease published `2026-09-24T02:56:15Z`; not promoted |
+| Publication / Latest | Non-Latest prerelease at `2026-09-24T02:56:15Z`; promoted at `2026-09-24T03:17:39Z` after final gates |
 
 ## Install this build
 
-Use a fresh `AZD_CONFIG_DIR` and azd 1.33.0 or later. These explicit pins install
-the prerelease without following or changing the Latest designation:
+Use a fresh `AZD_CONFIG_DIR` and azd 1.33.0 or later. These explicit pins select
+build 42 independently of future changes to the Latest designation:
 
 ```bash
 azd extension source add -n foundry-candidate-42 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-42/registry.json
@@ -184,8 +186,8 @@ then passed. No Azure operations were performed by packaging.
 | Testing consolidated local Windows gate | Passed: matching receipts, scoped results and both installed executable identities independently crosschecked |
 | Non-Latest prerelease publication | Passed: 15 individual checked uploads, matching server sizes/digests, literal `registry.json` last |
 | Anonymous downloads and fresh public installation | Passed: all 15 asset SHA256s and registry URLs/metadata; fresh pinned Windows install on azd 1.33.0 matched runtime JSON, source and executable bytes |
-| Exact-candidate hosted proof | Pending: 160 actual CLI commands on each Linux/Windows runner plus both full Linux source-race suites |
-| Latest promotion, stable registry and fresh unversioned installation | Pending |
+| Exact-candidate hosted proof | Passed: [run 35949654046](https://github.com/m7md7sien/azure-dev/actions/runs/35949654046), 160 actual CLI commands per Linux/Windows OS and both full Linux source-race suites; both downloaded CLI artifact sets verified |
+| Latest promotion, stable registry and fresh unversioned installation | Passed: approved metadata-only promotion; stable registry/all 15 anonymous assets and fresh unversioned Latest-source Windows install match accepted versions, source and executable bytes |
 
 Local Windows amd64 executable SHA256s:
 
@@ -194,13 +196,43 @@ Local Windows amd64 executable SHA256s:
 | Evaluations | `f55c588d6aa333c57454569c70b42a69b96983a730c6d6c39cd2527e9f1224a5` |
 | Dataset | `b6cd32c24595ffa8fd17b8fd8ad11b69597d1836d4c1fb141167013c9055cd5f` |
 
-The intended hosted gate retains the existing 160-command-per-OS matrix:
-68 earlier checks, 50 seed refusals and six valid controls, and 36 dataset-binding
-checks. Its precise cold-read allowance permits only a new zero-byte
-`.azure/.env.lock` on the first relevant core read, not ignored directories or
-other authored/private writes. New build 42 pins and downloaded evidence are
-required; [build 41 proof](./Build-41-Verification.md#final-hosted-proof) does
-not satisfy this candidate's gate.
+## Final hosted proof
+
+[Run 35949654046](https://github.com/m7md7sien/azure-dev/actions/runs/35949654046)
+passed all four jobs at
+[`421a464525f280bb63dc0c69a9c52f7a852b5cd3`](https://github.com/m7md7sien/azure-dev/commit/421a464525f280bb63dc0c69a9c52f7a852b5cd3).
+The [frozen manifest](https://github.com/m7md7sien/azure-dev/blob/421a464525f280bb63dc0c69a9c52f7a852b5cd3/eng/scripts/eval-candidate-proof/candidate.json)
+pins this release, both source fields to `d40a3b5a...`, the exact registry and
+four Linux/Windows amd64 archives, both extension versions and azd 1.33.0.
+The workflow and harness are byte-identical to the frozen build 41 versions;
+only candidate pins changed.
+
+Both downloaded CLI artifact sets contain **160 unique actual commands and
+expected outcomes per OS**, with the same ordered names as the prior matrix:
+68 earlier checks, 50 seed refusals, six valid controls and 36 dataset-binding
+checks. Installed-byte assertions and runtime JSON checks ran against the
+published build 42 packages, not substituted build 41 packages.
+
+The 50 seed refusals include four cold reads that created exactly a new
+zero-byte `.azure/.env.lock`; the other 46 were entirely unchanged. The
+36 binding cases include 12 similarly strict cold-lock refusals and 24
+add-only preservation passes. Their four layouts and three modes retain
+same-file reuse, distinct-file addition, pins, unknown metadata, existing
+references/evaluations and the chosen config without unintended sidecars.
+This precise allowance does not ignore directories or permit other
+authored/private writes.
+
+Both Linux source-race logs confirmed Go 1.26.4 and the exact candidate source,
+with the unchanged full command
+`go test -race -count=1 -timeout 15m ./internal/...`.
+The evaluations and dataset jobs passed in approximately 2m33s and 1m58s,
+respectively. These are separate hosted receipts from the earlier focused and
+full source runs.
+
+Hosted interactive correction, cloud evaluation, failed-cloud-run verification
+and quality gates were **not run**. The separate local ConPTY/practical cases
+above retain their own scopes. [Build 41 proof](./Build-41-Verification.md#final-hosted-proof)
+remains historical and unchanged.
 
 ## Deferred work and evidence boundaries
 
