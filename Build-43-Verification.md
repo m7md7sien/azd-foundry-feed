@@ -157,6 +157,14 @@ identity, checksum and preservation checks followed.
 
 ## Deferred work and known limitations
 
+**Known limitation:** diagnostic URL redaction coverage is not complete;
+follow-up work is tracked in
+[Azure/azure-dev#10147](https://github.com/Azure/azure-dev/pull/10147).
+Use synthetic data for this bug-bash preview, and do not upload or share
+diagnostic logs containing credentials, tokens, or credential-bearing URLs.
+The numeric-precision fix does not claim to resolve these diagnostic-redaction
+limitations.
+
 The editable-rubric download/update, local deleted-evaluation cleanup and
 empty-version first-publication fixes are **excluded from this release**.
 Complete package lifecycle acceptance was not established for that group;
