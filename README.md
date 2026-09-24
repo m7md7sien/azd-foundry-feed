@@ -14,8 +14,22 @@ for a later build. Each release identifies its bundled changes; a PR bundled int
 this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
+[43](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-43),
+a **non-Latest prerelease**: evaluations `1.0.43-beta` and dataset
+`1.0.0-beta.31`, both built from
+[`067b2fd5622494db2dc6ac3a2e9bc19e871ed9e7`](https://github.com/m7md7sien/azure-dev/commit/067b2fd5622494db2dc6ac3a2e9bc19e871ed9e7).
+Its required-only update preserves numeric precision in typed evaluation
+output and corrects init path, output-format and empty-evaluator validation.
+All 15 anonymous asset downloads and a fresh pinned Windows installation
+matched the accepted bytes. The [build 43 record](./Build-43-Verification.md)
+separates its fresh native Windows and mocked Linux acceptance from the
+still-pending published-package hosted proof and Latest decision.
+Rubric editing, local deletion cleanup and empty-version first-publication
+fixes are **deferred, not shipped**; there is no new dataset functional fix.
+
+**Build 42 remains Latest and the default feed selection.**
 [42](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-42),
-now **Latest**: evaluations `1.0.42-beta` and dataset
+evaluations `1.0.42-beta` and dataset
 `1.0.0-beta.30`, both built from
 [`d40a3b5a1e7c5944b1b43decd14c96096a99e5b6`](https://github.com/m7md7sien/azure-dev/commit/d40a3b5a1e7c5944b1b43decd14c96096a99e5b6).
 It preserves the published build 41 baseline, including earlier work from
@@ -71,7 +85,11 @@ backend-open; deprecated agent-hint work remains deferred.
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
-For the current candidate's evidence and limitations, use
+For the new non-Latest candidate, use
+**[Build 43 verification and pinned installation](./Build-43-Verification.md)**.
+The quick start below still follows Latest, which remains build 42.
+
+For the default build's evidence and limitations, use
 **[Build 42 verification](./Build-42-Verification.md)**. Its local/offline scope
 does not relabel older live tests as build 42 execution. New live qualification
 for excluded changes is deferred, not passed.

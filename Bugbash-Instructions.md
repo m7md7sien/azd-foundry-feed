@@ -21,6 +21,16 @@ has passed. Baseline simulation and rubric evidence does not verify a newer
 candidate. Service deployment, GA simulation contract/deployment alignment, and
 privacy signoff remain separate gates.
 
+**Build 43 is published as a non-Latest prerelease.** Its required-only
+numeric precision, init path, output-format and empty-evaluator fixes have
+[separate pinned installation and scoped evidence](./Build-43-Verification.md).
+All 15 anonymous downloads and a fresh pinned Windows installation matched
+the accepted packages. Published-package hosted proof and a separate Latest
+decision remain pending. Rubric editing, local deletion cleanup and
+empty-version first-publication fixes are not included; the conditional
+first-publication limitation remains. Do not treat source fixtures or local
+mocked service checks as live Azure or full-authentication proof.
+
 **Build 42 is now Latest**, with
 [explicit pinned installation and scoped evidence](./Build-42-Verification.md#install-this-build).
 It adds focused picker-cancellation and SDK-initialization fixes while
