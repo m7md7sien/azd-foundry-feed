@@ -1,11 +1,12 @@
 # Build 43: required-only source and acceptance
 
-**Published as a non-Latest prerelease on 2026-09-24.**
+**Published and promoted to Latest on 2026-09-24.**
 Exact-source gates, packaging and required local package acceptance passed.
-All 15 anonymous asset downloads and a fresh pinned Windows installation
-matched the accepted packages. **Build 42 remains Latest and the default.**
-The new published-package hosted gate and a separate Latest decision remain
-pending. This is an unofficial beta bug-bash build, not GA.
+The stable Latest registry, all 15 anonymous asset downloads, and fresh pinned
+and unversioned Latest-source Windows installations matched the accepted
+packages. Final published-package hosted proof and separate approval preceded
+the metadata-only promotion. Changing GitHub's prerelease flag for Latest
+routing does not change the beta versions or make this unofficial build GA.
 
 | Item | Published value |
 | --- | --- |
@@ -18,12 +19,12 @@ pending. This is an unofficial beta bug-bash build, not GA.
 | Integration branch | `m7md7sien-build-42-integration` |
 | Published baseline | Build 42, [`d40a3b5a1e7c5944b1b43decd14c96096a99e5b6`](https://github.com/m7md7sien/azure-dev/commit/d40a3b5a1e7c5944b1b43decd14c96096a99e5b6) |
 | Registry SHA256 | `4027cd85bf2a5853db90b4bed12c225eb125197e758e3015a88f9e9aca7a3215` |
-| Publication | Non-Latest prerelease at `2026-09-24T07:14:49Z` |
+| Publication / Latest | Non-Latest prerelease at `2026-09-24T07:14:49Z`; promoted at `2026-09-24T07:31:22Z` |
 
 ## Install this build
 
 Use a new, empty `AZD_CONFIG_DIR` and azd 1.33.0 or later. These pins select
-build 43 even while the rolling Latest source remains build 42:
+build 43 independently of future changes to the rolling Latest source:
 
 ```bash
 azd extension source add -n foundry-candidate-43 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-43/registry.json
@@ -35,8 +36,8 @@ azd ai dataset version -o json
 
 Adding a source does not replace installed binaries. Check source provenance
 and archive hashes, not version text alone, and do not reuse an older cached
-installation. The main [bug-bash guide](./Bugbash-Instructions.md) continues
-to pin build 42 until promotion is separately approved and verified.
+installation. The main [bug-bash guide](./Bugbash-Instructions.md) now pins
+this exact build; the rolling Latest source was independently checked too.
 
 [SHA256SUMS](https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-43/SHA256SUMS)
 contains the other 14 assets. The immutable
@@ -140,8 +141,8 @@ were run for this candidate.
 | Non-Latest publication | Passed: 15 individual checked uploads, literal `registry.json` last, matching server digests |
 | Anonymous public assets | Passed all 15 asset hashes, registry and checksum manifest |
 | Fresh public pinned Windows installation | Passed on azd 1.33.0: both JSON versions, embedded source and installed executable bytes |
-| New public hosted proof | Pending: exact build 43 pins, 160 actual CLI commands per OS and both full Linux race suites, with downloaded artifacts |
-| Latest promotion | Not approved or performed; build 42 remains the default |
+| New public hosted proof | Passed: [run 35969288265](https://github.com/m7md7sien/azure-dev/actions/runs/35969288265), exact build 43 pins, 160 actual CLI commands per OS and both full Linux race suites; downloaded artifact sets verified |
+| Latest promotion | Passed: separately approved metadata-only promotion; stable registry/all 15 anonymous assets and fresh unversioned Latest-source Windows installation match accepted bytes |
 
 Both extensions were built with the existing
 `azd x build --all --skip-install --no-prompt` and `azd x pack --bundle`
@@ -154,6 +155,33 @@ identity, checksum and preservation checks followed.
 | --- | --- |
 | Evaluations | `9d3e8140c34550c7c52f7b2aedf73ea24e88bd23248db3e8ac7a40b230835d9a` |
 | Dataset | `ec402e5c3c4c2d132828584849160e8a2ef0c81f188f3ab0d2c532644c53d178` |
+
+## Final hosted proof
+
+[Run 35969288265](https://github.com/m7md7sien/azure-dev/actions/runs/35969288265)
+passed all four jobs at
+[`e8d07ded9163562976a14b9eb9b61952829bd36e`](https://github.com/m7md7sien/azure-dev/commit/e8d07ded9163562976a14b9eb9b61952829bd36e).
+The [frozen manifest](https://github.com/m7md7sien/azure-dev/blob/e8d07ded9163562976a14b9eb9b61952829bd36e/eng/scripts/eval-candidate-proof/candidate.json)
+pins both source fields to `067b2fd5`, this registry, all four Linux/Windows
+amd64 archives, azd 1.33.0 and the exact extension versions. The workflow,
+harness and canonical command identities matched the frozen dispatch.
+
+Both downloaded CLI artifact sets contain **160 unique ordered actual
+commands and expected outcomes per OS**, with installed package/runtime
+identity and cleanup checks. The 50 strict seed refusals include four cold
+reads creating exactly a new zero-byte core `.azure/.env.lock` and 46 fully
+unchanged cases. The 36 binding cases include 12 similarly strict cold
+refusals and 24 add-only preservation passes. No other paths were ignored.
+
+Both Linux logs confirmed Go 1.26.4, exact source `067b2fd5` and the full,
+unreduced command `go test -race -count=1 -timeout 15m ./internal/...`.
+Evaluations passed in approximately 2m29s and dataset in 2m6s. These are
+separate from the earlier local source races.
+
+No prior candidate acceptance was transferred. Hosted interactive/PTY,
+live Azure, full core authentication and excluded rubric/deletion lifecycle
+acceptance are not claimed. Separate automatic scenario/configuration runs
+do not replace this critical release gate.
 
 ## Deferred work and known limitations
 

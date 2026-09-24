@@ -21,17 +21,23 @@ has passed. Baseline simulation and rubric evidence does not verify a newer
 candidate. Service deployment, GA simulation contract/deployment alignment, and
 privacy signoff remain separate gates.
 
-**Build 43 is published as a non-Latest prerelease.** Its required-only
+**Build 43 is now Latest.** Its required-only
 numeric precision, init path, output-format and empty-evaluator fixes have
 [separate pinned installation and scoped evidence](./Build-43-Verification.md).
-All 15 anonymous downloads and a fresh pinned Windows installation matched
-the accepted packages. Published-package hosted proof and a separate Latest
-decision remain pending. Rubric editing, local deletion cleanup and
+The stable registry, all 15 anonymous downloads, and fresh pinned and
+unversioned Latest-source Windows installations matched the accepted packages.
+The exact published-package hosted gate and separate Latest approval passed.
+Rubric editing, local deletion cleanup and
 empty-version first-publication fixes are not included; the conditional
 first-publication limitation remains. Do not treat source fixtures or local
 mocked service checks as live Azure or full-authentication proof.
+Use synthetic data and follow the
+[diagnostic-log warning](./Build-43-Verification.md#deferred-work-and-known-limitations):
+diagnostic URL redaction remains incomplete, and the numeric fix does not
+resolve it. Do not share logs containing credentials, tokens or
+credential-bearing URLs. Latest routing does not make these beta packages GA.
 
-**Build 42 is now Latest**, with
+**Build 42 remains available as a historical pinned release**, with
 [explicit pinned installation and scoped evidence](./Build-42-Verification.md#install-this-build).
 It adds focused picker-cancellation and SDK-initialization fixes while
 preserving build 41. It does not include the broader new simulation-contract,
@@ -40,10 +46,10 @@ Its new acceptance is local/offline, not permission for generation or paid-cloud
 testing. Final hosted proof, stable registry and fresh Latest-source installation
 have passed; this is still an unofficial beta bug-bash build, not GA.
 
-These instructions target **build 42**, evaluations `1.0.42-beta` and dataset
-`1.0.0-beta.30`. The source below pins that release for reproducible results.
+These instructions target **build 43**, evaluations `1.0.43-beta` and dataset
+`1.0.0-beta.31`. The source below pins that release for reproducible results.
 Both pinned and rolling Latest installation paths were verified.
-[Final hosted CI](./Build-42-Verification.md#final-hosted-proof)
+[Final hosted CI](./Build-43-Verification.md#final-hosted-proof)
 passed 160 actual CLI checks per Linux/Windows OS and both full source-race
 suites; these are offline checks, not hosted live-cloud evaluation.
 
@@ -53,7 +59,7 @@ with two passing evaluator results, and a zero-run manual catalog-pin control
 from `1` to `2` to unset. Legacy migration/rename/history evidence remains
 scoped source fixtures, not live coverage of all paths. All ten owned service
 identities were absent after cleanup. Broader existing build 40 checks below
-remain historical, not build 41 or build 42 reruns.
+remain historical, not build 41, build 42 or build 43 reruns.
 
 **Known build 40 runtime defect:** the observed `source.responses` evaluation
 failed with zero output rows and a `response_id` mapping error. Do not treat
@@ -131,15 +137,15 @@ the project is shared and evals persist, so prefix your datasets, evaluators
 and evals to avoid collisions with other testers.
 
 **Returning testers:** use a fresh azd configuration or explicitly reinstall
-the two extensions from `foundry-candidate-42` below. Adding a source does not
+the two extensions from `foundry-candidate-43` below. Adding a source does not
 replace installed binaries. If this source name already exists, check that its
 URL matches rather than silently using an older registry.
 
 ```bash
 # 1. install the extensions
-azd extension source add -n foundry-candidate-42 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-42/registry.json
-azd extension install azure.ai.evaluations --source foundry-candidate-42 --version 1.0.42-beta
-azd extension install azure.ai.dataset --source foundry-candidate-42 --version 1.0.0-beta.30
+azd extension source add -n foundry-candidate-43 -t url -l https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-43/registry.json
+azd extension install azure.ai.evaluations --source foundry-candidate-43 --version 1.0.43-beta
+azd extension install azure.ai.dataset --source foundry-candidate-43 --version 1.0.0-beta.31
 
 # 2. make a project to work in
 mkdir azd-eval-bugbash
@@ -185,10 +191,10 @@ The endpoint is saved in this azd environment. `--project-endpoint` overrides it
 otherwise the environment value takes precedence over a machine-wide
 `azd ai project` selection and over variables exported in your shell.
 
-**Check what you installed:** both extensions should use `foundry-candidate-42`
+**Check what you installed:** both extensions should use `foundry-candidate-43`
 and match the versions in the [pinned registry][registry].
 
-[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-42/registry.json
+[registry]: https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-09-24-43/registry.json
 
 ```bash
 azd extension list --installed
@@ -204,8 +210,8 @@ source (skip an uninstall if that extension is absent):
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension install azure.ai.evaluations --source foundry-candidate-42 --version 1.0.42-beta
-azd extension install azure.ai.dataset --source foundry-candidate-42 --version 1.0.0-beta.30
+azd extension install azure.ai.evaluations --source foundry-candidate-43 --version 1.0.43-beta
+azd extension install azure.ai.dataset --source foundry-candidate-43 --version 1.0.0-beta.31
 ```
 
 ## Optional: owned-agent and own-trace setup
@@ -213,7 +219,7 @@ azd extension install azure.ai.dataset --source foundry-candidate-42 --version 1
 The bug-bash feed installs only evaluations and datasets. Seeing only `eval`
 and `dataset` under `azd ai --help` is expected. Agent management is a separate,
 independently versioned [official extension][agents-install]. Install it from
-`azd`, **not** `foundry-candidate-42`, in the same isolated configuration:
+`azd`, **not** `foundry-candidate-43`, in the same isolated configuration:
 
 ```bash
 azd extension install azure.ai.agents --source azd --version 1.0.0-beta.16
@@ -534,7 +540,7 @@ Read its next steps, then explicitly declare or initialize the eval you want.
 The `--conversation-mode static|simulation` flags and explicit simulator limits
 introduced in build 38 remain supported. Its
 [authoring examples](./Build-38-Verification.md#candidate-authoring) show those
-unchanged command forms; install build 42 using this guide's pinned source.
+unchanged command forms; install build 43 using this guide's pinned source.
 Full YAML remains useful beyond the scaffold.
 
 Author the full configuration when the scaffold does not expose the desired
@@ -720,8 +726,8 @@ or coverage of every operational-failure and errored-row case.
 
 Use the version-specific build 40 and build 41 checklists for measured live
 evidence; the remaining authoring examples are not thereby verified.
-The build 42 checklist covers its new local/offline scope, not new live
-qualification.
+The build 42 and build 43 checklists cover their respective local/offline
+scopes, not new live qualification.
 A missing deployment, unavailable evaluator, or service
 rejection is a recorded blocker, not a successful test. The current simulation
 run uses `azure_ai_user_conversation_simulation_preview`. The
@@ -782,5 +788,5 @@ To remove the extensions and the feed:
 ```bash
 azd extension uninstall azure.ai.evaluations
 azd extension uninstall azure.ai.dataset
-azd extension source remove foundry-candidate-42
+azd extension source remove foundry-candidate-43
 ```

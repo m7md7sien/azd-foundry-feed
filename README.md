@@ -15,19 +15,25 @@ this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
 [43](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-43),
-a **non-Latest prerelease**: evaluations `1.0.43-beta` and dataset
+now **Latest**: evaluations `1.0.43-beta` and dataset
 `1.0.0-beta.31`, both built from
 [`067b2fd5622494db2dc6ac3a2e9bc19e871ed9e7`](https://github.com/m7md7sien/azure-dev/commit/067b2fd5622494db2dc6ac3a2e9bc19e871ed9e7).
 Its required-only update preserves numeric precision in typed evaluation
 output and corrects init path, output-format and empty-evaluator validation.
-All 15 anonymous asset downloads and a fresh pinned Windows installation
-matched the accepted bytes. The [build 43 record](./Build-43-Verification.md)
-separates its fresh native Windows and mocked Linux acceptance from the
-still-pending published-package hosted proof and Latest decision.
+The stable Latest registry, all 15 anonymous asset downloads, and fresh pinned
+and unversioned Latest-source Windows installations matched the accepted bytes.
+[Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35969288265)
+passed 160 actual CLI commands per OS and both full Linux race suites; both
+downloaded artifact sets were verified. The
+[build 43 record](./Build-43-Verification.md) keeps native Windows, mocked
+Linux and hosted evidence separate. This remains an unofficial beta, not GA.
 Rubric editing, local deletion cleanup and empty-version first-publication
 fixes are **deferred, not shipped**; there is no new dataset functional fix.
+Use synthetic data and follow the
+[diagnostic-log warning](./Build-43-Verification.md#deferred-work-and-known-limitations);
+the numeric fix does not resolve the diagnostic-redaction limitations.
 
-**Build 42 remains Latest and the default feed selection.**
+**Build 42 remains available as a historical pinned release.**
 [42](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-42),
 evaluations `1.0.42-beta` and dataset
 `1.0.0-beta.30`, both built from
@@ -42,15 +48,15 @@ The broader new simulation-contract/model/seed cluster is deferred, not
 implicitly included from the latest review branch. There is no new dataset
 functional fix.
 
-Use the [pinned build 42 instructions](./Build-42-Verification.md#install-this-build)
-for reproducible installation. The stable Latest registry, all 15 anonymous
+The [pinned build 42 instructions](./Build-42-Verification.md#install-this-build)
+remain available. At its promotion, the stable registry, all 15 anonymous
 downloads, and fresh pinned and unversioned Latest-source Windows installations
 matched the accepted bytes. Its local edge gate passed eight
 cases; practical acceptance passed six cases and 25 assertions, with the
 recorded harness correction qualified separately.
 
-**Build 42 is the default feed selection.**
-[Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35949654046)
+Build 42's
+[historical hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35949654046)
 passed 160 unique actual CLI commands on each of Linux and Windows plus both
 full source-race suites; both downloaded artifact sets were verified.
 The [acceptance record](./Build-42-Verification.md#final-hosted-proof) preserves
@@ -85,12 +91,12 @@ backend-open; deprecated agent-hint work remains deferred.
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
-For the new non-Latest candidate, use
-**[Build 43 verification and pinned installation](./Build-43-Verification.md)**.
-The quick start below still follows Latest, which remains build 42.
-
 For the default build's evidence and limitations, use
-**[Build 42 verification](./Build-42-Verification.md)**. Its local/offline scope
+**[Build 43 verification and pinned installation](./Build-43-Verification.md)**.
+The quick start below follows Latest, now build 43.
+
+**[Build 42 verification](./Build-42-Verification.md)** retains that historical
+release's evidence. Its local/offline scope
 does not relabel older live tests as build 42 execution. New live qualification
 for excluded changes is deferred, not passed.
 
