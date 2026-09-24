@@ -15,11 +15,19 @@ exact command with sanitized output. Never post tokens, private prompts,
 customer data, or full raw live-service responses.
 
 **Release status:** the published versions and bundled PRs are listed in the
-[README](./README.md). Bundled means included in a feed build, not merged
-upstream. These scenarios are test instructions, not a claim that every scenario
+[README](./README.md). Bundled describes feed contents; it does not establish
+upstream merge status. These scenarios are test instructions, not a claim that every scenario
 has passed. Baseline simulation and rubric evidence does not verify a newer
 candidate. Service deployment, GA simulation contract/deployment alignment, and
 privacy signoff remain separate gates.
+
+**A separate build 42 non-Latest prerelease is available** with
+[explicit pinned installation and scoped evidence](./Build-42-Verification.md#install-this-build).
+It adds focused picker-cancellation and SDK-initialization fixes while
+preserving build 41. It does not include the broader new simulation-contract,
+qualified-model or nested-seed changes, and it adds no dataset functional fix.
+Its new acceptance is local/offline, not permission for generation or paid-cloud
+testing. Final hosted proof and Latest promotion are pending.
 
 These instructions target **build 41**, evaluations `1.0.41-beta` and dataset
 `1.0.0-beta.29`. The source below pins that release for reproducible results.

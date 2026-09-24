@@ -14,17 +14,28 @@ for a later build. Each release identifies its bundled changes; a PR bundled int
 this feed is **not necessarily merged upstream**.
 
 The newest published candidate is
-[41](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-23-41):
-evaluations `1.0.41-beta` and dataset `1.0.0-beta.29`, both built from
-[`8ef8b6df77336950c60506ab2966037f579d92cd`](https://github.com/m7md7sien/azure-dev/commit/8ef8b6df77336950c60506ab2966037f579d92cd).
-It bundles
+[42](https://github.com/m7md7sien/azd-foundry-feed/releases/tag/extensions-2026-09-24-42),
+a **non-Latest prerelease**: evaluations `1.0.42-beta` and dataset
+`1.0.0-beta.30`, both built from
+[`d40a3b5a1e7c5944b1b43decd14c96096a99e5b6`](https://github.com/m7md7sien/azure-dev/commit/d40a3b5a1e7c5944b1b43decd14c96096a99e5b6).
+It preserves the published build 41 baseline, including earlier work from
 [Azure/azure-dev#10116](https://github.com/Azure/azure-dev/pull/10116),
 [Azure/azure-dev#10113](https://github.com/Azure/azure-dev/pull/10113), and
-[Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102)
-plus the follow-up fixes described in the
-[build 41 acceptance record](./Build-41-Verification.md).
+[Azure/azure-dev#10102](https://github.com/Azure/azure-dev/pull/10102), and adds
+only the focused picker-cancellation and isolated SDK-initialization changes
+described in the [build 42 record](./Build-42-Verification.md).
+The broader new simulation-contract/model/seed cluster is deferred, not
+implicitly included from the latest review branch. There is no new dataset
+functional fix.
 
-**Build 41 is now Latest.** Use the
+Use the [pinned build 42 instructions](./Build-42-Verification.md#install-this-build)
+to install that prerelease. All 15 anonymous downloads and a fresh pinned public
+Windows install matched the accepted bytes. Its local edge gate passed eight
+cases; practical acceptance passed six cases and 25 assertions, with the
+recorded harness correction qualified separately. Final exact-candidate hosted
+proof and Latest promotion remain pending.
+
+**Build 41 remains Latest and the default feed.** Use the
 [pinned build 41 instructions](./Build-41-Verification.md#install-this-build)
 for reproducible installation. [Final hosted CI](https://github.com/m7md7sien/azure-dev/actions/runs/35851410814)
 passed 160 actual CLI checks on each of Linux and Windows plus both full
@@ -61,9 +72,14 @@ backend-open; deprecated agent-hint work remains deferred.
 Start here: **[Bugbash Instructions](./Bugbash-Instructions.md)** for setup,
 hero scenarios, full YAML authoring, and where to file findings.
 
-For current candidate evidence and known limitations, use
-**[Build 41 verification](./Build-41-Verification.md)**. Its targeted corrective
-acceptance does not relabel broader build 40 journeys as build 41 results.
+For the newest prerelease's evidence and limitations, use
+**[Build 42 verification](./Build-42-Verification.md)**. Its local/offline scope
+does not relabel older live tests as build 42 execution. New live qualification
+for excluded changes is deferred, not passed.
+
+**[Build 41 verification](./Build-41-Verification.md)** records the current
+Latest package. Its targeted corrective acceptance does not relabel broader
+build 40 journeys as build 41 results.
 
 **[Build 40 verification](./Build-40-Verification.md)** retains its
 [124-check-per-OS and full-race CI](https://github.com/m7md7sien/azure-dev/actions/runs/35826828347).
