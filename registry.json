@@ -7,6 +7,85 @@
       "description": "Define and run Foundry evaluations from your terminal. (Beta)",
       "versions": [
         {
+          "version": "1.0.51-beta",
+          "requiredAzdVersion": ">=1.33.0",
+          "capabilities": [
+            "custom-commands",
+            "service-target-provider",
+            "metadata"
+          ],
+          "providers": [
+            {
+              "name": "azure.ai.eval",
+              "type": "service-target",
+              "description": "Deploys evaluation datasets, evaluators, and eval groups to Foundry"
+            }
+          ],
+          "usage": "azd ai eval <command> [options]",
+          "examples": [
+            {
+              "name": "init",
+              "description": "Scaffold evaluation config for an agent or completed conversations.",
+              "usage": "azd ai eval init"
+            },
+            {
+              "name": "run",
+              "description": "Start, list, and read the results of evaluation runs.",
+              "usage": "azd ai eval run <command>"
+            }
+          ],
+          "artifacts": {
+            "windows/amd64": {
+              "checksum": {
+                "algorithm": "sha256",
+                "value": "b46bd9529fae4a2b05d3ec5a289d97f2fc11bd48e0c8bb0d8eb83b8bd671be7f"
+              },
+              "entryPoint": "azure-ai-evaluations-windows-amd64.exe",
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-10-06-51/azure-ai-evaluations-windows-amd64-b46bd9529fae4a2b05d3ec5a289d97f2fc11bd48e0c8bb0d8eb83b8bd671be7f.zip"
+            },
+            "windows/arm64": {
+              "checksum": {
+                "algorithm": "sha256",
+                "value": "c246c9ac990c759ea5f2efd64995f081bcf58b0ee81c0b88cf28fd0e25d76feb"
+              },
+              "entryPoint": "azure-ai-evaluations-windows-arm64.exe",
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-10-06-51/azure-ai-evaluations-windows-arm64-c246c9ac990c759ea5f2efd64995f081bcf58b0ee81c0b88cf28fd0e25d76feb.zip"
+            },
+            "darwin/amd64": {
+              "checksum": {
+                "algorithm": "sha256",
+                "value": "7ee9e2b180562c8b31d237475b2c70cbb908725cbf02e4fcb4933c2752b3cfbd"
+              },
+              "entryPoint": "azure-ai-evaluations-darwin-amd64",
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-10-06-51/azure-ai-evaluations-darwin-amd64-7ee9e2b180562c8b31d237475b2c70cbb908725cbf02e4fcb4933c2752b3cfbd.zip"
+            },
+            "darwin/arm64": {
+              "checksum": {
+                "algorithm": "sha256",
+                "value": "738b2d8c8fc5e5320a6fbf2fb6b8ab62e0fb5b85f93048d1bb4ff486301831b6"
+              },
+              "entryPoint": "azure-ai-evaluations-darwin-arm64",
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-10-06-51/azure-ai-evaluations-darwin-arm64-738b2d8c8fc5e5320a6fbf2fb6b8ab62e0fb5b85f93048d1bb4ff486301831b6.zip"
+            },
+            "linux/amd64": {
+              "checksum": {
+                "algorithm": "sha256",
+                "value": "5e06513664cdff82215787f8a657bf21a0a05cb7e695e6588479069c7e8d3522"
+              },
+              "entryPoint": "azure-ai-evaluations-linux-amd64",
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-10-06-51/azure-ai-evaluations-linux-amd64-5e06513664cdff82215787f8a657bf21a0a05cb7e695e6588479069c7e8d3522.tar.gz"
+            },
+            "linux/arm64": {
+              "checksum": {
+                "algorithm": "sha256",
+                "value": "6c6a30f23516803a7e9a51725ef26633dac35c1ee82d01040637c73ca3fade27"
+              },
+              "entryPoint": "azure-ai-evaluations-linux-arm64",
+              "url": "https://github.com/m7md7sien/azd-foundry-feed/releases/download/extensions-2026-10-06-51/azure-ai-evaluations-linux-arm64-6c6a30f23516803a7e9a51725ef26633dac35c1ee82d01040637c73ca3fade27.tar.gz"
+            }
+          }
+        },
+        {
           "version": "1.0.50-beta",
           "requiredAzdVersion": ">=1.33.0",
           "capabilities": [
